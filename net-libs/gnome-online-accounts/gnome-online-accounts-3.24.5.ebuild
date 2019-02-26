@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -12,7 +12,7 @@ HOMEPAGE="https://wiki.gnome.org/Projects/GnomeOnlineAccounts"
 
 LICENSE="LGPL-2+"
 SLOT="0/1"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 ~sparc ~x86"
+KEYWORDS="~alpha amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 ~sparc x86"
 
 IUSE="debug gnome +introspection kerberos vala" # telepathy"
 REQUIRED_USE="vala? ( introspection )"
@@ -59,6 +59,11 @@ DEPEND="${RDEPEND}
 
 # Due to sub-configure
 QA_CONFIGURE_OPTIONS=".*"
+
+PATCHES=(
+	"${FILESDIR}"/${PV}-glib-2.58-compat.patch
+	"${FILESDIR}"/glib-2.58-compat2.patch
+)
 
 src_prepare() {
 	use vala && vala_src_prepare

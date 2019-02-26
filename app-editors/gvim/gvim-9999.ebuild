@@ -1,13 +1,13 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
-VIM_VERSION="8.0"
-PYTHON_COMPAT=( python{2_7,3_4,3_5,3_6} )
-PYTHON_REQ_USE="threads"
-USE_RUBY="ruby22 ruby23 ruby24 ruby25"
+VIM_VERSION="8.1"
+PYTHON_COMPAT=( python{2_7,3_4,3_5,3_6,3_7} )
+PYTHON_REQ_USE="threads(+)"
+USE_RUBY="ruby23 ruby24 ruby25"
 
-inherit vim-doc flag-o-matic xdg-utils gnome2-utils versionator bash-completion-r1 prefix python-single-r1 ruby-single
+inherit vim-doc flag-o-matic xdg-utils gnome2-utils bash-completion-r1 prefix python-single-r1 ruby-single
 
 if [[ ${PV} == 9999* ]]; then
 	inherit git-r3
@@ -280,14 +280,14 @@ src_compile() {
 }
 
 src_test() {
-	echo
+	einfo
 	einfo "Starting vim tests. Several error messages will be shown"
 	einfo "while the tests run. This is normal behaviour and does not"
 	einfo "indicate a fault."
-	echo
+	einfo
 	ewarn "If the tests fail, your terminal may be left in a strange"
 	ewarn "state. Usually, running 'reset' will fix this."
-	echo
+	einfo
 
 	# Don't let vim talk to X
 	unset DISPLAY
@@ -333,8 +333,6 @@ src_install() {
 	insinto /etc/vim
 	newins "${FILESDIR}"/gvimrc-r1 gvimrc
 	eprefixify "${ED}"/etc/vim/gvimrc
-
-	doicon -s scalable "${FILESDIR}"/gvim.svg
 
 	# bash completion script, bug #79018.
 	newbashcomp "${FILESDIR}"/${PN}-completion ${PN}

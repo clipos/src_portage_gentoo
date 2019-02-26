@@ -23,6 +23,7 @@ src_prepare() {
 	epatch "${FILESDIR}"/${P}-links.patch
 	epatch "${FILESDIR}"/${P}-nodocs.patch
 	epatch "${FILESDIR}"/${P}-txt-file.patch
+	epatch "${FILESDIR}"/${P}-check-boot.patch
 
 	eapply_user
 }
@@ -33,12 +34,18 @@ src_configure() {
 	append-flags -fno-strict-aliasing
 	use debug && append-flags -DDEBUG
 
+	if tc-enables-pie; then
+		# gplc generates its own native ASM; disable PIE
+		append-ldflags -no-pie
+	fi
+
 	cd "${S}"/src
 	econf \
 		CFLAGS_MACHINE="${CFLAGS_MACHINE}" \
 		--with-c-flags="${CFLAGS}" \
 		--with-install-dir="${EPREFIX}"/usr/$(get_libdir)/${P} \
 		--with-links-dir="${EPREFIX}"/usr/bin \
+		$(use_enable !x86 regs) \
 		$(use_with doc doc-dir "${EPREFIX}"/usr/share/doc/${PF}) \
 		$(use_with doc html-dir "${EPREFIX}"/usr/share/doc/${PF}/html) \
 		$(use_with examples examples-dir "${EPREFIX}"/usr/share/doc/${PF}/examples)

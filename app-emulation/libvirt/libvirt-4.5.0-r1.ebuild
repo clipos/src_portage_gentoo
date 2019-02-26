@@ -3,13 +3,15 @@
 
 EAPI=6
 
-inherit autotools eutils user linux-info systemd readme.gentoo-r1 bash-completion-r1
+PYTHON_COMPAT=( python3_{4,5,6} )
+
+inherit autotools bash-completion-r1 eutils linux-info python-any-r1 readme.gentoo-r1 systemd user
 
 if [[ ${PV} = *9999* ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://libvirt.org/git/libvirt.git"
 	SRC_URI=""
-	KEYWORDS=""
+	KEYWORDS="amd64 x86"
 	SLOT="0"
 else
 	# Versions with 4 numbers are stable updates:
@@ -18,7 +20,7 @@ else
 	else
 		SRC_URI="https://libvirt.org/sources/${P}.tar.xz"
 	fi
-	KEYWORDS="~amd64 ~arm64 ~x86"
+	KEYWORDS="amd64 ~arm64 x86"
 	SLOT="0/${PV}"
 fi
 
@@ -115,6 +117,7 @@ RDEPEND="
 	zfs? ( sys-fs/zfs )"
 
 DEPEND="${RDEPEND}
+	${PYTHON_DEPS}
 	app-text/xhtml1
 	dev-lang/perl
 	dev-libs/libxslt

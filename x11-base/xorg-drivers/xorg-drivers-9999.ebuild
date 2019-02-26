@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -18,7 +18,6 @@ IUSE_INPUT_DEVICES="
 	input_devices_keyboard
 	input_devices_libinput
 	input_devices_mouse
-	input_devices_tslib
 	input_devices_vmmouse
 	input_devices_void
 	input_devices_synaptics
@@ -64,7 +63,6 @@ PDEPEND="
 	input_devices_keyboard?    ( x11-drivers/xf86-input-keyboard )
 	input_devices_libinput?    ( >=x11-drivers/xf86-input-libinput-0.27.1 )
 	input_devices_mouse?       ( >=x11-drivers/xf86-input-mouse-1.9.3 )
-	input_devices_tslib?       ( x11-drivers/xf86-input-tslib )
 	input_devices_vmmouse?     ( x11-drivers/xf86-input-vmmouse )
 	input_devices_void?        ( x11-drivers/xf86-input-void )
 	input_devices_synaptics?   ( x11-drivers/xf86-input-synaptics )
@@ -95,10 +93,7 @@ PDEPEND="
 	video_cards_vc4?           ( >=x11-base/xorg-server-${PV}[glamor] )
 	video_cards_vesa?          ( x11-drivers/xf86-video-vesa )
 	video_cards_via?           ( x11-drivers/xf86-video-openchrome )
-	video_cards_virtualbox?    ( || (
-					x11-drivers/xf86-video-vboxvideo
-					>=x11-drivers/xf86-video-virtualbox-5.1.14
-					) )
+	video_cards_virtualbox?    ( x11-drivers/xf86-video-vboxvideo )
 	video_cards_vmware?        ( >=x11-drivers/xf86-video-vmware-13.3.0 )
 	video_cards_voodoo?        ( x11-drivers/xf86-video-voodoo )
 

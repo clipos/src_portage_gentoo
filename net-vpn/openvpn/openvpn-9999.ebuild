@@ -33,8 +33,8 @@ CDEPEND="
 	pam? ( virtual/pam )
 	ssl? (
 		!mbedtls? (
-			!libressl? ( >=dev-libs/openssl-0.9.8:* )
-			libressl? ( dev-libs/libressl )
+			!libressl? ( >=dev-libs/openssl-0.9.8:0= )
+			libressl? ( dev-libs/libressl:0= )
 		)
 		mbedtls? ( net-libs/mbedtls )
 	)
@@ -119,11 +119,6 @@ pkg_postinst() {
 	# dns information and other such things.
 	enewgroup openvpn
 	enewuser openvpn "" "" "" openvpn
-
-	if path_exists -o "${EROOT%/}"/etc/openvpn/*/local.conf ; then
-		ewarn "WARNING: The openvpn init script has changed"
-		ewarn ""
-	fi
 
 	elog "The openvpn init script expects to find the configuration file"
 	elog "openvpn.conf in /etc/openvpn along with any extra files it may need."

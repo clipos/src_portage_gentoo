@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -13,7 +13,7 @@ SRC_URI="https://github.com/${PN}-shell/${PN}-shell/releases/download/${MY_PV}/$
 LICENSE="GPL-2"
 SLOT="0"
 [[ "${PV}" = *_* ]] || \
-KEYWORDS="amd64 ~arm ~arm64 ~ppc ~ppc64 x86 ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~x86-solaris"
+KEYWORDS="amd64 ~arm ~arm64 ppc ~ppc64 x86 ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~x86-solaris"
 IUSE="nls test"
 
 RDEPEND="
@@ -27,7 +27,8 @@ DEPEND="
 	test? ( dev-tcltk/expect )
 "
 
-PATCHES=( "${FILESDIR}/${P}-fix-printf-o-handling-on-ppc.patch" )
+PATCHES=( "${FILESDIR}/${P}-fix-printf-o-handling-on-ppc.patch"
+	"${FILESDIR}/fix-histfile-test-on-ppc.patch" )
 
 S="${WORKDIR}/${MY_P}"
 

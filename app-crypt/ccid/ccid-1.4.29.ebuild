@@ -1,7 +1,7 @@
 # Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 inherit toolchain-funcs udev
 
@@ -11,13 +11,13 @@ SRC_URI="https://ccid.apdu.fr/files/${P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86"
+KEYWORDS="~alpha amd64 arm ~hppa ~ia64 ppc ppc64 ~sparc x86"
 IUSE="twinserial kobil-midentity +usb"
 
 RDEPEND=">=sys-apps/pcsc-lite-1.8.3
 	usb? ( virtual/libusb:1 )"
-DEPEND="${RDEPEND}
-	kernel_linux? ( virtual/pkgconfig )"
+DEPEND="${RDEPEND}"
+BDEPEND="kernel_linux? ( virtual/pkgconfig )"
 
 DOCS=( README AUTHORS )
 

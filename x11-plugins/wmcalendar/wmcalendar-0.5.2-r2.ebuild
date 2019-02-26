@@ -10,15 +10,15 @@ SRC_URI="mirror://sourceforge/${PN}/${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~amd64 ~ppc ~sparc ~x86"
+KEYWORDS="~amd64 ppc ~sparc x86"
 
 RDEPEND="
 	dev-libs/libical
 	x11-libs/gtk+:2
 	x11-libs/libX11
 	x11-libs/libXext
-	x11-libs/libXpm
-"
+	x11-libs/libXpm"
+DEPEND="${RDEPEND}"
 BDEPEND="virtual/pkgconfig"
 
 DOCS=( ../{BUGS,CHANGES,HINTS,README,TODO} )

@@ -1,9 +1,9 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 
-PYTHON_COMPAT=( python3_4 python3_{5,6} )
+PYTHON_COMPAT=( python3_4 python3_{5,6,7} )
 
 inherit eutils flag-o-matic linux-info python-single-r1 systemd xdg-utils
 
@@ -22,7 +22,7 @@ fi
 
 LICENSE="GPL-2+"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64 ~ppc ~ppc64 ~x86"
+KEYWORDS="amd64 ~arm64 ppc ppc64 x86"
 IUSE="audio +devinput doc ftdi gtk inputlirc static-libs systemd +uinput usb X"
 
 REQUIRED_USE="
@@ -52,6 +52,7 @@ COMMON_DEPEND="
 DEPEND="
 	${COMMON_DEPEND}
 	dev-libs/libxslt
+	dev-python/setuptools[${PYTHON_USEDEP}]
 	doc? ( app-doc/doxygen )
 	sys-apps/kmod
 	sys-kernel/linux-headers
@@ -66,8 +67,12 @@ RDEPEND="
 	inputlirc? ( app-misc/inputlircd )
 "
 
+MAKEOPTS+=" -j1"
+
 pkg_setup() {
-	use uinput && CONFIG_CHECK="INPUT_UINPUT"
+	use uinput && CONFIG_CHECK="~INPUT_UINPUT"
+	python-single-r1_pkg_setup
+	linux-info_pkg_setup
 }
 
 src_configure() {

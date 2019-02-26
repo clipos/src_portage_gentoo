@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -11,14 +11,14 @@ SRC_URI="https://secure.nic.cz/files/datove_schranky/${PV}/${P}.tar.xz"
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="amd64 x86"
 IUSE=""
 
 # minimum Qt version required
 QT_PV="5.3.2:5"
 
 RDEPEND="
-	>=dev-libs/openssl-1.0.2
+	>=dev-libs/openssl-1.0.2:0=
 	>=dev-qt/qtcore-${QT_PV}
 	>=dev-qt/qtgui-${QT_PV}
 	>=dev-qt/qtnetwork-${QT_PV}

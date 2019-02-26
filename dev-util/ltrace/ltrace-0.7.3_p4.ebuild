@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=5
@@ -16,7 +16,7 @@ SRC_URI="
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~ia64 ~mips ~ppc ~ppc64 ~sparc ~x86"
+KEYWORDS="~alpha amd64 ~arm ~ia64 ~mips ppc ~ppc64 ~sparc x86"
 IUSE="debug selinux test unwind"
 
 RDEPEND="dev-libs/elfutils
@@ -33,6 +33,7 @@ src_prepare() {
 	epatch "${FILESDIR}"/${PN}-0.7.3-test-protos.patch #bug 421649
 	epatch "${FILESDIR}"/${PN}-0.7.3-alpha-protos.patch
 	epatch "${FILESDIR}"/${PN}-0.7.3-ia64.patch
+	epatch "${FILESDIR}"/${PN}-0.7.3-print-test-pie.patch
 	sed -i '/^dist_doc_DATA/d' Makefile.am || die
 	eautoreconf
 }

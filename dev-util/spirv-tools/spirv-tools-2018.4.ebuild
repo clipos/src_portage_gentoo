@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -24,13 +24,14 @@ S="${WORKDIR}/SPIRV-Tools-${PV}"
 multilib_src_configure() {
 	local mycmakeargs=(
 		"-DSPIRV-Headers_SOURCE_DIR=/usr/"
+		"-DSPIRV_WERROR=OFF"
 	)
 
 	cmake-utils_src_configure
 }
 
 multilib_src_install() {
-	default
+	cmake-utils_src_install
 	echo "${EGIT_COMMIT}" > "${PN}-commit.h" || die
 	insinto /usr/include/"${PN}"
 	doins  "${PN}-commit.h"

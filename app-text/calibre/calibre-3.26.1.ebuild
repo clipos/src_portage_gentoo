@@ -30,9 +30,8 @@ LICENSE="
 	CC-BY-3.0
 	OFL-1.1
 	PSF-2
-	unRAR
 "
-KEYWORDS="~amd64 ~arm ~x86"
+KEYWORDS="amd64 ~arm x86"
 SLOT="0"
 IUSE="ios +udisks"
 

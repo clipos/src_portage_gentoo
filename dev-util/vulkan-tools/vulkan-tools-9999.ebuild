@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -9,7 +9,7 @@ if [[ "${PV}" == "9999" ]]; then
 	EGIT_SUBMODULES=()
 	inherit git-r3
 else
-	EGIT_COMMIT="384fff68c802a10b5d7f4f352a4bb43b3efe5f23"
+	EGIT_COMMIT="9bbdd552f0fd62741aa1f1e02ab3eafc45cf3c1e"
 	KEYWORDS="~amd64"
 	SRC_URI="https://github.com/KhronosGroup/Vulkan-Tools/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
 	S="${WORKDIR}/Vulkan-Tools-${EGIT_COMMIT}"
@@ -24,8 +24,6 @@ LICENSE="Apache-2.0"
 SLOT="0"
 IUSE="+cube +vulkaninfo X wayland"
 
-# Old packaging will cause file collisions
-RDEPEND="!<=media-libs/vulkan-loader-1.1.70.0-r999"
 DEPEND="${PYTHON_DEPS}
 	cube? ( dev-util/glslang:=[${MULTILIB_USEDEP}] )
 	dev-util/vulkan-headers
@@ -40,12 +38,28 @@ DEPEND="${PYTHON_DEPS}
 REQUIRED_USE="|| ( X wayland )
 			  vulkaninfo? ( X )"
 
+pkg_setup() {
+	MULTILIB_CHOST_TOOLS=()
+
+	if use vulkaninfo; then
+		MULTILIB_CHOST_TOOLS+=( /usr/bin/vulkaninfo )
+	fi
+
+	if use cube; then
+		MULTILIB_CHOST_TOOLS+=(
+			/usr/bin/vkcube
+			/usr/bin/vkcubepp
+		)
+	fi
+
+	python-any-r1_pkg_setup
+}
+
 multilib_src_configure() {
 	local mycmakeargs=(
 		-DCMAKE_SKIP_RPATH=True
 		-DBUILD_CUBE=$(usex cube)
 		-DBUILD_VULKANINFO=$(usex vulkaninfo)
-		-DBUILD_WSI_MIR_SUPPORT=False
 		-DBUILD_WSI_WAYLAND_SUPPORT=$(usex wayland)
 		-DBUILD_WSI_XCB_SUPPORT=$(usex X)
 		-DBUILD_WSI_XLIB_SUPPORT=$(usex X)
@@ -61,7 +75,6 @@ multilib_src_configure() {
 	if use X; then
 		mycmakeargs+=(
 			-DCUBE_WSI_SELECTION="XCB"
-			-DVULKANINFO_WSI_SELECTION="XCB"
 		)
 	fi
 
@@ -75,15 +88,5 @@ multilib_src_configure() {
 }
 
 multilib_src_install() {
-	default
-
-	if use cube; then
-		mv "${ED%/}"/usr/bin/cube "${ED%/}"/usr/bin/vulkancube || die
-		mv "${ED%/}"/usr/bin/cubepp "${ED%/}"/usr/bin/vulkancubecpp || die
-	fi
-}
-
-pkg_postinst() {
-	einfo "The cube and cubepp demos have been renamed to"
-	einfo "vulkancube and vulkancubecpp to prevent collisions"
+	cmake-utils_src_install
 }

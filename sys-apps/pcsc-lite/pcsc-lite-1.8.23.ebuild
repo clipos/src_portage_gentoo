@@ -1,7 +1,7 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI="6"
+EAPI=7
 PYTHON_COMPAT=( python2_7 python3_{4,5,6} )
 
 inherit python-single-r1 systemd udev user multilib-minimal
@@ -15,7 +15,7 @@ SRC_URI="https://pcsclite.apdu.fr/files/${P}.tar.bz2"
 # upstream.
 LICENSE="BSD ISC MIT GPL-3+ GPL-2"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos"
+KEYWORDS="alpha amd64 arm ~arm64 ~hppa ia64 ~m68k ppc ppc64 s390 ~sh sparc x86 ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos"
 
 # This is called libusb so that it doesn't fool people in thinking that
 # it is _required_ for USB support. Otherwise they'll disable udev and
@@ -27,18 +27,16 @@ REQUIRED_USE="^^ ( udev libusb ) \
 
 # No dependencies need the MULTILIB_DEPS because the libraries are actually
 # standalone, the deps are only needed for the daemon itself.
-CDEPEND="libusb? ( virtual/libusb:1 )
+DEPEND="libusb? ( virtual/libusb:1 )
 	udev? ( virtual/udev )
 	policykit? ( >=sys-auth/polkit-0.111 )
 	python? ( ${PYTHON_DEPS} )"
-DEPEND="${CDEPEND}
-	virtual/pkgconfig"
-RDEPEND="${CDEPEND}
+RDEPEND="${DEPEND}
 	!<app-crypt/ccid-1.4.1-r1
 	!<sys-apps/baselayout-2
 	!<sys-apps/openrc-0.11.8
-	selinux? ( sec-policy/selinux-pcscd )
-"
+	selinux? ( sec-policy/selinux-pcscd )"
+BDEPEND="virtual/pkgconfig"
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-1.8.11-polkit-pcscd.patch

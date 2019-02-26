@@ -1,12 +1,11 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 
-PYTHON_COMPAT=( python{3_4,3_5,3_6} )
-CMAKE_MIN_VERSION=3.9.6
+PYTHON_COMPAT=( python{3_4,3_5,3_6,3_7} )
 
-inherit cmake-utils gnome2-utils python-any-r1
+inherit cmake-utils gnome2-utils python-single-r1
 
 if [[ ${PV} == *9999 ]]; then
 	inherit git-r3
@@ -22,7 +21,8 @@ HOMEPAGE="https://obsproject.com"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="+alsa fdk imagemagick jack luajit nvenc pulseaudio python speexdsp truetype v4l"
+IUSE="+alsa fdk imagemagick jack luajit nvenc pulseaudio python speex truetype v4l"
+REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
 
 COMMON_DEPEND="
 	>=dev-libs/jansson-2.5
@@ -46,10 +46,15 @@ COMMON_DEPEND="
 	imagemagick? ( media-gfx/imagemagick:= )
 	jack? ( virtual/jack )
 	luajit? ( dev-lang/luajit:2 )
-	nvenc? ( media-video/ffmpeg:=[nvenc(+),video_cards_nvidia(+)] )
+	nvenc? (
+		|| (
+			<media-video/ffmpeg-4[nvenc]
+			>=media-video/ffmpeg-4[video_cards_nvidia]
+		)
+	)
 	pulseaudio? ( media-sound/pulseaudio )
 	python? ( ${PYTHON_DEPS} )
-	speexdsp? ( media-libs/speexdsp )
+	speex? ( media-libs/speexdsp )
 	truetype? (
 		media-libs/fontconfig
 		media-libs/freetype
@@ -62,9 +67,11 @@ DEPEND="${COMMON_DEPEND}
 "
 RDEPEND="${COMMON_DEPEND}"
 
-PATCHES="${FILESDIR}/${PN}-21.1.2-use-less-automagic.patch"
-
 CMAKE_REMOVE_MODULES_LIST=( FindFreetype )
+
+pkg_setup() {
+	use python && python-single-r1_pkg_setup
+}
 
 src_configure() {
 	local libdir=$(get_libdir)
@@ -74,7 +81,7 @@ src_configure() {
 		-DDISABLE_JACK=$(usex !jack)
 		-DDISABLE_LIBFDK=$(usex !fdk)
 		-DDISABLE_PULSEAUDIO=$(usex !pulseaudio)
-		-DDISABLE_SPEEXDSP=$(usex !speexdsp)
+		-DDISABLE_SPEEXDSP=$(usex !speex)
 		-DDISABLE_V4L2=$(usex !v4l)
 		-DLIBOBS_PREFER_IMAGEMAGICK=$(usex imagemagick)
 		-DOBS_MULTIARCH_SUFFIX=${libdir#lib}

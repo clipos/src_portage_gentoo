@@ -11,7 +11,7 @@ HOMEPAGE="https://launchpad.net/swift"
 if [[ ${PV} == *9999 ]];then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/openstack/swift.git"
-	EGIT_BRANCH="stable/pike"
+	EGIT_BRANCH="stable/queens"
 else
 	SRC_URI="https://tarballs.openstack.org/${PN}/${P}.tar.gz"
 	KEYWORDS="~amd64 ~arm64 ~x86"

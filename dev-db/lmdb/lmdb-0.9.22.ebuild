@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -10,7 +10,7 @@ SRC_URI="https://github.com/LMDB/lmdb/archive/LMDB_${PV}.tar.gz"
 
 LICENSE="OPENLDAP"
 SLOT="0/${PV}"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~sh ~sparc ~x86 ~ppc-aix ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~x64-solaris ~x86-solaris"
+KEYWORDS="~alpha amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ppc ppc64 ~sh ~sparc x86 ~ppc-aix ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~x64-solaris ~x86-solaris"
 IUSE="static-libs"
 
 DEPEND=""
@@ -21,6 +21,11 @@ S="${WORKDIR}/${PN}-LMDB_${PV}/libraries/liblmdb"
 
 src_prepare() {
 	eapply_user
+	if [[ ${CHOST} == *-darwin* && ${CHOST#*-darwin} -lt 10 ]] ; then
+		# posix_memalign isn't available before 10.6, but on OSX
+		# malloc is always aligned for any addressable type
+		sed -i -e '/(__APPLE__)/a#define HAVE_MEMALIGN 1\n#define memalign(X,Y) malloc(X)' mdb.c || die
+	fi
 	multilib_copy_sources
 }
 
@@ -38,8 +43,6 @@ multilib_src_configure() {
 		"Makefile" || die
 
 	if [[ ${CHOST} == *-solaris* ]] ; then
-		# ensure sigwait has a second sig argument
-		append-cppflags -D_POSIX_PTHREAD_SEMANTICS
 		# fdatasync lives in -lrt on Solaris 10
 		[[ ${CHOST#*-solaris2.} -le 10 ]] && append-ldflags -lrt
 	fi

@@ -18,10 +18,9 @@ IUSE="test"
 DEPEND="test? (
 		dev-python/numpy[${PYTHON_USEDEP}]
 		dev-python/pytest[${PYTHON_USEDEP}]
-		dev-python/pytest-cov[${PYTHON_USEDEP}]
-		dev-python/tox[${PYTHON_USEDEP}]
+		$(python_gen_cond_dep 'dev-python/scimath[${PYTHON_USEDEP}]' 'python2_7')
 	)"
 
 python_test() {
-	py.test -vv || die "Tests failed under ${EPYTHON}"
+	pytest -vv || die "Tests failed under ${EPYTHON}"
 }

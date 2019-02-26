@@ -1,12 +1,12 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
-PYTHON_COMPAT=( python2_7 python3_{5,6} )
+PYTHON_COMPAT=( python2_7 python3_{4,5,6,7} pypy )
 PYTHON_REQ_USE='tk?,threads(+)'
 
-inherit distutils-r1 eutils virtualx
+inherit distutils-r1 virtualx
 
 MY_PN=Pillow
 MY_P=${MY_PN}-${PV}
@@ -17,7 +17,7 @@ SRC_URI="mirror://pypi/${MY_PN:0:1}/${MY_PN}/${MY_P}.tar.gz"
 
 LICENSE="HPND"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64 ~x86 ~amd64-linux ~x86-linux"
+KEYWORDS="amd64 arm ~arm64 ppc ppc64 x86 ~amd64-linux ~x86-linux"
 IUSE="doc examples imagequant jpeg jpeg2k lcms test tiff tk truetype webp zlib"
 
 REQUIRED_USE="test? ( jpeg tiff )"
@@ -39,12 +39,16 @@ DEPEND="${RDEPEND}
 		dev-python/sphinx_rtd_theme[${PYTHON_USEDEP}]
 	)
 	test? (
-		dev-python/pytest[${PYTHON_USEDEP}]
+		<dev-python/pytest-3.10[${PYTHON_USEDEP}]
 		media-gfx/imagemagick[png]
 	)
 "
 
 S="${WORKDIR}/${MY_P}"
+
+PATCHES=(
+	"${FILESDIR}/${PN}-5.2.0-fix-lib-paths.patch"
+)
 
 python_configure_all() {
 	# It's important that these flags are also passed during the install phase
@@ -64,13 +68,23 @@ python_configure_all() {
 	)
 }
 
+python_compile() {
+	# Pillow monkeypatches distutils to achieve parallel compilation. This
+	# conflicts with distutils' builtin parallel computation (since py35)
+	# and make builds hang. To avoid that, we set MAX_CONCURRENCY=1 to
+	# disable monkeypatching. Can be removed when/if
+	# https://github.com/python-pillow/Pillow/pull/3272 is merged.
+	MAX_CONCURRENCY=1 distutils-r1_python_compile
+}
+
 python_compile_all() {
 	use doc && emake -C docs html
 }
 
 python_test() {
 	"${PYTHON}" selftest.py --installed || die "selftest failed with ${EPYTHON}"
-	virtx pytest -vx Tests/test_*.py
+	# no:relaxed: pytest-relaxed plugin make our tests fail. deactivate if installed
+	virtx pytest -vx Tests/test_*.py -p no:relaxed
 }
 
 python_install() {

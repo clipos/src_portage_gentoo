@@ -9,7 +9,7 @@ inherit cmake-utils l10n systemd user
 DESCRIPTION="Simple Desktop Display Manager"
 HOMEPAGE="https://github.com/sddm/sddm"
 SRC_URI="https://github.com/${PN}/${PN}/releases/download/v${PV}/${P}.tar.gz"
-KEYWORDS="~amd64 ~arm ~arm64 ~x86"
+KEYWORDS="amd64 ~arm ~arm64 x86"
 
 LICENSE="GPL-2+ MIT CC-BY-3.0 CC-BY-SA-3.0 public-domain"
 SLOT="0"
@@ -85,9 +85,9 @@ src_install() {
 }
 
 pkg_postinst() {
-	einfo "Starting with 0.18.0, SDDM no longer installs /etc/sddm.conf"
-	einfo "Use it to override specific options. SDDM defaults are now"
-	einfo "found in: /usr/share/sddm/sddm.conf.d/00default.conf"
+	elog "Starting with 0.18.0, SDDM no longer installs /etc/sddm.conf"
+	elog "Use it to override specific options. SDDM defaults are now"
+	elog "found in: /usr/share/sddm/sddm.conf.d/00default.conf"
 
 	enewgroup ${PN}
 	enewuser ${PN} -1 -1 /var/lib/${PN} ${PN},video

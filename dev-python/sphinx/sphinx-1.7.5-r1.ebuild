@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -14,8 +14,12 @@ SRC_URI="mirror://pypi/S/${PN^}/${P^}.tar.gz"
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~amd64-linux ~ppc-macos ~x86-fbsd ~x86-macos ~x86-linux ~x64-macos ~x64-solaris"
+KEYWORDS="alpha amd64 arm arm64 hppa ia64 ~m68k ~mips ppc ppc64 s390 ~sh sparc x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~x64-solaris"
 IUSE="doc latex net test"
+
+# Tests automagically use latex, bug 667414
+#REQUIRED_USE="test? ( latex )"
+RESTRICT="!test? ( test )"
 
 RDEPEND="
 	>=dev-python/alabaster-0.7.9[${PYTHON_USEDEP}]
@@ -54,6 +58,9 @@ DEPEND="${RDEPEND}
 		>=dev-python/whoosh-2.0[${PYTHON_USEDEP}]
 		virtual/imagemagick-tools[jpeg,png,svg]
 		virtual/python-enum34[${PYTHON_USEDEP}]
+		dev-texlive/texlive-latexextra
+		dev-texlive/texlive-luatex
+		app-text/dvipng
 	)"
 
 S="${WORKDIR}/${P^}"

@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -10,7 +10,7 @@ SRC_URI="http://projects.gw-computing.net/attachments/download/615/${P}.tar.gz"
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="~amd64 ~arm ~x86"
+KEYWORDS="amd64 ~arm x86"
 IUSE="nls"
 
 DEPEND="nls? (
@@ -28,7 +28,6 @@ src_configure() {
 		# disable automagic dependency
 		-DNLS_ENABLED="$(usex nls)"
 		-DLFS_ENABLED=ON
-		-DGRIM=OFF
 	)
 
 	cmake-utils_src_configure

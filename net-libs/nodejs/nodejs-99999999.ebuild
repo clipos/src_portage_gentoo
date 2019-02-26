@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -23,12 +23,13 @@ REQUIRED_USE="
 
 RDEPEND="
 	>=dev-libs/libuv-1.19.2:=
-	>=net-libs/http-parser-2.8.0:=
+	>=net-dns/c-ares-1.15.0
+	>=net-libs/http-parser-2.9.0:=
 	>=net-libs/nghttp2-1.29.0
 	sys-libs/zlib
 	icu? ( >=dev-libs/icu-61.1:= )
 	npm? ( ${PYTHON_DEPS} )
-	ssl? ( >=dev-libs/openssl-1.0.2g:0=[-bindist] )
+	ssl? ( =dev-libs/openssl-1.1.0*:0= )
 "
 DEPEND="
 	${RDEPEND}
@@ -37,7 +38,8 @@ DEPEND="
 	test? ( net-misc/curl )
 "
 PATCHES=(
-	"${FILESDIR}"/gentoo-global-npm-config.patch
+	"${FILESDIR}"/${PN}-10.3.0-global-npm-config.patch
+	"${FILESDIR}"/${PN}-99999999-llhttp.patch
 )
 
 pkg_pretend() {
@@ -91,7 +93,7 @@ src_prepare() {
 }
 
 src_configure() {
-	local myconf=( --shared-http-parser --shared-libuv --shared-nghttp2 --shared-zlib )
+	local myconf=( --shared-cares --shared-http-parser --shared-libuv --shared-nghttp2 --shared-zlib )
 	use debug && myconf+=( --debug )
 	use icu && myconf+=( --with-intl=system-icu ) || myconf+=( --with-intl=none )
 	use inspector || myconf+=( --without-inspector )

@@ -11,7 +11,7 @@ SRC_URI="https://github.com/brndnmtthws/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.
 
 LICENSE="GPL-3 BSD LGPL-2.1 MIT"
 SLOT="0"
-KEYWORDS="alpha amd64 ~arm ~ppc ppc64 sparc x86"
+KEYWORDS="alpha amd64 ~arm ppc ppc64 sparc x86"
 IUSE="apcupsd audacious cmus curl eve hddtemp ical iconv imlib iostats ipv6 irc
 	lua-cairo lua-imlib lua-rsvg math moc mpd mysql nano-syntax ncurses
 	nvidia +portmon pulseaudio rss systemd thinkpad truetype vim-syntax
@@ -29,7 +29,7 @@ DEPEND_COMMON="
 		lua-rsvg? (
 			>=dev-lua/toluapp-1.0.93
 			gnome-base/librsvg )
-		nvidia? ( || ( x11-drivers/nvidia-drivers[tools,static-libs] media-video/nvidia-settings ) )
+		nvidia? ( x11-drivers/nvidia-drivers[tools,static-libs] )
 		truetype? ( x11-libs/libXft >=media-libs/freetype-2 )
 		x11-libs/libX11
 		x11-libs/libXdamage

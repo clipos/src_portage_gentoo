@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -8,7 +8,10 @@ inherit eutils libtool flag-o-matic gnuconfig multilib versionator
 DESCRIPTION="Tools necessary to build programs"
 HOMEPAGE="https://sourceware.org/binutils/"
 LICENSE="GPL-3+"
-IUSE="+cxx doc multitarget +nls static-libs test"
+# USE="+cxx" is a transitional flag until llvm migrates to new flags:
+#    bug #677888
+IUSE="+cxx default-gold doc +gold multitarget +nls +plugins static-libs test"
+REQUIRED_USE="cxx? ( gold plugins ) default-gold? ( gold )"
 
 # Variables that can be set here:
 # PATCH_VER          - the patchset version
@@ -17,9 +20,8 @@ IUSE="+cxx doc multitarget +nls static-libs test"
 #                    - Default: PV
 # PATCH_DEV          - Use download URI https://dev.gentoo.org/~{PATCH_DEV}/distfiles/...
 #                      for the patchsets
-#                      Default: dilfridge :)
 
-PATCH_VER=1
+PATCH_VER=3
 PATCH_BINUTILS_VER=9999
 
 case ${PV} in
@@ -49,7 +51,7 @@ esac
 # The Gentoo patchset
 #
 PATCH_BINUTILS_VER=${PATCH_BINUTILS_VER:-${PV}}
-PATCH_DEV=${PATCH_DEV:-dilfridge}
+PATCH_DEV=${PATCH_DEV:-slyfox}
 
 [[ -z ${PATCH_VER} ]] || SRC_URI="${SRC_URI}
 	https://dev.gentoo.org/~${PATCH_DEV}/distfiles/binutils-${PATCH_BINUTILS_VER}-patches-${PATCH_VER}.tar.xz"
@@ -79,12 +81,6 @@ DEPEND="${RDEPEND}
 	sys-devel/flex
 	virtual/yacc
 "
-if is_cross ; then
-	# The build assumes the host has libiberty and such when cross-compiling
-	# its build tools.  We should probably make binutils itself build a local
-	# copy to use, but until then, be lazy.
-	DEPEND+=" >=sys-libs/binutils-libs-${PV}"
-fi
 
 MY_BUILDDIR=${WORKDIR}/build
 
@@ -180,10 +176,15 @@ src_configure() {
 	cd "${MY_BUILDDIR}"
 	local myconf=()
 
-	# enable gold (installed as ld.gold) and ld's plugin architecture
-	if use cxx ; then
-		myconf+=( --enable-gold )
+	if use plugins ; then
 		myconf+=( --enable-plugins )
+	fi
+	# enable gold (installed as ld.gold) and ld's plugin architecture
+	if use gold ; then
+		myconf+=( --enable-gold )
+		if use default-gold; then
+			myconf+=( --enable-gold=default )
+		fi
 	fi
 
 	if use nls ; then
@@ -249,6 +250,9 @@ src_configure() {
 		# Strip out broken static link flags.
 		# https://gcc.gnu.org/PR56750
 		--without-stage1-ldflags
+		# Change SONAME to avoid conflict across
+		# {native,cross}/binutils, binutils-libs. #666100
+		--with-extra-soversion-suffix=gentoo-${CATEGORY}-${PN}-$(usex multitarget mt st)
 	)
 	echo ./configure "${myconf[@]}"
 	"${S}"/configure "${myconf[@]}" || die
@@ -278,7 +282,12 @@ src_compile() {
 
 src_test() {
 	cd "${MY_BUILDDIR}"
-	emake -k check
+
+	# bug 637066
+	filter-flags -Wall -Wreturn-type
+
+	# enable verbose test run and result logging
+	emake -k check RUNTESTFLAGS='-a -v' VERBOSE=1
 }
 
 src_install() {
