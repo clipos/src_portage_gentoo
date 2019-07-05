@@ -120,13 +120,6 @@ DATAPATH=${TOOLCHAIN_DATAPATH:-${PREFIX}/share/gcc-data/${CTARGET}/${GCC_CONFIG_
 # We will handle /usr/include/g++-v3/ with gcc-config ...
 STDCXX_INCDIR=${TOOLCHAIN_STDCXX_INCDIR:-${LIBPATH}/include/g++-v${GCC_BRANCH_VER/\.*/}}
 
-if $BUILD_GCC_LIBS_ONLY; then
-	LIBPATH="${PREFIX}/$(get_libdir)"
-
-	# Don't set to gcc-library or we'll get a compat libstdc++
-	ETYPE="gcc-compiler"
-fi
-
 #---->> LICENSE+SLOT+IUSE logic <<----
 
 if tc_version_is_at_least 4.6 ; then
@@ -895,6 +888,13 @@ toolchain_src_configure() {
 	einfo "CFLAGS=\"${CFLAGS}\""
 	einfo "CXXFLAGS=\"${CXXFLAGS}\""
 	einfo "LDFLAGS=\"${LDFLAGS}\""
+
+	if $BUILD_GCC_LIBS_ONLY; then
+		LIBPATH="${PREFIX}/$(get_libdir)"
+
+		# Don't set to gcc-library or we'll get a compat libstdc++
+		ETYPE="gcc-compiler"
+	fi
 
 	# Force internal zip based jar script to avoid random
 	# issues with 3rd party jar implementations.  #384291
