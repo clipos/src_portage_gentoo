@@ -1,9 +1,9 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
-PYTHON_COMPAT=( python3_{4,5,6,7} )
-inherit cmake-utils eutils fcaps flag-o-matic git-r3 gnome2-utils ltprune multilib python-r1 qmake-utils user xdg-utils
+EAPI=7
+PYTHON_COMPAT=( python3_{5,6,7} )
+inherit fcaps flag-o-matic git-r3 multilib python-r1 qmake-utils user xdg-utils cmake-utils
 
 DESCRIPTION="A network protocol analyzer formerly known as ethereal"
 HOMEPAGE="https://www.wireshark.org/"
@@ -13,11 +13,11 @@ LICENSE="GPL-2"
 SLOT="0/${PV}"
 KEYWORDS=""
 IUSE="
-	adns androiddump bcg729 +capinfos +captype ciscodump +dftest doc dpauxmon
-	+dumpcap +editcap kerberos libxml2 lua lz4 maxminddb +mergecap +netlink
-	nghttp2 +pcap +qt5 +randpkt +randpktdump +reordercap sbc selinux +sharkd
-	smi snappy spandsp sshdump ssl sdjournal +text2pcap tfshark +tshark
-	+udpdump zlib
+	adns androiddump bcg729 brotli +capinfos +captype ciscodump +dftest doc
+	dpauxmon +dumpcap +editcap kerberos libxml2 lua lz4 maxminddb +mergecap
+	+netlink nghttp2 +plugins plugin_ifdemo +pcap +qt5 +randpkt +randpktdump
+	+reordercap sbc selinux +sharkd smi snappy spandsp sshdump ssl sdjournal
+	+text2pcap tfshark +tshark +udpdump zlib
 "
 
 S=${WORKDIR}/${P/_/}
@@ -27,6 +27,7 @@ CDEPEND="
 	dev-libs/libgcrypt:0
 	adns? ( >=net-dns/c-ares-1.5 )
 	bcg729? ( media-libs/bcg729 )
+	brotli? ( app-arch/brotli )
 	ciscodump? ( >=net-libs/libssh-0.6 )
 	filecaps? ( sys-libs/libcap )
 	kerberos? ( virtual/krb5 )
@@ -59,6 +60,8 @@ CDEPEND="
 DEPEND="
 	${CDEPEND}
 	${PYTHON_DEPS}
+"
+BDEPEND="
 	!<perl-core/Pod-Simple-3.170
 	!<virtual/perl-Pod-Simple-3.170
 	dev-lang/perl
@@ -80,6 +83,7 @@ RDEPEND="
 "
 REQUIRED_USE="
 	${PYTHON_REQUIRED_USE}
+	plugin_ifdemo? ( plugins )
 "
 PATCHES=(
 	"${FILESDIR}"/${PN}-2.4-androiddump.patch
@@ -144,8 +148,10 @@ src_configure() {
 		-DBUILD_tshark=$(usex tshark)
 		-DBUILD_udpdump=$(usex udpdump)
 		-DBUILD_wireshark=$(usex qt5)
+		-DCMAKE_INSTALL_DOCDIR="/usr/share/doc/${PF}"
 		-DDISABLE_WERROR=yes
 		-DENABLE_BCG729=$(usex bcg729)
+		-DENABLE_BROTLI=$(usex brotli)
 		-DENABLE_CAP=$(usex filecaps caps)
 		-DENABLE_CARES=$(usex adns)
 		-DENABLE_GNUTLS=$(usex ssl)
@@ -156,6 +162,8 @@ src_configure() {
 		-DENABLE_NETLINK=$(usex netlink)
 		-DENABLE_NGHTTP2=$(usex nghttp2)
 		-DENABLE_PCAP=$(usex pcap)
+		-DENABLE_PLUGINS=$(usex plugins)
+		-DENABLE_PLUGIN_IFDEMO=$(usex plugin_ifdemo)
 		-DENABLE_SBC=$(usex sbc)
 		-DENABLE_SMI=$(usex smi)
 		-DENABLE_SNAPPY=$(usex snappy)
@@ -167,8 +175,7 @@ src_configure() {
 }
 
 src_test() {
-	emake -C "${BUILD_DIR}" test-programs
-	emake -C "${BUILD_DIR}" test
+	cmake-utils_src_test
 }
 
 src_install() {
@@ -214,13 +221,11 @@ src_install() {
 			newins image/WiresharkDoc-${s}.png application-vnd.tcpdump.pcap.png
 		done
 	fi
-
-	prune_libtool_files
 }
 
 pkg_postinst() {
-	gnome2_icon_cache_update
 	xdg_desktop_database_update
+	xdg_icon_cache_update
 	xdg_mimeinfo_database_update
 
 	# Add group for users allowed to sniff.
@@ -239,7 +244,7 @@ pkg_postinst() {
 }
 
 pkg_postrm() {
-	gnome2_icon_cache_update
 	xdg_desktop_database_update
+	xdg_icon_cache_update
 	xdg_mimeinfo_database_update
 }

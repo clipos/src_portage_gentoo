@@ -1,11 +1,11 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 PYTHON_COMPAT=( python2_7 )
 GNOME2_EAUTORECONF=yes
 
-inherit virtualx autotools gnome2 multilib python-single-r1 ltprune git-r3
+inherit virtualx autotools gnome2 multilib python-single-r1 git-r3
 
 DESCRIPTION="GNU Image Manipulation Program"
 HOMEPAGE="https://www.gimp.org/"
@@ -20,7 +20,7 @@ IUSE="alsa aalib altivec aqua debug doc openexr gnome heif postscript jpeg2k cpu
 
 RDEPEND=">=dev-libs/glib-2.56.0:2
 	>=dev-libs/atk-2.2.0
-	>=x11-libs/gtk+-2.24.10:2
+	>=x11-libs/gtk+-2.24.32:2
 	>=x11-libs/gdk-pixbuf-2.31:2
 	>=x11-libs/cairo-1.12.2
 	>=x11-libs/pango-1.29.4
@@ -35,8 +35,8 @@ RDEPEND=">=dev-libs/glib-2.56.0:2
 	dev-libs/libxml2
 	dev-libs/libxslt
 	x11-themes/hicolor-icon-theme
-	>=media-libs/babl-0.1.58
-	>=media-libs/gegl-0.4.12:0.4[cairo]
+	>=media-libs/babl-0.1.62
+	>=media-libs/gegl-0.4.14:0.4[cairo]
 	aalib? ( media-libs/aalib )
 	alsa? ( media-libs/alsa-lib )
 	aqua? ( x11-libs/gtk-mac-integration )
@@ -46,7 +46,7 @@ RDEPEND=">=dev-libs/glib-2.56.0:2
 	>=media-libs/lcms-2.8:2
 	mng? ( media-libs/libmng )
 	openexr? ( >=media-libs/openexr-1.6.1:= )
-	>=app-text/poppler-0.44[cairo]
+	>=app-text/poppler-0.50[cairo]
 	>=app-text/poppler-data-0.4.7
 	>=media-libs/libpng-1.6.25:0=
 	python?	(
@@ -102,7 +102,23 @@ src_prepare() {
 	fgrep -q GIMP_DISABLE_DEPRECATED configure || die #615144, self-test
 }
 
+_adjust_sandbox() {
+	# Bugs #569738 and #591214
+	local nv
+	for nv in /dev/nvidia-uvm /dev/nvidiactl /dev/nvidia{0..9} ; do
+		# We do not check for existence as they may show up later
+		# https://bugs.gentoo.org/show_bug.cgi?id=569738#c21
+		addwrite "${nv}"
+	done
+
+	addwrite /dev/dri/  # bugs #574038 and #684886
+	addwrite /dev/ati/  # bug #589198
+	addwrite /proc/mtrr  # bug #589198
+}
+
 src_configure() {
+	_adjust_sandbox
+
 	local myconf=(
 		GEGL="${EPREFIX}"/usr/bin/gegl-0.4
 		GDBUS_CODEGEN="${EPREFIX}"/usr/bin/gdbus-codegen
@@ -129,7 +145,7 @@ src_configure() {
 		--enable-mp
 		$(use_enable cpu_flags_x86_sse sse)
 		$(use_with udev gudev)
-		$(use_with unwind)
+		$(use_with unwind libunwind)
 		$(use_with wmf)
 		--with-xmc
 		$(use_with xpm libxpm)
@@ -141,17 +157,6 @@ src_configure() {
 }
 
 src_compile() {
-	# Bugs #569738 and #591214
-	local nv
-	for nv in /dev/nvidia-uvm /dev/nvidiactl /dev/nvidia{0..9} ; do
-		# We do not check for existence as they may show up later
-		# https://bugs.gentoo.org/show_bug.cgi?id=569738#c21
-		addwrite "${nv}"
-	done
-	addwrite /dev/dri/  # bug #574038
-	addwrite /dev/ati/  # bug 589198
-	addwrite /proc/mtrr  # bug 589198
-
 	export XDG_DATA_DIRS="${EPREFIX}"/usr/share  # bug 587004
 	gnome2_src_compile
 }
@@ -201,7 +206,7 @@ src_install() {
 	# precedence on PDF documents by default
 	mv "${ED%/}"/usr/share/applications/{,zzz-}gimp.desktop || die
 
-	prune_libtool_files --all
+	find "${D}" -name '*.la' -type f -delete || die
 
 	# Prevent dead symlink gimp-console.1 from downstream man page compression (bug #433527)
 	mv "${ED%/}"/usr/share/man/man1/gimp-console{-*,}.1 || die

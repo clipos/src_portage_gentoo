@@ -3,7 +3,7 @@
 
 EAPI=6
 
-PYTHON_COMPAT=( python2_7 python3_{4,5,6,7} pypy pypy3 )
+PYTHON_COMPAT=( python2_7 python3_{5,6,7} pypy pypy3 )
 PYTHON_REQ_USE="threads(+)"
 
 inherit distutils-r1
@@ -27,7 +27,7 @@ python_compile_all() {
 }
 
 python_test() {
-	py.test tests || die "Tests fail with ${EPYTHON}"
+	pytest -vv tests || die "Tests fail with ${EPYTHON}"
 }
 
 python_install_all() {

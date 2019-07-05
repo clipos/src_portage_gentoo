@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python2_7 python3_{4,5,6} )
+PYTHON_COMPAT=( python2_7 python3_{5,6} )
 PYTHON_REQ_USE="threads"
 DISTUTILS_OPTIONAL=true
 DISTUTILS_IN_SOURCE_BUILD=true
@@ -42,6 +42,8 @@ DEPEND="${RDEPEND}
 "
 
 S="${WORKDIR}/${PN/-rasterbar}-${MY_P}"
+
+PATCHES=( "${FILESDIR}"/fix-boost-1.70.patch )
 
 src_prepare() {
 	mkdir "${S}"/build-aux/ || die

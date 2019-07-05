@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python2_7 python3_{4,5,6,7} )
+PYTHON_COMPAT=( python2_7 python3_{5,6,7} pypy3 )
 inherit distutils-r1
 
 DESCRIPTION="A setuptools_scm plugin for git archives"
@@ -12,7 +12,7 @@ SRC_URI="https://github.com/Changaco/setuptools_scm_git_archive/archive/${PV}.ta
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="amd64"
+KEYWORDS="amd64 ~arm64 ~x86"
 IUSE=""
 
 DEPEND="

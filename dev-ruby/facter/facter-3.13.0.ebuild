@@ -19,7 +19,7 @@ if [[ ${PV} == 9999 ]] ; then
 	EGIT_BRANCH="master"
 else
 	[[ "${PV}" = *_rc* ]] || \
-	KEYWORDS="~amd64 ~arm ~hppa ~ppc ~ppc64 ~sparc ~x86"
+	KEYWORDS="amd64 ~arm ~hppa ~ppc ~ppc64 ~sparc x86"
 	SRC_URI="https://github.com/puppetlabs/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
 fi
 
@@ -28,7 +28,7 @@ BDEPEND="
 	dev-cpp/cpp-hocon"
 COMMON_DEPEND="
 	>=dev-libs/leatherman-1.0.0:=
-	dev-libs/openssl:*
+	dev-libs/openssl:0=
 	sys-apps/util-linux
 	app-emulation/virt-what
 	net-misc/curl

@@ -8,14 +8,14 @@ if [[ ${PV} = *9999 ]]; then
 	inherit git-r3
 else
 	SRC_URI="http://exiv2.dyndns.org/builds/${P}a-Source.tar.gz"
-	KEYWORDS="alpha amd64 arm ~arm64 ~hppa ~ia64 ~mips ppc ppc64 ~s390 ~sh sparc x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~x64-solaris ~x86-solaris"
+	KEYWORDS="alpha amd64 arm arm64 ~hppa ia64 ~mips ppc ppc64 ~s390 ~sh sparc x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~x64-solaris ~x86-solaris"
 fi
 
 PYTHON_COMPAT=( python2_7 python3_{5,6,7} )
 inherit cmake-multilib python-any-r1
 
 DESCRIPTION="EXIF, IPTC and XMP metadata C++ library and command line utility"
-HOMEPAGE="http://www.exiv2.org/"
+HOMEPAGE="https://www.exiv2.org/"
 
 LICENSE="GPL-2"
 SLOT="0/27"

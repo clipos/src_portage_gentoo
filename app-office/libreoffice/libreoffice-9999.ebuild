@@ -1,7 +1,7 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 PYTHON_COMPAT=( python2_7 python3_{5,6,7} )
 PYTHON_REQ_USE="threads(+),xml"
@@ -21,7 +21,7 @@ BRANDING="${PN}-branding-gentoo-0.8.tar.xz"
 # PATCHSET="${P}-patchset-01.tar.xz"
 
 [[ ${MY_PV} == *9999* ]] && inherit git-r3
-inherit autotools bash-completion-r1 check-reqs eapi7-ver flag-o-matic java-pkg-opt-2 multiprocessing pax-utils python-single-r1 qmake-utils toolchain-funcs xdg
+inherit autotools bash-completion-r1 check-reqs flag-o-matic java-pkg-opt-2 multiprocessing python-single-r1 qmake-utils toolchain-funcs xdg-utils
 
 DESCRIPTION="A full office productivity suite"
 HOMEPAGE="https://www.libreoffice.org"
@@ -79,6 +79,14 @@ SLOT="0"
 [[ ${MY_PV} == *9999* ]] || \
 KEYWORDS="~amd64 ~arm ~arm64 ~ppc64 ~x86 ~amd64-linux ~x86-linux"
 
+BDEPEND="
+	dev-util/intltool
+	sys-devel/bison
+	sys-devel/flex
+	sys-devel/gettext
+	virtual/pkgconfig
+	odk? ( >=app-doc/doxygen-1.8.4 )
+"
 COMMON_DEPEND="${PYTHON_DEPS}
 	app-arch/unzip
 	app-arch/zip
@@ -192,7 +200,32 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	pdfimport? ( app-text/poppler:=[cxx] )
 	postgres? ( >=dev-db/postgresql-9.0:*[kerberos] )
 "
-
+# FIXME: cppunit should be moved to test conditional
+#        after everything upstream is under gbuild
+#        as dmake execute tests right away
+#        tests apparently also need google-carlito-fonts (not packaged)
+DEPEND="${COMMON_DEPEND}
+	>=dev-libs/libatomic_ops-7.2d
+	dev-perl/Archive-Zip
+	>=dev-util/cppunit-1.14.0
+	>=dev-util/gperf-3
+	>=dev-util/mdds-1.4.1:1=
+	media-libs/glm
+	sys-devel/ucpp
+	x11-base/xorg-proto
+	x11-libs/libXt
+	x11-libs/libXtst
+	java? (
+		dev-java/ant-core
+		>=virtual/jdk-1.6
+	)
+	test? (
+		app-crypt/gnupg
+		dev-util/cppunit
+		media-fonts/dejavu
+		media-fonts/liberation-fonts
+	)
+"
 RDEPEND="${COMMON_DEPEND}
 	!app-office/libreoffice-bin
 	!app-office/libreoffice-bin-debug
@@ -203,7 +236,6 @@ RDEPEND="${COMMON_DEPEND}
 	kde? ( kde-frameworks/breeze-icons:* )
 	vlc? ( media-video/vlc )
 "
-
 if [[ ${MY_PV} != *9999* ]] && [[ ${PV} != *_* ]]; then
 	PDEPEND="=app-office/libreoffice-l10n-$(ver_cut 1-2)*"
 else
@@ -211,39 +243,6 @@ else
 	# rather force people to use english only.
 	PDEPEND="!app-office/libreoffice-l10n"
 fi
-
-# FIXME: cppunit should be moved to test conditional
-#        after everything upstream is under gbuild
-#        as dmake execute tests right away
-#        tests apparently also need google-carlito-fonts (not packaged)
-DEPEND="${COMMON_DEPEND}
-	>=dev-libs/libatomic_ops-7.2d
-	dev-perl/Archive-Zip
-	>=dev-util/cppunit-1.14.0
-	>=dev-util/gperf-3
-	dev-util/intltool
-	>=dev-util/mdds-1.4.1:1=
-	media-libs/glm
-	sys-devel/bison
-	sys-devel/flex
-	sys-devel/gettext
-	sys-devel/ucpp
-	virtual/pkgconfig
-	x11-base/xorg-proto
-	x11-libs/libXt
-	x11-libs/libXtst
-	java? (
-		dev-java/ant-core
-		>=virtual/jdk-1.6
-	)
-	odk? ( >=app-doc/doxygen-1.8.4 )
-	test? (
-		app-crypt/gnupg
-		dev-util/cppunit
-		media-fonts/dejavu
-		media-fonts/liberation-fonts
-	)
-"
 
 PATCHES=(
 	# "${WORKDIR}"/${PATCHSET/.tar.xz/}
@@ -282,6 +281,7 @@ pkg_pretend() {
 pkg_setup() {
 	java-pkg-opt-2_pkg_setup
 	python-single-r1_pkg_setup
+	xdg_environment_reset
 
 	[[ ${MERGE_TYPE} != binary ]] && _check_reqs pkg_setup
 }
@@ -305,7 +305,7 @@ src_unpack() {
 }
 
 src_prepare() {
-	xdg_src_prepare
+	default
 
 	# sandbox violations on many systems, we don't need it. Bug #646406
 	sed -i \
@@ -425,8 +425,8 @@ src_configure() {
 		--with-x
 		--without-fonts
 		--without-myspell-dicts
-		--without-help
-		--with-helppack-integration
+		--with-help="html"
+		--without-helppack-integration
 		--with-system-gpgmepp
 		--without-system-sane
 		$(use_enable bluetooth sdremote-bluetooth)
@@ -503,24 +503,6 @@ src_compile() {
 	addpredict /dev/ati
 	addpredict /dev/nvidiactl
 
-	# hack for offlinehelp, this needs fixing upstream at some point
-	# it is broken because we send --without-help
-	# https://bugs.freedesktop.org/show_bug.cgi?id=46506
-	(
-		grep "^export" "${S}/config_host.mk" > "${T}/config_host.mk" || die
-		source "${T}/config_host.mk" 2&> /dev/null
-
-		local path="${WORKDIR}/helpcontent2/source/auxiliary/"
-		mkdir -p "${path}" || die
-
-		echo "perl \"${S}/helpcontent2/helpers/create_ilst.pl\" -dir=helpcontent2/source/media/helpimg > \"${path}/helpimg.ilst\""
-		perl "${S}/helpcontent2/helpers/create_ilst.pl" \
-			-dir=helpcontent2/source/media/helpimg \
-			> "${path}/helpimg.ilst"
-		[[ -s "${path}/helpimg.ilst" ]] || \
-			ewarn "The help images list is empty, something is fishy, report a bug."
-	)
-
 	local target
 	use test && target="build" || target="build-nocheck"
 
@@ -552,20 +534,18 @@ src_install() {
 		insinto /usr/$(get_libdir)/${PN}/program
 		newins "${WORKDIR}/branding-sofficerc" sofficerc
 		dodir /etc/env.d
-		echo "CONFIG_PROTECT=/usr/$(get_libdir)/${PN}/program/sofficerc" > "${ED%/}"/etc/env.d/99${PN} || die
+		echo "CONFIG_PROTECT=/usr/$(get_libdir)/${PN}/program/sofficerc" > "${ED}"/etc/env.d/99${PN} || die
 	fi
-
-	# Hack for offlinehelp, this needs fixing upstream at some point.
-	# It is broken because we send --without-help
-	# https://bugs.freedesktop.org/show_bug.cgi?id=46506
-	insinto /usr/$(get_libdir)/libreoffice/help
-	doins xmlhelp/util/*.xsl
-
-	pax-mark -m "${ED%/}"/usr/$(get_libdir)/libreoffice/program/soffice.bin
-	pax-mark -m "${ED%/}"/usr/$(get_libdir)/libreoffice/program/unopkg.bin
 }
 
-pkg_preinst() {
-	java-utils-2_pkg_preinst
-	xdg_pkg_preinst
+pkg_postinst() {
+	xdg_icon_cache_update
+	xdg_desktop_database_update
+	xdg_mimeinfo_database_update
+}
+
+pkg_postrm() {
+	xdg_icon_cache_update
+	xdg_desktop_database_update
+	xdg_mimeinfo_database_update
 }

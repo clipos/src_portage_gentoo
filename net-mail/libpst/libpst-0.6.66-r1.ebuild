@@ -7,8 +7,8 @@ PYTHON_COMPAT=( python2_7 )
 inherit autotools python-single-r1
 
 DESCRIPTION="Tools and library for reading Outlook files (.pst format)"
-HOMEPAGE="http://www.five-ten-sg.com/libpst/"
-SRC_URI="http://www.five-ten-sg.com/${PN}/packages/${P}.tar.gz"
+HOMEPAGE="https://www.five-ten-sg.com/libpst/"
+SRC_URI="https://www.five-ten-sg.com/${PN}/packages/${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -16,7 +16,7 @@ KEYWORDS="~alpha amd64 ~hppa ~ia64 ~ppc ~ppc64 ~sparc x86"
 IUSE="debug dii doc python static-libs"
 
 RDEPEND="dii? ( media-gfx/imagemagick:=[png] )
-	python? ( >=dev-libs/boost-1.48:=[python]
+	python? ( <dev-libs/boost-1.70:=[python]
 		${PYTHON_DEPS} )
 	gnome-extra/libgsf:="
 DEPEND="${RDEPEND}

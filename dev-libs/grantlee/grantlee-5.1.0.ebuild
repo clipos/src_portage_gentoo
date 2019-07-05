@@ -12,7 +12,7 @@ SRC_URI="http://downloads.grantlee.org/${P}.tar.gz"
 
 LICENSE="LGPL-2.1+"
 SLOT="5"
-KEYWORDS="amd64 ~arm ~arm64 ~ppc ~ppc64 x86"
+KEYWORDS="amd64 ~arm arm64 ~ppc ~ppc64 x86"
 IUSE="debug doc test"
 
 RDEPEND="
@@ -24,6 +24,9 @@ DEPEND="${RDEPEND}
 	doc? ( app-doc/doxygen[dot] )
 	test? ( dev-qt/qttest:5 )
 "
+
+# bug 682258
+RESTRICT="test"
 
 DOCS=( AUTHORS CHANGELOG README.md )
 

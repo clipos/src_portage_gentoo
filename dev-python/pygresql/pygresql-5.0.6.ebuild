@@ -3,8 +3,8 @@
 
 EAPI=6
 
-POSTGRES_COMPAT=( 9.{3..6} 10 )
-PYTHON_COMPAT=( python2_7 python3_{4..7} )
+POSTGRES_COMPAT=( 9.{4..6} 10 )
+PYTHON_COMPAT=( python2_7 python3_{5..7} )
 
 inherit distutils-r1 postgres
 
@@ -16,7 +16,7 @@ SRC_URI="mirror://pypi/P/PyGreSQL/${MY_P}.tar.gz"
 
 LICENSE="POSTGRESQL"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~hppa ~ia64 ~ppc ~sparc ~x86"
+KEYWORDS="alpha amd64 ~hppa ia64 ppc ~sparc x86"
 IUSE=""
 
 DEPEND="${POSTGRES_DEP}"

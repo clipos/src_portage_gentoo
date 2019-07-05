@@ -3,7 +3,7 @@
 
 EAPI=6
 
-PYTHON_COMPAT=( python2_7 python3_{4,5,6,7} pypy )
+PYTHON_COMPAT=( python2_7 python3_{5,6,7} pypy )
 PYTHON_REQ_USE="threads(+)"
 
 RUBY_OPTIONAL="yes"
@@ -69,7 +69,7 @@ REQUIRED_USE="|| ( ${LANG_SUPPORT_SIMPLE[@]} ${LANG_SUPPORT_EXTENDED[@]} )
 	uwsgi_plugins_router_xmldir? ( xml !expat )
 	pypy? ( python_targets_python2_7 )
 	python? ( ${PYTHON_REQUIRED_USE} )
-	python_asyncio? ( || ( python_targets_python3_4 python_targets_python3_5 python_targets_python3_6 python_targets_python3_7 ) )
+	python_asyncio? ( || ( $(python_gen_useflags -3) ) )
 	python_gevent? ( python )
 	expat? ( xml )"
 
@@ -116,6 +116,7 @@ CDEPEND="
 	mono? ( dev-lang/mono:= )
 	perl? ( dev-lang/perl:= )
 	php? (
+		net-libs/libnsl
 		php_targets_php5-6? ( dev-lang/php:5.6[embed] )
 		php_targets_php7-1? ( dev-lang/php:7.1[embed] )
 		php_targets_php7-2? ( dev-lang/php:7.2[embed] )

@@ -15,7 +15,7 @@ SRC_URI="https://download.virtualbox.org/virtualbox/${MY_PV}/${MY_P}.tar.bz2
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="amd64 x86"
 IUSE="X"
 
 RDEPEND="
@@ -49,6 +49,7 @@ BUILD_TARGET_ARCH="${ARCH}"
 S="${WORKDIR}/${MY_P}"
 
 pkg_setup() {
+	export DISTCC_DISABLE=1 #674256
 	MODULE_NAMES="vboxguest(misc:${WORKDIR}/vboxguest:${WORKDIR}/vboxguest)
 		vboxsf(misc:${WORKDIR}/vboxsf:${WORKDIR}/vboxsf)"
 	use X && MODULE_NAMES+=" vboxvideo(misc:${WORKDIR}/vboxvideo::${WORKDIR}/vboxvideo)"

@@ -22,6 +22,8 @@ LICENSE="ISC"
 SLOT="0"
 IUSE="pie"
 
+DEPEND=">=dev-lang/go-1.12"
+
 FILECAPS=( cap_net_bind_service+ep usr/bin/dnscrypt-proxy )
 PATCHES=( "${FILESDIR}"/config-full-paths-r10.patch )
 
@@ -34,6 +36,8 @@ src_prepare() {
 	default
 	# Create directory structure suitable for building
 	mkdir -p "src/${EGO_PN%/*}" || die
+	# fixes $GOPATH/go.mod exists but should not
+	rm go.mod || die
 	mv "${PN}" "src/${EGO_PN}" || die
 	mv "vendor" "src/" || die
 }
@@ -57,6 +61,9 @@ src_install() {
 	newconfd "${FILESDIR}"/dnscrypt-proxy.confd dnscrypt-proxy
 	systemd_newunit "${FILESDIR}"/dnscrypt-proxy.service dnscrypt-proxy.service
 	systemd_newunit "${FILESDIR}"/dnscrypt-proxy.socket dnscrypt-proxy.socket
+
+	insinto /etc/logrotate.d
+	newins "${FILESDIR}"/dnscrypt-proxy.logrotate dnscrypt-proxy
 
 	einstalldocs
 }

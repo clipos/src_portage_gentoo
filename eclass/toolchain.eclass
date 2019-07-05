@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 # Maintainer: Toolchain Ninjas <toolchain@gentoo.org>
-# @SUPPORTED_EAPIS: 5
+# @SUPPORTED_EAPIS: 5 6
 
 DESCRIPTION="The GNU Compiler Collection"
 HOMEPAGE="https://gcc.gnu.org/"
@@ -26,7 +26,7 @@ FEATURES=${FEATURES/multilib-strict/}
 
 case ${EAPI:-0} in
 	0|1|2|3|4*) die "Need to upgrade to at least EAPI=5" ;;
-	5*) inherit eapi7-ver ;;
+	5*|6) inherit eapi7-ver ;;
 	*) die "I don't speak EAPI ${EAPI}." ;;
 esac
 EXPORT_FUNCTIONS pkg_pretend pkg_setup src_unpack src_prepare src_configure \
@@ -153,16 +153,23 @@ else
 fi
 IUSE="${GCC_EBUILD_TEST_FLAG} vanilla +nls +nptl"
 
+TC_FEATURES=()
+
+tc_has_feature() {
+	has "$1" "${TC_FEATURES[@]}"
+}
+
 if [[ ${PN} != "kgcc64" && ${PN} != gcc-* ]] ; then
-	IUSE+=" altivec debug +cxx +fortran"
+	IUSE+=" altivec debug +cxx +fortran" TC_FEATURES+=(fortran)
 	[[ -n ${PIE_VER} ]] && IUSE+=" nopie"
 	[[ -n ${HTB_VER} ]] && IUSE+=" boundschecking"
 	[[ -n ${D_VER}   ]] && IUSE+=" d"
 	[[ -n ${SPECS_VER} ]] && IUSE+=" nossp"
 	tc_version_is_at_least 3 && IUSE+=" doc hardened multilib objc"
-	tc_version_is_between 3 7 && IUSE+=" awt gcj"
+	tc_version_is_between 3 7 && IUSE+=" awt gcj" TC_FEATURES+=(gcj)
 	tc_version_is_at_least 3.3 && IUSE+=" pgo"
-	tc_version_is_at_least 4.0 && IUSE+=" objc-gc"
+	tc_version_is_at_least 4.0 &&
+		IUSE+=" objc-gc" TC_FEATURES+=(objc-gc)
 	tc_version_is_between 4.0 4.9 && IUSE+=" mudflap"
 	tc_version_is_at_least 4.1 && IUSE+=" libssp objc++"
 	tc_version_is_at_least 4.2 && IUSE+=" +openmp"
@@ -171,13 +178,18 @@ if [[ ${PN} != "kgcc64" && ${PN} != gcc-* ]] ; then
 	# Note: while <=gcc-4.7 also supported graphite, it required forked ppl
 	# versions which we dropped.  Since graphite was also experimental in
 	# the older versions, we don't want to bother supporting it.  #448024
-	tc_version_is_at_least 4.8 && IUSE+=" graphite +sanitize"
+	tc_version_is_at_least 4.8 &&
+		IUSE+=" graphite +sanitize" TC_FEATURES+=(graphite)
 	tc_version_is_between 4.9 8 && IUSE+=" cilk"
 	tc_version_is_at_least 4.9 && IUSE+=" +vtv"
-	tc_version_is_at_least 5.0 && IUSE+=" jit mpx"
+	tc_version_is_at_least 5.0 && IUSE+=" jit"
+	tc_version_is_between 5.0 9 && IUSE+=" mpx"
 	tc_version_is_at_least 6.0 && IUSE+=" +pie +ssp +pch"
 	# systemtap is a gentoo-specific switch: bug #654748
-	tc_version_is_at_least 8.0 && IUSE+=" systemtap"
+	tc_version_is_at_least 8.0 &&
+		IUSE+=" systemtap" TC_FEATURES+=(systemtap)
+	tc_version_is_at_least 9.0 && IUSE+=" d"
+	tc_version_is_at_least 9.1 && IUSE+=" lto"
 fi
 
 SLOT="${GCC_CONFIG_VER}"
@@ -195,20 +207,20 @@ if tc_version_is_at_least 4 ; then
 	GMP_MPFR_DEPS=">=dev-libs/gmp-4.3.2:0= >=dev-libs/mpfr-2.4.2:0="
 	if tc_version_is_at_least 4.3 ; then
 		RDEPEND+=" ${GMP_MPFR_DEPS}"
-	elif in_iuse fortran ; then
+	elif tc_has_feature fortran ; then
 		RDEPEND+=" fortran? ( ${GMP_MPFR_DEPS} )"
 	fi
 fi
 
 tc_version_is_at_least 4.5 && RDEPEND+=" >=dev-libs/mpc-0.8.1:0="
 
-if in_iuse objc-gc ; then
+if tc_has_feature objc-gc ; then
 	if tc_version_is_at_least 7 ; then
 		RDEPEND+=" objc-gc? ( >=dev-libs/boehm-gc-7.4.2 )"
 	fi
 fi
 
-if in_iuse graphite ; then
+if tc_has_feature graphite ; then
 	if tc_version_is_at_least 5.0 ; then
 		RDEPEND+=" graphite? ( >=dev-libs/isl-0.14:0= )"
 	elif tc_version_is_at_least 4.8 ; then
@@ -229,7 +241,7 @@ DEPEND="${RDEPEND}
 		>=sys-devel/autogen-5.5.4
 	)"
 
-if in_iuse gcj ; then
+if tc_has_feature gcj ; then
 	GCJ_DEPS=">=media-libs/libart_lgpl-2.1"
 	GCJ_GTK_DEPS="
 		x11-base/xorg-proto
@@ -244,7 +256,7 @@ if in_iuse gcj ; then
 	DEPEND+=" gcj? ( awt? ( ${GCJ_GTK_DEPS} ) ${GCJ_DEPS} )"
 fi
 
-if in_iuse systemtap ; then
+if tc_has_feature systemtap ; then
 	# gcc needs sys/sdt.h headers on target
 	DEPEND+=" systemtap? ( dev-util/systemtap )"
 fi
@@ -397,7 +409,7 @@ get_gcc_src_uri() {
 	[[ -n ${D_VER} ]] && \
 		GCC_SRC_URI+=" d? ( mirror://sourceforge/dgcc/gdc-${D_VER}-src.tar.bz2 )"
 
-	if in_iuse gcj ; then
+	if tc_has_feature gcj ; then
 		if tc_version_is_at_least 4.5 ; then
 			GCC_SRC_URI+=" gcj? ( ftp://sourceware.org/pub/java/ecj-4.5.jar )"
 		elif tc_version_is_at_least 4.3 ; then
@@ -543,7 +555,12 @@ toolchain_src_prepare() {
 	do_gcc_HTB_patches
 	do_gcc_PIE_patches
 	do_gcc_CYGWINPORTS_patches
-	epatch_user
+
+	case ${EAPI:-0} in
+		5*) epatch_user;;
+		6) eapply_user ;;
+		*) die "Update toolchain_src_prepare() for ${EAPI}." ;;
+	esac
 
 	if ( tc_version_is_at_least 4.8.2 || use_if_iuse hardened ) && ! use vanilla ; then
 		make_gcc_hard
@@ -994,6 +1011,11 @@ toolchain_src_configure() {
 		confgcc+=( --enable-libstdcxx-time )
 	fi
 
+	# Build compiler using LTO
+	if tc_version_is_at_least 9.1 && use_if_iuse lto ; then
+		confgcc+=( --with-build-config=bootstrap-lto )
+	fi
+
 	# Support to disable pch when building libstdcxx
 	if tc_version_is_at_least 6.0 && ! use_if_iuse pch ; then
 		confgcc+=( --disable-libstdcxx-pch )
@@ -1107,6 +1129,9 @@ toolchain_src_configure() {
 	*-elf|*-eabi)
 		confgcc+=( --with-newlib )
 		;;
+	*-musl*)
+		confgcc+=( --enable-__cxa_atexit )
+		;;
 	*-gnu*)
 		confgcc+=(
 			--enable-__cxa_atexit
@@ -1204,6 +1229,10 @@ toolchain_src_configure() {
 		# Set up defaults based on current CFLAGS
 		is-flagq -mfloat-gprs=double && confgcc+=( --enable-e500-double )
 		[[ ${CTARGET//_/-} == *-e500v2-* ]] && confgcc+=( --enable-e500-double )
+		;;
+	riscv)
+		# Add --with-abi flags to set default ABI
+		confgcc+=( --with-abi=$(gcc-abi-map ${TARGET_DEFAULT_ABI}) )
 		;;
 	esac
 
@@ -1632,6 +1661,7 @@ gcc-abi-map() {
 	local map=()
 	case ${CTARGET} in
 	mips*)   map=("o32 32" "n32 n32" "n64 64") ;;
+	riscv*)  map=("lp64d lp64d" "lp64 lp64") ;;
 	x86_64*) map=("amd64 m64" "x86 m32" "x32 mx32") ;;
 	esac
 
@@ -2435,6 +2465,10 @@ is_go() {
 
 is_jit() {
 	gcc-lang-supported jit || return 1
+	# cross-compiler does not really support jit as it has
+	# to generate code for a target. On target like avr
+	# libgcclit.so can't link at all: bug #594572
+	is_crosscompile && return 1
 	use_if_iuse jit
 }
 

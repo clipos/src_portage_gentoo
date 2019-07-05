@@ -9,7 +9,7 @@ SRC_URI="mirror://sourceforge/project/${PN}/${P}.tar.gz"
 
 LICENSE="|| ( GPL-2 MIT )"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86 ~x64-macos"
+KEYWORDS="alpha amd64 arm arm64 hppa ia64 ppc ppc64 sparc x86 ~x64-macos"
 IUSE="bindist curl doc libressl +nss"
 
 REQUIRED_USE="bindist? ( nss )"
@@ -30,7 +30,7 @@ CDEPEND="
 	)
 	!nss? (
 		!libressl? ( dev-libs/openssl:0= )
-		libressl? ( dev-libs/libressl:= )
+		libressl? ( dev-libs/libressl:0= )
 		curl? ( || (
 			net-misc/curl[ssl,curl_ssl_openssl]
 			net-misc/curl[-ssl]

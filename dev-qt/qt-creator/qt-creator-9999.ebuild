@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -56,7 +56,7 @@ CDEPEND="
 		>=dev-qt/qthelp-${QT_PV}
 		webengine? ( >=dev-qt/qtwebengine-${QT_PV}[widgets] )
 	)
-	qbs? ( >=dev-util/qbs-1.12.2 )
+	qbs? ( >=dev-util/qbs-1.13.0 )
 	serialterminal? ( >=dev-qt/qtserialport-${QT_PV} )
 	systemd? ( sys-apps/systemd:= )
 "
@@ -65,7 +65,11 @@ DEPEND="${CDEPEND}
 	virtual/pkgconfig
 	doc? ( >=dev-qt/qdoc-${QT_PV} )
 	test? (
-		>=dev-qt/qtdeclarative-${QT_PV}[localstorage,xml]
+		>=dev-qt/qtdeclarative-${QT_PV}[localstorage]
+		|| (
+			>=dev-qt/qtxmlpatterns-5.12.1-r1:5[qml(+)]
+			<dev-qt/qtdeclarative-5.12.0[xml]
+		)
 		>=dev-qt/qtquickcontrols2-${QT_PV}
 		>=dev-qt/qttest-${QT_PV}
 	)
@@ -135,6 +139,9 @@ src_prepare() {
 	sed -i -e 's/\(manual\|tools\|unit\)//g' tests/tests.pro || die
 	sed -i -e '/\(dumpers\|namedemangler\)\.pro/d' tests/auto/debugger/debugger.pro || die
 	sed -i -e '/CONFIG -=/s/$/ testcase/' tests/auto/extensionsystem/pluginmanager/correctplugins1/plugin?/plugin?.pro || die
+
+	# do not install test binaries
+	sed -i -e '/CONFIG +=/s/$/ no_testcase_installs/' tests/auto/{qttest.pri,json/json.pro} || die
 
 	# fix path to some clang headers
 	sed -i -e "/^CLANG_RESOURCE_DIR\s*=/s:\$\${LLVM_LIBDIR}:${EPREFIX}/usr/lib:" src/shared/clang/clang_defines.pri || die

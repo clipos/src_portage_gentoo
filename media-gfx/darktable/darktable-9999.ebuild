@@ -19,9 +19,6 @@ IUSE="colord cups cpu_flags_x86_sse3 doc flickr geolocation gnome-keyring gphoto
 nls opencl openmp openexr pax_kernel webp
 ${LANGS// / l10n_}"
 
-# sse3 support is required to build darktable
-REQUIRED_USE="cpu_flags_x86_sse3"
-
 BDEPEND="
 	dev-util/intltool
 	virtual/pkgconfig
@@ -106,11 +103,13 @@ src_install() {
 	cmake-utils_src_install
 	use doc && dodoc "${DISTDIR}"/${PN}-usermanual-${DOC_PV}.pdf
 
-	for lang in ${LANGS} ; do
-		if ! use l10n_${lang}; then
-			rm -r "${ED}"/usr/share/locale/${lang/-/_} || die
-		fi
-	done
+	if use nls ; then
+		for lang in ${LANGS} ; do
+			if ! use l10n_${lang}; then
+				rm -r "${ED}"/usr/share/locale/${lang/-/_} || die
+			fi
+		done
+	fi
 
 	if use pax_kernel && use opencl ; then
 		pax-mark Cm "${ED}"/usr/bin/${PN} || die

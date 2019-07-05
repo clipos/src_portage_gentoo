@@ -166,9 +166,9 @@ qt5-build_src_prepare() {
 			-e '/echo "Done."/a fi' configure || die "sed failed (skip qmake bootstrap)"
 
 		# Respect CC, CXX, *FLAGS, MAKEOPTS and EXTRA_EMAKE when bootstrapping qmake
-		sed -i -e "/outpath\/qmake\".*\"\$MAKE\")/ s:): \
+		sed -i -e "/outpath\/qmake\".*\"\$MAKE\")/ s|)| \
 			${MAKEOPTS} ${EXTRA_EMAKE} 'CC=$(tc-getCC)' 'CXX=$(tc-getCXX)' \
-			'QMAKE_CFLAGS=${CFLAGS}' 'QMAKE_CXXFLAGS=${CXXFLAGS}' 'QMAKE_LFLAGS=${LDFLAGS}'&:" \
+			'QMAKE_CFLAGS=${CFLAGS}' 'QMAKE_CXXFLAGS=${CXXFLAGS}' 'QMAKE_LFLAGS=${LDFLAGS}'&|" \
 			-e 's/\(setBootstrapVariable\s\+\|EXTRA_C\(XX\)\?FLAGS=.*\)QMAKE_C\(XX\)\?FLAGS_\(DEBUG\|RELEASE\).*/:/' \
 			configure || die "sed failed (respect env for qmake build)"
 		sed -i -e '/^CPPFLAGS\s*=/ s/-g //' \
@@ -256,7 +256,9 @@ qt5-build_src_install() {
 
 		popd >/dev/null || die
 
-		docompress -x "${QT5_DOCDIR#${EPREFIX}}"/global
+		if [[ ${QT5_MINOR_VERSION} -lt 12 ]]; then
+			docompress -x "${QT5_DOCDIR#${EPREFIX}}"/global
+		fi
 
 		# install an empty Gentoo/gentoo-qconfig.h in ${D}
 		# so that it's placed under package manager control
@@ -414,7 +416,11 @@ qt5_prepare_env() {
 	QT5_IMPORTDIR=${QT5_ARCHDATADIR}/imports
 	QT5_QMLDIR=${QT5_ARCHDATADIR}/qml
 	QT5_DATADIR=${QT5_PREFIX}/share/qt5
-	QT5_DOCDIR=${QT5_PREFIX}/share/doc/qt-${PV}
+	if [[ ${QT5_MINOR_VERSION} -lt 12 ]]; then
+		QT5_DOCDIR=${QT5_PREFIX}/share/doc/qt-${PV}
+	else
+		QT5_DOCDIR=${QT5_PREFIX}/share/qt5-doc
+	fi
 	QT5_TRANSLATIONDIR=${QT5_DATADIR}/translations
 	QT5_EXAMPLESDIR=${QT5_DATADIR}/examples
 	QT5_TESTSDIR=${QT5_DATADIR}/tests
@@ -574,8 +580,7 @@ qt5_base_configure() {
 		-no-openssl -no-libproxy
 		-no-xcb-xlib
 		$([[ ${QT5_MINOR_VERSION} -lt 12 ]] && echo -no-xinput2 -no-xkbcommon-x11 -no-xkbcommon-evdev)
-		$([[ ${PV} = 5.12.0* ]] && echo -no-xcb-xinput -no-xkbcommon-x11 -no-xkbcommon-evdev) # bug 672340
-		$([[ ${QT5_MINOR_VERSION} -ge 12 && ${PV} != 5.12.0* ]] && echo -no-xcb-xinput -no-xkbcommon) # bug 672340
+		$([[ ${QT5_MINOR_VERSION} -ge 12 ]] && echo -no-xcb-xinput -no-xkbcommon) # bug 672340
 
 		# cannot use -no-gif because there is no way to override it later
 		#-no-gif

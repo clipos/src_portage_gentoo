@@ -3,7 +3,7 @@
 
 EAPI=6
 
-PYTHON_COMPAT=( python2_7 python3_{4,5,6,7} pypy )
+PYTHON_COMPAT=( python2_7 python3_{5,6,7} pypy )
 PYTHON_REQ_USE="threads(+)"
 
 inherit distutils-r1 eutils
@@ -31,7 +31,7 @@ RDEPEND="
 DEPEND="dev-python/setuptools[${PYTHON_USEDEP}]
 	doc? ( dev-python/sphinx[${PYTHON_USEDEP}] )
 	test? ( ${RDEPEND}
-		<dev-python/pytest-3.3[${PYTHON_USEDEP}] )"
+		<dev-python/pytest-4[${PYTHON_USEDEP}] )"
 
 python_prepare_all() {
 	# remove unused dep

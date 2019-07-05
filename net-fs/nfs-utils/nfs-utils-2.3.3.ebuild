@@ -29,6 +29,7 @@ RESTRICT="test" #315573
 # so don't depend on virtual/krb.
 # (04 Feb 2005 agriffis)
 DEPEND_COMMON="
+	dev-libs/libxml2
 	net-libs/libtirpc:=
 	>=net-nds/rpcbind-0.2.4
 	sys-libs/e2fsprogs-libs
@@ -59,7 +60,6 @@ RDEPEND="${DEPEND_COMMON}
 	)
 "
 DEPEND="${DEPEND_COMMON}
-	dev-libs/libxml2
 	net-libs/rpcsvc-proto
 	virtual/pkgconfig"
 
@@ -68,6 +68,8 @@ PATCHES=(
 	"${FILESDIR}"/${PN}-1.2.8-cross-build.patch
 	"${FILESDIR}"/${PN}-2.3.2-junction_libs.patch
 	"${FILESDIR}"/${PN}-2.3.2-no-werror.patch
+	"${FILESDIR}"/${PN}-2.3.1-limits.patch #651080
+	"${FILESDIR}"/${PN}-2.3.4_rc2-improved_res_querydomain_check.patch #651080
 )
 
 src_prepare() {

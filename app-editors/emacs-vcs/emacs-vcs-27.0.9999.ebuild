@@ -38,6 +38,7 @@ RDEPEND="sys-libs/ncurses:0=
 	acl? ( virtual/acl )
 	alsa? ( media-libs/alsa-lib )
 	dbus? ( sys-apps/dbus )
+	games? ( acct-group/gamestat )
 	gmp? ( dev-libs/gmp:0= )
 	gpm? ( sys-libs/gpm )
 	!inotify? ( gfile? ( >=dev-libs/glib-2.28.6 ) )
@@ -121,7 +122,7 @@ BDEPEND="virtual/pkgconfig
 #	pax_kernel? ( sys-apps/attr )
 
 if [[ ${PV##*.} = 9999 ]]; then
-	DEPEND="${DEPEND}
+	BDEPEND="${BDEPEND}
 	sys-apps/texinfo"
 fi
 

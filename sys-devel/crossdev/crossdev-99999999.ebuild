@@ -1,7 +1,7 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 if [[ ${PV} == "99999999" ]] ; then
 	inherit git-r3
@@ -20,10 +20,7 @@ SLOT="0"
 IUSE=""
 
 RDEPEND="
-	|| (
-		>=sys-apps/portage-2.1
-		sys-apps/portage-mgorny
-	)
+	>=sys-apps/portage-2.1
 	>=app-portage/portage-utils-0.55
 	app-shells/bash
 	sys-apps/gentoo-functions

@@ -18,7 +18,7 @@ SRC_URI="ftp://ftp.openldap.org/pub/OpenLDAP/openldap-release/${P}.tgz
 
 LICENSE="OPENLDAP GPL-2"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~ppc-aix ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~x86-solaris"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~riscv ~s390 ~sh ~sparc ~x86 ~ppc-aix ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~x86-solaris"
 
 IUSE_DAEMON="crypt samba slp tcpd experimental minimal"
 IUSE_BACKEND="+berkdb"
@@ -29,7 +29,6 @@ IUSE_CONTRIB="${IUSE_CONTRIB} -cxx"
 IUSE="${IUSE_DAEMON} ${IUSE_BACKEND} ${IUSE_OVERLAY} ${IUSE_OPTIONAL} ${IUSE_CONTRIB}"
 
 REQUIRED_USE="cxx? ( sasl )
-	?? ( gnutls libressl )
 	pbkdf2? ( ssl )
 	test? ( berkdb )
 	?? ( test minimal )"
@@ -50,8 +49,8 @@ CDEPEND="
 			libressl? ( dev-libs/libressl:0=[${MULTILIB_USEDEP}] )
 		)
 		gnutls? (
-			>=net-libs/gnutls-2.12.23-r6[${MULTILIB_USEDEP}]
-			>=dev-libs/libgcrypt-1.5.3:0[${MULTILIB_USEDEP}]
+			>=net-libs/gnutls-2.12.23-r6:=[${MULTILIB_USEDEP}]
+			>=dev-libs/libgcrypt-1.5.3:0=[${MULTILIB_USEDEP}]
 		)
 	)
 	sasl? ( dev-libs/cyrus-sasl:= )
@@ -273,7 +272,7 @@ openldap_find_versiontags() {
 			eerror "	against	${NEWVER} and your database may be inaccessible."
 			echo
 			fail=1
-		elif [[ -n "${OLDVER}" ]]&& [[ -z "${NEWVER}" ]]; then
+		elif [[ -n "${OLDVER}" ]] && [[ -z "${NEWVER}" ]]; then
 			eerror "	Your existing version of OpenLDAP was built against"
 			eerror "	sys-libs/db:${OLDVER}, but the new one will not be"
 			eerror "	built against any version and your database may be"

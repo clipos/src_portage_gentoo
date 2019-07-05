@@ -19,7 +19,7 @@ HOMEPAGE="https://www.qutebrowser.org/ https://github.com/qutebrowser/qutebrowse
 
 LICENSE="GPL-3"
 SLOT="0"
-IUSE="test"
+IUSE="scripts test"
 
 COMMON_DEPEND="dev-python/setuptools[${PYTHON_USEDEP}]"
 DEPEND="${COMMON_DEPEND}
@@ -30,7 +30,11 @@ RDEPEND="${COMMON_DEPEND}
 	>=dev-python/jinja-2.8[${PYTHON_USEDEP}]
 	>=dev-python/pygments-2.1.3[${PYTHON_USEDEP}]
 	>=dev-python/pypeg2-2.15.2[${PYTHON_USEDEP}]
-	>=dev-python/PyQt5-5.7.1[${PYTHON_USEDEP},declarative,multimedia,gui,network,opengl,printsupport,sql,webengine,widgets]
+	|| (  (
+			>=dev-python/PyQt5-5.12[${PYTHON_USEDEP},declarative,multimedia,gui,network,opengl,printsupport,sql,widgets]
+			dev-python/PyQtWebEngine[${PYTHON_USEDEP}] )
+		<dev-python/PyQt5-5.12[${PYTHON_USEDEP},declarative,multimedia,gui,network,opengl,printsupport,sql,webengine,widgets]
+	)
 	>=dev-python/pyyaml-3.12[${PYTHON_USEDEP},libyaml]
 "
 
@@ -52,8 +56,19 @@ python_test() {
 
 python_install_all() {
 	doman doc/${PN}.1
-	domenu misc/${PN}.desktop
+	domenu misc/org.${PN}.${PN}.desktop
 	doicon -s scalable icons/${PN}.svg
+
+	if use scripts; then
+		# Install only those userscripts that have an explicit license header
+		exeinto /usr/share/qutebrowser/userscripts/
+		doexe misc/userscripts/dmenu_qutebrowser
+		doexe misc/userscripts/openfeeds
+		doexe misc/userscripts/qute-keepass
+		doexe misc/userscripts/qute-pass
+		doexe misc/userscripts/rss
+		doexe misc/userscripts/tor_identity
+	fi
 
 	distutils-r1_python_install_all
 }

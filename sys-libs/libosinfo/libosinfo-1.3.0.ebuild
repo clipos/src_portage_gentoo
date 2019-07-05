@@ -16,7 +16,7 @@ SLOT="0"
 IUSE="+introspection +vala test"
 REQUIRED_USE="vala? ( introspection )"
 
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 ~sparc ~x86"
+KEYWORDS="~alpha amd64 ~arm arm64 ~ia64 ~ppc ~ppc64 ~sparc x86"
 
 # Unsure about osinfo-db-tools rdep, but at least fedora does it too
 RDEPEND="
@@ -40,10 +40,10 @@ DEPEND="${RDEPEND}
 	>=dev-util/intltool-0.40.0
 	virtual/pkgconfig
 	test? (
-		>=sys-apps/osinfo-db-20180612
+		<=sys-apps/osinfo-db-20190304
 	)
 	vala? ( $(vala_depend) )
-"
+" # osinfo-db-20190319 and newer make tests fail; next libosinfo will remove the failing tests (moved to a future osinfo-db itself)
 
 src_prepare() {
 	gnome2_src_prepare
