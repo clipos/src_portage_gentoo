@@ -9,7 +9,7 @@ HOMEPAGE="https://gitlab.gnome.org/GNOME/gnome-session"
 
 LICENSE="GPL-2+"
 SLOT="0"
-KEYWORDS="~alpha amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 ~sparc x86 ~x86-fbsd ~amd64-linux ~x86-linux ~x86-solaris"
+KEYWORDS="~alpha amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 ~sparc x86 ~amd64-linux ~x86-linux ~x86-solaris"
 IUSE="consolekit doc elogind systemd"
 # There is a null backend available, thus ?? not ^^
 # consolekit can be enabled alone, or together with a logind provider; in latter case CK is used as fallback
@@ -23,7 +23,7 @@ COMMON_DEPEND="
 	x11-libs/libX11
 	>=gnome-base/gnome-desktop-3.18:3=
 	>=dev-libs/json-glib-0.10
-	media-libs/mesa[egl,gles2]
+	media-libs/mesa[egl,gles2,X(+)]
 	media-libs/libepoxy
 	x11-libs/libXcomposite
 

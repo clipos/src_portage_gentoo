@@ -3,7 +3,7 @@
 
 EAPI=6
 
-PYTHON_COMPAT=( python2_7 python3_{5,6,7} pypy pypy3 )
+PYTHON_COMPAT=( python2_7 python3_{5,6,7,8} pypy pypy3 )
 
 inherit distutils-r1
 
@@ -13,7 +13,7 @@ SRC_URI="mirror://pypi/${PN:0:1}/${PN}/${P}.tar.gz"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~amd64-linux ~x86-linux ~x64-macos ~x86-macos"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-linux ~x86-linux ~x64-macos ~x86-macos"
 IUSE="test"
 RESTRICT="!test? ( test )"
 
@@ -32,13 +32,17 @@ python_prepare_all() {
 	# remove self-dependency
 	sed -i -e "/arguments\.update/s@scm_config()@{'version': '${PV}'}@" \
 		-e "/__main__/i del sys.path[0]" setup.py || die
+	# incompatible pytest version?
+	sed -i -e '/@pytest.mark.issue/d' \
+		-e 's/, marks=pytest.mark.issue([0-9]*)//' \
+		testing/*.py || die
 
 	distutils-r1_python_prepare_all
 }
 
 python_test() {
 	PYTHONPATH= distutils_install_for_testing
-	py.test -v -v -x || die "Tests fail with ${EPYTHON}"
+	pytest -v -v -x || die "Tests fail with ${EPYTHON}"
 }
 
 python_install() {

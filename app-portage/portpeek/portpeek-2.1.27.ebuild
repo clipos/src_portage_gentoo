@@ -8,12 +8,12 @@ PYTHON_COMPAT=( python2_7 python3_{5,6,7} )
 inherit python-r1
 
 DESCRIPTION="A helper program for maintaining the package.keyword and package.unmask files"
-HOMEPAGE="http://www.mpagano.com/blog/?page_id=3"
-SRC_URI="http://www.mpagano.com/downloads/${P}.tar.gz"
+HOMEPAGE="https://www.mpagano.com/blog/?page_id=3"
+SRC_URI="https://www.mpagano.com/downloads/${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="amd64 ~arm ppc ~sparc x86 ~x86-fbsd"
+KEYWORDS="amd64 arm ppc sparc x86"
 IUSE=""
 
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"

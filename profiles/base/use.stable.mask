@@ -4,6 +4,14 @@
 # This file requires eapi 5 or later. New entries go on top.
 # Please use the same syntax as in use.mask
 
+# Thomas Deutschmann <whissi@gentoo.org> (28 Nov  2019)
+# Mask PHP 7.4 target while unstable
+php_targets_php7-4
+
+# Patrick Lauer <patrick@gentoo.org> (2019-10-04)
+# No postgres-12 stable yet
+postgres_targets_postgres12
+
 # Zac Medico <zmedico@gentoo.org> (2016-09-01)
 # Needs virtual/pypy* stable
 python_targets_pypy
@@ -13,9 +21,4 @@ python_single_target_pypy3
 
 # Hans de Graaff <graaff@gentoo.org> (2018-12-25)
 # Currently in testing and not ready to go stable yet.
-ruby_targets_ruby25
 ruby_targets_ruby26
-
-# Patrick Lauer <patrick@gentoo.org> (2015-04-28)
-# dependencies not stable yet
-ayatana

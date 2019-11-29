@@ -14,7 +14,7 @@ if [[ ${PV##*.} = 9999 ]]; then
 else
 	SRC_URI="https://dev.gentoo.org/~ulm/distfiles/emacs-${PV}.tar.xz
 		mirror://gnu-alpha/emacs/pretest/emacs-${PV}.tar.xz"
-	KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos"
+	KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~riscv ~s390 ~sh ~sparc ~x86 ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos"
 	# FULL_VERSION keeps the full version number, which is needed in
 	# order to determine some path information correctly for copy/move
 	# operations later on
@@ -119,7 +119,6 @@ DEPEND="${RDEPEND}
 
 BDEPEND="virtual/pkgconfig
 	gzip-el? ( app-arch/gzip )"
-#	pax_kernel? ( sys-apps/attr )
 
 if [[ ${PV##*.} = 9999 ]]; then
 	BDEPEND="${BDEPEND}
@@ -175,7 +174,6 @@ src_configure() {
 	if use X; then
 		myconf+=" --with-x --without-ns"
 		myconf+=" $(use_with gconf)"
-		myconf+=" $(use_with gmp libgmp)"
 		myconf+=" $(use_with gsettings)"
 		myconf+=" $(use_with toolkit-scroll-bars)"
 		myconf+=" $(use_with gif)"
@@ -265,6 +263,7 @@ src_configure() {
 		$(use_with dbus) \
 		$(use_with dynamic-loading modules) \
 		$(use_with games gameuser ":gamestat") \
+		$(use_with gmp libgmp) \
 		$(use_with gpm) \
 		$(use_with json) \
 		$(use_with kerberos) $(use_with kerberos kerberos5) \
@@ -338,9 +337,9 @@ src_install () {
 	Y	"${EPREFIX}${cdir}")
 	X  (let ((path (getenv "INFOPATH"))
 	X	(dir "${EPREFIX}/usr/share/info/${EMACS_SUFFIX}")
-	X	(re "\\\\\`${EPREFIX}/usr/share/info\\\\>"))
+	X	(re "\\\\\`${EPREFIX}/usr/share\\\\>"))
 	X    (and path
-	X	 ;; move Emacs Info dir before anything else in /usr/share/info
+	X	 ;; move Emacs Info dir before anything else in /usr/share
 	X	 (let* ((p (cons nil (split-string path ":" t))) (q p))
 	X	   (while (and (cdr q) (not (string-match re (cadr q))))
 	X	     (setq q (cdr q)))
@@ -378,19 +377,8 @@ src_install () {
 
 pkg_preinst() {
 	# move Info dir file to correct name
-	local infodir=/usr/share/info/${EMACS_SUFFIX} f
-	if [[ -f ${ED}${infodir}/dir.orig ]]; then
-		mv "${ED}"${infodir}/dir{.orig,} || die "moving info dir failed"
-	elif [[ -d "${ED}"${infodir} ]]; then
-		# this should not happen in EAPI 4
-		ewarn "Regenerating Info directory index in ${infodir} ..."
-		rm -f "${ED}"${infodir}/dir{,.*}
-		for f in "${ED}"${infodir}/*; do
-			if [[ ${f##*/} != *-[0-9]* && -e ${f} ]]; then
-				install-info --info-dir="${ED}"${infodir} "${f}" \
-					|| die "install-info failed"
-			fi
-		done
+	if [[ -d ${ED}/usr/share/info ]]; then
+		mv "${ED}"/usr/share/info/${EMACS_SUFFIX}/dir{.orig,} || die
 	fi
 }
 

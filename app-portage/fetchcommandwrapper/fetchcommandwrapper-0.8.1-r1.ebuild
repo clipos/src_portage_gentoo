@@ -7,8 +7,8 @@ PYTHON_COMPAT=( python{2_7,3_{5,6,7}} )
 inherit distutils-r1
 
 DESCRIPTION="Wrapper integrating aria2 into portage's FETCHCOMMAND"
-HOMEPAGE="https://github.com/gentoo/fetchcommandwrapper"
-SRC_URI="https://github.com/gentoo/fetchcommandwrapper/archive/${PV}.tar.gz -> ${P}.tar.gz"
+HOMEPAGE="https://github.com/hartwork/fetchcommandwrapper"
+SRC_URI="https://github.com/hartwork/fetchcommandwrapper/archive/${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="GPL-3"
 SLOT="0"

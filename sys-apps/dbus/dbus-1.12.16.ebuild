@@ -4,7 +4,7 @@
 EAPI=7
 
 PYTHON_COMPAT=( python{2_7,3_{5,6,7}} )
-inherit autotools flag-o-matic linux-info python-any-r1 readme.gentoo-r1 systemd virtualx user multilib-minimal
+inherit autotools flag-o-matic linux-info python-any-r1 readme.gentoo-r1 systemd virtualx multilib-minimal
 
 DESCRIPTION="A message bus system, a simple way for applications to talk to each other"
 HOMEPAGE="https://dbus.freedesktop.org/"
@@ -12,12 +12,13 @@ SRC_URI="https://dbus.freedesktop.org/releases/dbus/${P}.tar.gz"
 
 LICENSE="|| ( AFL-2.1 GPL-2 )"
 SLOT="0"
-KEYWORDS="alpha amd64 ~arm ~arm64 hppa ia64 ~m68k ~mips ppc ppc64 s390 ~sh sparc x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
+KEYWORDS="alpha amd64 arm arm64 hppa ia64 ~m68k ~mips ppc ppc64 s390 sh sparc x86 ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
 IUSE="debug doc elogind kernel_linux selinux static-libs systemd test user-session X"
 
 REQUIRED_USE="?? ( elogind systemd )"
 
 BDEPEND="
+	acct-user/messagebus
 	app-text/xmlto
 	app-text/docbook-xml-dtd:4.4
 	sys-devel/autoconf-archive
@@ -42,6 +43,7 @@ DEPEND="${COMMON_DEPEND}
 	)
 "
 RDEPEND="${COMMON_DEPEND}
+	acct-user/messagebus
 	selinux? ( sec-policy/selinux-dbus )
 "
 
@@ -59,9 +61,6 @@ PATCHES=(
 )
 
 pkg_setup() {
-	enewgroup messagebus
-	enewuser messagebus -1 -1 -1 messagebus
-
 	use test && python-any-r1_pkg_setup
 
 	if use kernel_linux; then

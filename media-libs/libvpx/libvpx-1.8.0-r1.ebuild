@@ -20,7 +20,7 @@ SRC_URI="https://github.com/webmproject/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.
 
 LICENSE="BSD"
 SLOT="0/6"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~s390 ~sparc ~x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux"
+KEYWORDS="~amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 ~s390 ~sparc ~x86 ~amd64-linux ~x86-linux"
 IUSE="doc +highbitdepth postproc static-libs svc test +threads"
 
 REQUIRED_USE="test? ( threads )"
@@ -42,6 +42,7 @@ DEPEND="abi_x86_32? ( dev-lang/yasm )
 
 PATCHES=(
 	"${FILESDIR}/libvpx-1.3.0-sparc-configure.patch" # 501010
+	"${FILESDIR}/libvpx-1.8.0-ppc64le-disable-vsx.patch" #688138
 )
 
 src_configure() {
@@ -82,6 +83,9 @@ multilib_src_configure() {
 		i?86*) export AS=yasm;;
 		x86_64*) export AS=yasm;;
 	esac
+
+	# powerpc toolchain is not recognized anymore, #694368
+	[[ ${CHOST} == powerpc-* ]] && myconfargs+=( --force-target=generic-gnu )
 
 	# Build with correct toolchain.
 	tc-export CC CXX AR NM

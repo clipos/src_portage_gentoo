@@ -90,7 +90,7 @@ RDEPEND="
 	>=dev-libs/nss-3.28.3
 	>=dev-libs/nspr-4.13.1
 	jack? ( virtual/jack )
-	crypt? ( >=x11-plugins/enigmail-2.0.5 )
+	crypt? ( <x11-plugins/enigmail-2.1.0 )
 "
 
 DEPEND="
@@ -156,9 +156,6 @@ src_prepare() {
 	eapply "${WORKDIR}"/firefox
 	popd &>/dev/null || die
 
-	# gcc9 patch #685092
-	eapply "${FILESDIR}"/${PN}-gcc9.patch
-
 	if grep -q '^sdkdir.*$(MOZ_APP_NAME)-devel' mozilla/config/baseconfig.mk ; then
 		sed '/^sdkdir/s@-devel@@' \
 			-i mozilla/config/baseconfig.mk || die
@@ -182,6 +179,9 @@ src_prepare() {
 	eapply_user
 
 	local ms="${S}/mozilla"
+
+	# Don't error for format with gcc-9
+	grep -rl -- '-Werror=format' | xargs sed -i 's/error=format/no-&/' || die "sed failed"
 
 	# Enable gnomebreakpad
 	if use debug ; then

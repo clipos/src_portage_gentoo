@@ -15,13 +15,13 @@ SRC_URI="https://www.gajim.org/downloads/$(get_version_component_range 1-2)/${P}
 
 LICENSE="GPL-3"
 SLOT="0"
-#KEYWORDS="~amd64 ~arm ~ppc ~ppc64 ~x86 ~x86-fbsd"
+#KEYWORDS="~amd64 ~arm ~ppc ~ppc64 ~x86"
 KEYWORDS="~amd64 ~x86"
 IUSE="+crypt geolocation jingle keyring networkmanager remote rst +spell upnp
 	+webp"
 
 COMMON_DEPEND="
-	dev-libs/gobject-introspection[cairo,${PYTHON_USEDEP}]
+	dev-libs/gobject-introspection[cairo]
 	>=x11-libs/gtk+-3.22:3[introspection]"
 DEPEND="${COMMON_DEPEND}
 	app-arch/unzip

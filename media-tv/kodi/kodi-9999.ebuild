@@ -7,20 +7,19 @@ PYTHON_REQ_USE="libressl?,sqlite,ssl"
 LIBDVDCSS_VERSION="1.4.2-Leia-Beta-5"
 LIBDVDREAD_VERSION="6.0.0-Leia-Alpha-3"
 LIBDVDNAV_VERSION="6.0.0-Leia-Alpha-3"
-FFMPEG_VERSION="4.0.3"
+FFMPEG_VERSION="4.0.4"
 CODENAME="Leia"
-FFMPEG_KODI_VERSION="18.2"
+FFMPEG_KODI_VERSION="18.4"
+PYTHON_COMPAT=( python3_{5,6,7} )
 SRC_URI="https://github.com/xbmc/libdvdcss/archive/${LIBDVDCSS_VERSION}.tar.gz -> libdvdcss-${LIBDVDCSS_VERSION}.tar.gz
 	https://github.com/xbmc/libdvdread/archive/${LIBDVDREAD_VERSION}.tar.gz -> libdvdread-${LIBDVDREAD_VERSION}.tar.gz
 	https://github.com/xbmc/libdvdnav/archive/${LIBDVDNAV_VERSION}.tar.gz -> libdvdnav-${LIBDVDNAV_VERSION}.tar.gz
 	!system-ffmpeg? ( https://github.com/xbmc/FFmpeg/archive/${FFMPEG_VERSION}-${CODENAME}-${FFMPEG_KODI_VERSION}.tar.gz -> ffmpeg-${PN}-${FFMPEG_VERSION}-${CODENAME}-${FFMPEG_KODI_VERSION}.tar.gz )"
 
 if [[ ${PV} == *9999 ]] ; then
-	PYTHON_COMPAT=( python2_7 python3_{5,6,7} )
 	EGIT_REPO_URI="https://github.com/xbmc/xbmc.git"
 	inherit git-r3
 else
-	PYTHON_COMPAT=( python2_7 )
 	MY_PV=${PV/_p/_r}
 	MY_PV=${MY_PV/_alpha/a}
 	MY_PV=${MY_PV/_beta/b}
@@ -31,7 +30,7 @@ else
 	S=${WORKDIR}/xbmc-${MY_PV}-${CODENAME}
 fi
 
-inherit autotools cmake-utils eutils gnome2-utils linux-info pax-utils python-single-r1 xdg-utils
+inherit autotools cmake-utils desktop linux-info pax-utils python-single-r1 xdg
 
 DESCRIPTION="A free and open source media-player and entertainment hub"
 HOMEPAGE="https://kodi.tv/ https://kodi.wiki/"
@@ -51,6 +50,7 @@ REQUIRED_USE="
 	udisks? ( dbus )
 	upower? ( dbus )
 "
+RESTRICT="!test? ( test )"
 
 COMMON_DEPEND="${PYTHON_DEPS}
 	airplay? (
@@ -59,13 +59,13 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	)
 	alsa? ( >=media-libs/alsa-lib-1.1.4.1 )
 	bluetooth? ( net-wireless/bluez )
-	bluray? ( >=media-libs/libbluray-1.0.2 )
+	bluray? ( >=media-libs/libbluray-1.1.2 )
 	caps? ( sys-libs/libcap )
 	dbus? ( sys-apps/dbus )
 	dev-db/sqlite
 	dev-libs/expat
-	dev-libs/flatbuffers
-	>=dev-libs/fribidi-0.19.7
+	>=dev-libs/flatbuffers-1.11.0
+	>=dev-libs/fribidi-1.0.5
 	cec? ( >=dev-libs/libcec-4.0[raspberry-pi?] )
 	dev-libs/libpcre[cxx]
 	>=dev-libs/libinput-1.10.5
@@ -73,7 +73,7 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	>=dev-libs/lzo-2.04
 	dev-libs/tinyxml[stl]
 	dev-python/pillow[${PYTHON_USEDEP}]
-	$(python_gen_cond_dep 'dev-python/pycryptodome[${PYTHON_USEDEP}]' 'python3*')
+	dev-python/pycryptodome[${PYTHON_USEDEP}]
 	>=dev-libs/libcdio-0.94
 	>=dev-libs/libfmt-3.0.1
 	dev-libs/libfstrcmp
@@ -85,10 +85,10 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	libusb? ( virtual/libusb:1 )
 	virtual/ttf-fonts
 	media-fonts/roboto
-	>=media-libs/fontconfig-2.12.4
-	>=media-libs/freetype-2.8
+	>=media-libs/fontconfig-2.13.1
+	>=media-libs/freetype-2.10.1
 	>=media-libs/libass-0.13.4
-	!raspberry-pi? ( media-libs/mesa[egl] )
+	!raspberry-pi? ( media-libs/mesa[egl,X(+)] )
 	>=media-libs/taglib-1.11.1
 	system-ffmpeg? (
 		>=media-video/ffmpeg-${FFMPEG_VERSION}:=[encode,postproc]
@@ -127,7 +127,7 @@ COMMON_DEPEND="${PYTHON_DEPS}
 		media-libs/mesa[wayland]
 		>=dev-libs/wayland-protocols-1.7
 	)
-	webserver? ( >=net-libs/libmicrohttpd-0.9.55[messages] )
+	webserver? ( >=net-libs/libmicrohttpd-0.9.55[messages(+)] )
 	X? (
 		x11-libs/libX11
 		x11-libs/libXrandr
@@ -175,14 +175,6 @@ pkg_setup() {
 
 src_unpack() {
 	if [[ ${PV} == *9999 ]] ; then
-		if python_is_python3; then
-			EGIT_BRANCH="feature_python3"
-			ewarn "Using the experimental Python 3 branch!"
-			ewarn "See https://kodi.wiki/view/Migration_to_Python_3 for more information."
-			ewarn "To use the non-experimental Python 2 version:"
-			ewarn "echo '~${CATEGORY}/${P} PYTHON_TARGETS: -* python2_7 PYTHON_SINGLE_TARGET: -* python2_7' >> /etc/portage/package.use"
-			ewarn "then re-merge using: emerge -a =${CATEGORY}/${PF}"
-		fi
 		git-r3_src_unpack
 	else
 		default
@@ -199,7 +191,6 @@ src_prepare() {
 
 	# Prepare tools and libs witch are configured with autotools during compile time
 	AUTOTOOLS_DIRS=(
-		"${S}"/lib/cpluff
 		"${S}"/tools/depends/native/TexturePacker/src
 		"${S}"/tools/depends/native/JsonSchemaBuilder/src
 	)
@@ -214,7 +205,6 @@ src_prepare() {
 
 	# Prevent autoreconf rerun
 	sed -e 's/autoreconf -vif/echo "autoreconf already done in src_prepare()"/' -i \
-		"${S}"/cmake/modules/FindCpluff.cmake \
 		"${S}"/tools/depends/native/TexturePacker/src/autogen.sh \
 		"${S}"/tools/depends/native/JsonSchemaBuilder/src/autogen.sh \
 		|| die
@@ -287,7 +277,10 @@ src_configure() {
 	fi
 
 	if use X; then
-		mycmakeargs+=( -DCORE_PLATFORM_NAME="x11" )
+		mycmakeargs+=(
+			-DCORE_PLATFORM_NAME="x11"
+			-DX11_RENDER_SYSTEM="$(usex opengl gl gles)"
+		)
 	fi
 
 	cmake-utils_src_configure
@@ -295,34 +288,23 @@ src_configure() {
 
 src_compile() {
 	cmake-utils_src_compile all
-	use test && emake -C "${BUILD_DIR}" kodi-test
 }
 
 src_test() {
-	emake -C "${BUILD_DIR}" test
+	cmake-utils_src_make check
 }
 
 src_install() {
 	cmake-utils_src_install
 
-	pax-mark Em "${ED%/}"/usr/$(get_libdir)/${PN}/${PN}.bin
+	pax-mark Em "${ED}"/usr/$(get_libdir)/${PN}/${PN}.bin
 
 	newicon media/icon48x48.png kodi.png
 
-	rm "${ED%/}"/usr/share/kodi/addons/skin.estuary/fonts/Roboto-Thin.ttf || die
+	rm "${ED}"/usr/share/kodi/addons/skin.estuary/fonts/Roboto-Thin.ttf || die
 	dosym ../../../../fonts/roboto/Roboto-Thin.ttf \
 		usr/share/kodi/addons/skin.estuary/fonts/Roboto-Thin.ttf
 
 	python_domodule tools/EventClients/lib/python/xbmcclient.py
 	python_newscript "tools/EventClients/Clients/KodiSend/kodi-send.py" kodi-send
-}
-
-pkg_postinst() {
-	gnome2_icon_cache_update
-	xdg_desktop_database_update
-}
-
-pkg_postrm() {
-	gnome2_icon_cache_update
-	xdg_desktop_database_update
 }

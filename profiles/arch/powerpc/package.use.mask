@@ -1,6 +1,18 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
+# Luke Dashjr <luke-jr+gentoobugs@utopios.org> (2019-09-21)
+# iasl is stable on ppc
+sys-firmware/seabios -debug
+
+# Eugene Bright <eugene@bright.gdn> (2019-09-09)
+# Missing keyword on dev-embedded/libjaylink
+sys-apps/flashrom jlink-spi
+
+# Conrad Kostecki <ck+gentoo@bl4ckb0x.de> (2019-08-17)
+# app-misc/graphlcd-base won't work on PowerPC/PowerPC64
+app-misc/lcdproc freetype lcd_devices_glcd png
+
 # Georgy Yakovlev <gyakovlev@gentoo.org> (2019-06-01)
 # not yet keyworded
 dev-java/openjdk javafx
@@ -34,7 +46,7 @@ net-analyzer/icinga2 mariadb
 
 # Luca Barbato <lu_zero@gentoo.org> (2018-08-12)
 # grub pc is not supported on powerpc
-sys-boot/grub:2 grub_platforms_pc grub_platforms_efi-32 grub_platforms_efi-64 grub_platforms_xen
+sys-boot/grub:2 grub_platforms_pc grub_platforms_efi-32 grub_platforms_efi-64 grub_platforms_xen grub_platforms_xen-pvh
 
 # Luke Dashjr <luke-jr+gentoobugs@utopios.org> (2018-06-08)
 # Requires unported sys-libs/netbsd-csu
@@ -46,7 +58,7 @@ sys-devel/llvm gold
 
 # Tomáš Mózes <hydrapolic@gmail.com> (2018-06-05)
 # Unkeyworded dependencies.
-app-admin/syslog-ng mongodb
+app-admin/syslog-ng kafka mongodb
 
 # Anthony G. Basile <blueness@gentoo.org> (2018-04-14)
 # net-vpn/tor, tests are broken on ppc/ppc64, bug #653098
@@ -67,7 +79,7 @@ app-emulation/qemu capstone
 
 # Amy Liffey <amynka@gentoo.org (2018-01-21)
 # dev-libs/cereal not keyworded for ppc
-media-libs/opencv contrib_dnn
+media-libs/opencv contribdnn
 
 # Robin H. Johnson <robbat2@gentoo.org> (2017-11-10)
 # Masked for dependencies:
@@ -102,11 +114,7 @@ media-libs/mesa vulkan vulkan-overlay
 
 # Michał Górny <mgorny@gentoo.org> (2017-08-08)
 # Requires USE=opencl that is masked in this profile.
-net-misc/bfgminer adl lm_sensors
-
-# Jason Zaman <perfinion@gentoo.org> (2017-05-09)
-# x11-libs/libXpresent is not keyworded on ppc
-xfce-base/xfwm4 xpresent
+net-misc/bfgminer adl lm-sensors
 
 # Michael Weber <xmw@gentoo.org> (2017-04-06)
 # mask unkeyworded dep pymongo -> mongodb
@@ -124,6 +132,10 @@ sci-geosciences/gpsbabel gui
 # James Le Cuirot <chewi@gentoo.org> (2016-12-14)
 # DOSBox + OpenGLide is untested on this arch.
 games-emulation/dosbox glide
+
+# Fabian Groffen <grobian@gentoo.org> (2016-12-07)
+# unkeyworded notmuch dependency, bug #587560
+mail-client/mutt notmuch
 
 # Thomas Deutschmann <whissi@gentoo.org> (2016-08-26)
 # Enable numa support on supported architectures
@@ -145,10 +157,6 @@ sys-block/gparted kde
 virtual/notification-daemon kde
 x11-wm/sawfish kde
 
-# Justin Lecher <jlec@gentoo.org> (2016-02-22)
-# Missing test deps keyword #575366
-dev-cpp/eigen test
-
 # Pacho Ramos <pacho@gentoo.org> (2015-11-15)
 # Missing keywords
 media-sound/rhythmbox upnp-av
@@ -169,10 +177,6 @@ x11-base/xorg-drivers video_cards_amdgpu
 # Missing keywords
 net-dns/unbound dnstap
 
-# Markos Chandras <hwoarang@gentoo.org> (2015-04-18)
-# samba-4 not keyworded on ppc/ppc64
-sys-auth/sssd samba
-
 # Mike Frysinger <vapier@gentoo.org> (2015-03-16)
 # Needs sci-physics/bullet & media-libs/libsdl2 tested #499974
 dev-libs/efl physics sdl
@@ -180,14 +184,6 @@ dev-libs/efl physics sdl
 # Andreas K. Huettel <dilfridge@gentoo.org> (2015-02-15)
 # There's no keyworded office implementation anymore.
 gnome-extra/sushi office
-
-# Alexis Ballier <aballier@gentoo.org> (2015-02-11)
-# Missing ffmpeg deps, bug #510340
-media-video/ffmpeg x265
-
-# Patrick Lauer <patrick@gentoo.org> (2015-02-10)
-# Missing keywords for media-libs/x265
-media-video/libav x265
 
 # Markos Chandras <hwoarang@gentoo.org> (2015-02-07)
 # app-admin/cgmanager misses PPC/PPC64 keywords. Bug #539208
@@ -295,7 +291,7 @@ net-vpn/tor tor-hardening
 
 # Pacho Ramos <pacho@gentoo.org> (2012-05-07)
 # libhid is not keyworded
-app-misc/lcdproc hid lcd_devices_mdm166a
+app-misc/lcdproc lcd_devices_mdm166a
 
 # Brent Baude <ranger@gentoo.org> (2012-03-06)
 # masking wimax use flag

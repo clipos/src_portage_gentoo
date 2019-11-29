@@ -1,6 +1,19 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
+# Thomas Deutschmann <whissi@gentoo.org> (2019-11-11)
+# dev-util/google-perftools is not keyworded yet
+sys-block/fio tcmalloc
+
+# Mart Raudsepp <leio@gentoo.org> (2019-08-18)
+# media-video/pipewire is not keyworded yet
+x11-wm/mutter screencast
+
+# Matt Turner <mattst88@gentoo.org> (2019-08-08)
+# Tomáš Mózes <hydrapolic@gmail.com> (2019-07-24)
+# Unkeyworded dependency
+app-admin/syslog-ng kafka
+
 # Sergei Trofimovich <slyfox@gentoo.org> (2019-05-21)
 # No ia64 arch support for jit. Version 17 USE=debug
 # required USE=jit.
@@ -20,7 +33,7 @@ media-sound/lame debug
 # USE=server does not compile and needs upstream fix: bug #662040
 >=sys-devel/gdb-8.1 server
 
-# Joonas Niilola <juippis@gmail.com> (2018-06-17)
+# Joonas Niilola <juippis@gentoo.org> (2018-06-17)
 # Optional dependency not available for this arch
 dev-libs/efl vlc
 

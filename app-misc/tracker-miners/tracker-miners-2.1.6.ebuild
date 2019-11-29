@@ -34,7 +34,7 @@ RDEPEND="
 	flac? ( >=media-libs/flac-1.2.1 )
 	raw? ( media-libs/gexiv2 )
 	>=dev-libs/icu-4.8.1.2:=
-	cue? ( media-libs/libcue )
+	cue? ( media-libs/libcue:= )
 	exif? ( >=media-libs/libexif-0.6 )
 	gsf? ( >=gnome-extra/libgsf-1.14.24:= )
 	xps? ( app-text/libgxps )
@@ -143,4 +143,14 @@ src_configure() {
 
 src_test() {
 	dbus-run-session meson test -C "${BUILD_DIR}" || die 'tests failed'
+}
+
+pkg_postinst() {
+	xdg_pkg_postinst
+	gnome2_schemas_update
+}
+
+pkg_postrm() {
+	xdg_pkg_postrm
+	gnome2_schemas_update
 }

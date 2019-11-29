@@ -16,7 +16,7 @@ IUSE="+bluetooth +browser-extension elogind gtk-doc +ibus +networkmanager nsplug
 REQUIRED_USE="${PYTHON_REQUIRED_USE}
 	?? ( elogind systemd )"
 
-KEYWORDS="amd64 ~arm ~ppc ~ppc64 x86"
+KEYWORDS="amd64 ~arm ~arm64 ~ppc ~ppc64 x86"
 
 # libXfixes-5.0 needed for pointer barriers and #include <X11/extensions/Xfixes.h>
 # FIXME:
@@ -58,7 +58,7 @@ DEPEND="
 
 	${PYTHON_DEPS}
 	dev-python/pygobject:3[${PYTHON_USEDEP}]
-	media-libs/mesa
+	media-libs/mesa[X(+)]
 "
 # Runtime-only deps are probably incomplete and approximate.
 # Introspection deps generated using:

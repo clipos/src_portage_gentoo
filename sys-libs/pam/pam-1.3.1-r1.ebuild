@@ -3,7 +3,7 @@
 
 EAPI=7
 
-inherit autotools db-use fcaps multilib-minimal toolchain-funcs
+inherit autotools db-use fcaps multilib-minimal toolchain-funcs usr-ldscript
 
 DESCRIPTION="Linux-PAM (Pluggable Authentication Modules)"
 HOMEPAGE="https://github.com/linux-pam/linux-pam"
@@ -30,7 +30,6 @@ DEPEND="
 	nis? ( >=net-libs/libtirpc-0.2.4-r2[${MULTILIB_USEDEP}] )
 	nls? ( >=virtual/libintl-0-r1[${MULTILIB_USEDEP}] )"
 RDEPEND="${DEPEND}
-	!sys-auth/openpam
 	!sys-auth/pam_userdb"
 
 PDEPEND="sys-auth/pambase"
@@ -81,21 +80,7 @@ multilib_src_install() {
 	emake DESTDIR="${D}" install \
 		sepermitlockdir="${EPREFIX}/run/sepermit"
 
-	local prefix
-	if multilib_is_native_abi; then
-		prefix=
-		gen_usr_ldscript -a pam pamc pam_misc
-	else
-		prefix=/usr
-	fi
-
-	# create extra symlinks just in case something depends on them...
-	local lib
-	for lib in pam pamc pam_misc; do
-		if ! [[ -f "${ED}"${prefix}/$(get_libdir)/lib${lib}$(get_libname) ]]; then
-			dosym lib${lib}$(get_libname 0) ${prefix}/$(get_libdir)/lib${lib}$(get_libname)
-		fi
-	done
+	gen_usr_ldscript -a pam pam_misc pamc
 }
 
 multilib_src_install_all() {

@@ -3,17 +3,17 @@
 
 EAPI=7
 
-EGIT_REPO_URI="https://github.com/NVIDIA/${PN}.git"
+EGIT_REPO_URI="https://gitlab.freedesktop.org/glvnd/libglvnd.git"
 
 if [[ ${PV} = 9999* ]]; then
 	GIT_ECLASS="git-r3"
 fi
 
-PYTHON_COMPAT=( python2_7 )
+PYTHON_COMPAT=( python{2_7,3_5,3_6,3_7} )
 inherit autotools ${GIT_ECLASS} multilib-minimal python-any-r1
 
 DESCRIPTION="The GL Vendor-Neutral Dispatch library"
-HOMEPAGE="https://github.com/NVIDIA/libglvnd"
+HOMEPAGE="https://gitlab.freedesktop.org/glvnd/libglvnd"
 if [[ ${PV} = 9999* ]]; then
 	SRC_URI=""
 else
@@ -25,27 +25,30 @@ fi
 
 LICENSE="MIT"
 SLOT="0"
-IUSE=""
+IUSE="X"
 
 RDEPEND="
 	!media-libs/mesa[-libglvnd(-)]
-	x11-libs/libX11[${MULTILIB_USEDEP}]
-	"
+	!<media-libs/mesa-19.2.2
+	X? (
+		x11-libs/libX11[${MULTILIB_USEDEP}]
+		x11-libs/libXext[${MULTILIB_USEDEP}]
+	)"
 DEPEND="${PYTHON_DEPS}
-	${RDEPEND}"
-
-src_unpack() {
-	default
-	[[ $PV = 9999* ]] && git-r3_src_unpack
-}
+	${RDEPEND}
+	X? ( x11-base/xorg-proto )"
 
 src_prepare() {
 	default
-	eautoreconf
+	[[ $PV = 9999* ]] && eautoreconf
 }
 
 multilib_src_configure() {
-	ECONF_SOURCE=${S} econf
+	myconf=(
+		$(use_enable X x11)
+		$(use_enable X glx)
+	)
+	ECONF_SOURCE=${S} econf "${myconf[@]}"
 }
 
 multilib_src_install() {

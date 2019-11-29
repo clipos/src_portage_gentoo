@@ -3,7 +3,7 @@
 
 EAPI=5
 
-inherit libtool multilib multilib-minimal eutils pam toolchain-funcs flag-o-matic db-use fcaps
+inherit libtool multilib multilib-minimal eutils pam toolchain-funcs flag-o-matic db-use fcaps usr-ldscript
 
 MY_PN="Linux-PAM"
 MY_P="${MY_PN}-${PV}"
@@ -34,7 +34,6 @@ PDEPEND="sys-auth/pambase"
 
 RDEPEND="${RDEPEND}
 	!<sys-apps/openrc-0.11.8
-	!sys-auth/openpam
 	!sys-auth/pam_userdb"
 
 S="${WORKDIR}/${MY_P}"

@@ -12,7 +12,7 @@ CPY_PATCHSET_VERSION="2.7.15"
 MY_P=pypy2.7-v${PV}
 
 DESCRIPTION="A fast, compliant alternative implementation of the Python language"
-HOMEPAGE="http://pypy.org/"
+HOMEPAGE="https://pypy.org/"
 SRC_URI="
 	https://dev.gentoo.org/~floppym/python/python-gentoo-patches-${CPY_PATCHSET_VERSION}.tar.xz"
 
@@ -21,13 +21,13 @@ LICENSE="MIT"
 # pypy 7.0.0: install directory changed to 'pypy2.7'
 SLOT="0/41-py27"
 KEYWORDS=""
-IUSE="bzip2 gdbm +jit libressl low-memory ncurses sandbox sqlite cpu_flags_x86_sse2 test tk"
+IUSE="bzip2 gdbm +jit libressl low-memory ncurses sandbox sqlite cpu_flags_x86_sse2 tk"
 
 RDEPEND=">=sys-libs/zlib-1.1.3:0=
 	virtual/libffi:0=
 	virtual/libintl:0=
 	dev-libs/expat:0=
-	!libressl? ( dev-libs/openssl:0=[-bindist] )
+	!libressl? ( dev-libs/openssl:0= )
 	libressl? ( dev-libs/libressl:0= )
 	bzip2? ( app-arch/bzip2:0= )
 	gdbm? ( sys-libs/gdbm:0= )
@@ -202,6 +202,7 @@ src_compile() {
 	# Generate cffi modules
 	# Please keep in sync with pypy/tool/build_cffi_imports.py!
 #cffi_build_scripts = {
+#    "_ssl": "_ssl_build.py",
 #    "sqlite3": "_sqlite3_build.py",
 #    "audioop": "_audioop_build.py",
 #    "tk": "_tkinter/tklib_build.py",
@@ -210,7 +211,7 @@ src_compile() {
 #    "gdbm": "_gdbm_build.py"  if sys.platform != "win32" else None,
 #    "pwdgrp": "_pwdgrp_build.py" if sys.platform != "win32" else None,
 #    "resource": "_resource_build.py" if sys.platform != "win32" else None,
-	cffi_targets=( audioop syslog pwdgrp resource )
+	cffi_targets=( ssl audioop syslog pwdgrp resource )
 	use gdbm && cffi_targets+=( gdbm )
 	use ncurses && cffi_targets+=( curses )
 	use sqlite && cffi_targets+=( sqlite3 )
@@ -253,7 +254,7 @@ src_install() {
 	einfo "Installing PyPy ..."
 	exeinto "${dest}"
 	doexe pypy-c libpypy-c.so
-	pax-mark m "${ED%/}${dest}/pypy-c" "${ED%/}${dest}/libpypy-c.so"
+	pax-mark m "${ED}${dest}/pypy-c" "${ED}${dest}/libpypy-c.so"
 	insinto "${dest}"
 	# preserve mtimes to avoid obsoleting caches
 	insopts -p
@@ -262,21 +263,21 @@ src_install() {
 	dodoc README.rst
 
 	if ! use gdbm; then
-		rm -r "${ED%/}${dest}"/lib_pypy/gdbm.py \
-			"${ED%/}${dest}"/lib-python/*2.7/test/test_gdbm.py || die
+		rm -r "${ED}${dest}"/lib_pypy/gdbm.py \
+			"${ED}${dest}"/lib-python/*2.7/test/test_gdbm.py || die
 	fi
 	if ! use sqlite; then
-		rm -r "${ED%/}${dest}"/lib-python/*2.7/sqlite3 \
-			"${ED%/}${dest}"/lib_pypy/_sqlite3.py \
-			"${ED%/}${dest}"/lib-python/*2.7/test/test_sqlite.py || die
+		rm -r "${ED}${dest}"/lib-python/*2.7/sqlite3 \
+			"${ED}${dest}"/lib_pypy/_sqlite3.py \
+			"${ED}${dest}"/lib-python/*2.7/test/test_sqlite.py || die
 	fi
 	if ! use tk; then
-		rm -r "${ED%/}${dest}"/lib-python/*2.7/{idlelib,lib-tk} \
-			"${ED%/}${dest}"/lib_pypy/_tkinter \
-			"${ED%/}${dest}"/lib-python/*2.7/test/test_{tcl,tk,ttk*}.py || die
+		rm -r "${ED}${dest}"/lib-python/*2.7/{idlelib,lib-tk} \
+			"${ED}${dest}"/lib_pypy/_tkinter \
+			"${ED}${dest}"/lib-python/*2.7/test/test_{tcl,tk,ttk*}.py || die
 	fi
 
-	local -x PYTHON=${ED%/}${dest}/pypy-c
+	local -x PYTHON=${ED}${dest}/pypy-c
 	# we can't use eclass function since PyPy is dumb and always gives
 	# paths relative to the interpreter
 	local PYTHON_SITEDIR=${EPREFIX}/usr/lib/pypy2.7/site-packages
@@ -288,5 +289,5 @@ src_install() {
 	einfo "Byte-compiling Python standard library..."
 
 	# compile the installed modules
-	python_optimize "${ED%/}${dest}"
+	python_optimize "${ED}${dest}"
 }

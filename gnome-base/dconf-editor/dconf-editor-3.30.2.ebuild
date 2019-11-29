@@ -3,6 +3,7 @@
 
 EAPI=6
 VALA_MIN_API_VERSION="0.40"
+VALA_MAX_API_VERSION="0.42"
 
 inherit gnome.org gnome2-utils meson vala xdg
 
@@ -12,7 +13,7 @@ HOMEPAGE="https://gitlab.gnome.org/GNOME/dconf-editor"
 LICENSE="GPL-3+"
 SLOT="0"
 
-KEYWORDS="~alpha amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~sh ~sparc x86 ~x86-fbsd ~x86-linux"
+KEYWORDS="~alpha amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~sh ~sparc x86 ~x86-linux"
 
 RDEPEND="
 	>=gnome-base/dconf-0.26.1

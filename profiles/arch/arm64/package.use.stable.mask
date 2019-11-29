@@ -1,33 +1,50 @@
-# Copyright 1999-2019 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-# Aaron Bauman <bman@gentoo.org> (2019-05-27)
-# media-libs/dav1d is not stable
-~media-video/vlc-3.0.6 dav1d
+# Craig Andrews <candrews@gentoo.org> (2019-11-26)
+# net-libs/quiche is an early HTTP/3 implementation
+# not yet ready for everyone.
+net-misc/curl quiche
+
+# Luke Dashjr <luke-jr+gentoobugs@utopios.org> (2019-09-21)
+# iasl is keyworded ~arm64
+sys-firmware/seabios debug
+
+# Andreas Sturmlechner <asturm@gentoo.org> (2019-09-14)
+# media-video/pipewire is not stable yet
+dev-libs/weston pipewire
+kde-apps/krfb wayland
+kde-plasma/xdg-desktop-portal-kde screencast
+sys-apps/xdg-desktop-portal screencast
+x11-wm/mutter screencast
+
+# Aaron Bauman (2019-08-01)
+# app-text/docbook2X fails test
+dev-cpp/libcmis man
+
+# Aaron Bauman (2019-07-29)
+# no ocamlopt stuff here...
+kde-apps/kalzium solver
+
+# Aaron Bauman (2019-07-29)
+# app-arch/rar not supported
+kde-apps/kdeutils-meta rar
+
+# Aaron Bauman (2019-07-29)
+# deps are not stable yet
+net-im/pidgin eds
 
 # Aaron Bauman <bman@gentoo.org> (2019-05-20)
 # deps are not stable yet
-virtual/notification-daemon gnome kde
+virtual/notification-daemon gnome
 
 # Aaron Bauman <bman@gentoo.org> (2019-05-15)
 # packages for these USE flags fail tests
-media-libs/opencv contrib_cvv contrib_hdf contrib_sfm glog gstreamer
-
-# Andreas Sturmlechner <asturm@gentoo.org> (2019-02-10)
-# kde-frameworks/kconfig is not stable for arm64
-net-libs/libproxy kde
-
-# Andreas Sturmlechner <asturm@gentoo.org> (2019-02-10)
-# kde-plasma/polkit-kde-agent is not stable for arm64
-sys-auth/polkit kde
+media-libs/opencv contribcvv contribhdf contribsfm glog gstreamer
 
 # Mart Raudsepp <leio@gentoo.org> (2019-01-18)
 # Respective x11-drivers/ not tested and stable yet
 x11-base/xorg-drivers input_devices_elographics input_devices_joystick input_devices_void video_cards_dummy video_cards_fbdev video_cards_nouveau
-
-# Mart Raudsepp <leio@gentoo.org> (2018-09-11)
-# net-wireless/bluez not stable yet
-dev-lang/python bluetooth
 
 # Mart Raudsepp <leio@gentoo.org> (2018-07-24)
 # Temporary mask due to test failures in sys-libs/libcxxabi
@@ -53,10 +70,6 @@ app-doc/doxygen clang doxysearch doc
 # Mart Raudsepp <leio@gentoo.org> (2018-05-29)
 # virtual/opengl and media-libs/freeglut not stable yet
 media-libs/libwebp opengl
-
-# Mart Raudsepp <leio@gentoo.org> (2018-05-06)
-# No media-libs/freeglut and co stable yet
-media-libs/jasper opengl
 
 # Mart Raudsepp <leio@gentoo.org> (2018-05-04)
 # sci-libs/mpir fails tests, bug 640424

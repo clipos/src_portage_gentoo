@@ -5,7 +5,7 @@ EAPI="6"
 
 PYTHON_COMPAT=( python{2_7,3_5,3_6} )
 
-inherit autotools multilib multilib-minimal toolchain-funcs preserve-libs python-r1 linux-info systemd
+inherit autotools multilib multilib-minimal toolchain-funcs preserve-libs python-r1 linux-info systemd usr-ldscript
 
 DESCRIPTION="Userspace utilities for storing and processing auditing records"
 HOMEPAGE="https://people.redhat.com/sgrubb/audit/"
@@ -188,8 +188,6 @@ multilib_src_install_all() {
 
 	newinitd "${FILESDIR}"/auditd-init.d-2.4.3 auditd
 	newconfd "${FILESDIR}"/auditd-conf.d-2.1.3 auditd
-
-	fperms 644 "$(systemd_get_systemunitdir)"/auditd.service # 556436
 
 	[ -f "${ED}"/sbin/audisp-remote ] && \
 	dodir /usr/sbin && \

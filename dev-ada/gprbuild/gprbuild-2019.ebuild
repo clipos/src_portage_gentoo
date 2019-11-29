@@ -17,7 +17,7 @@ SRC_URI="
 		-> ${XMLADA}.tar.gz"
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="amd64 x86"
 IUSE="gnat_2017 gnat_2018 +gnat_2019"
 
 DEPEND="gnat_2017? ( dev-lang/gnat-gpl:6.3.0 )
@@ -53,7 +53,7 @@ src_prepare() {
 }
 
 src_configure() {
-	emake prefix="${D}"usr setup
+	emake prefix="${D}"/usr setup
 }
 
 bin_progs="gprbuild gprconfig gprclean gprinstall gprname gprls"

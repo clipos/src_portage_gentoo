@@ -14,7 +14,11 @@ SLOT="0"
 KEYWORDS="~amd64 ~arm ~x86"
 IUSE="acl ipv6 libressl test xattr"
 
-CDEPEND="dev-libs/uthash
+RESTRICT="!test? ( test )"
+
+CDEPEND=" acct-group/burp
+	acct-user/burp
+	dev-libs/uthash
 	net-libs/librsync
 	sys-libs/ncurses:0=
 	sys-libs/zlib
@@ -26,8 +30,6 @@ DEPEND="${CDEPEND}
 	virtual/pkgconfig
 	test? ( dev-libs/check )"
 RDEPEND="${CDEPEND}
-	acct-group/burp
-	acct-user/burp
 	virtual/logger"
 
 PATCHES=(

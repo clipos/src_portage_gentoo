@@ -3,23 +3,22 @@
 
 EAPI=6
 
-CMAKE_BUILD_TYPE=Release
 # ninja does not work due to fortran
 CMAKE_MAKEFILE_GENERATOR=emake
 FORTRAN_NEEDED="fortran"
 PYTHON_COMPAT=( python2_7 python3_{5,6,7} )
 
 inherit cmake-utils cuda eapi7-ver elisp-common eutils fortran-2 \
-	llvm prefix python-single-r1 toolchain-funcs
+	prefix python-single-r1 toolchain-funcs
 
 DESCRIPTION="C++ data analysis framework and interpreter from CERN"
 HOMEPAGE="https://root.cern"
 
-IUSE="+X aqua +asimage +c++11 c++14 c++17 cuda +davix emacs +examples
-	fits fftw fortran +gdml graphviz +gsl http libcxx +minuit mysql
-	odbc +opengl oracle postgres prefix pythia6 pythia8 +python qt5 R
-	+roofit root7 shadow sqlite +ssl +tbb test +tmva +unuran vc vmc
-	+xml xrootd"
+IUSE="+X aqua +asimage +c++11 c++14 c++17 cuda +davix debug emacs
+	+examples fits fftw fortran +gdml graphviz +gsl http libcxx +minuit
+	mysql odbc +opengl oracle postgres prefix pythia6 pythia8 +python
+	qt5 R +roofit root7 shadow sqlite +ssl +tbb test +tmva +unuran vc
+	vmc +xml xrootd"
 
 if [[ ${PV} =~ "9999" ]] ; then
 	inherit git-r3
@@ -51,6 +50,7 @@ REQUIRED_USE="
 
 CDEPEND="
 	app-arch/lz4
+	app-arch/zstd
 	app-arch/xz-utils
 	fortran? ( dev-lang/cfortran )
 	dev-libs/libpcre:3
@@ -58,7 +58,6 @@ CDEPEND="
 	media-fonts/dejavu
 	media-libs/freetype:2
 	media-libs/libpng:0=
-	sys-devel/llvm:5=
 	sys-libs/ncurses:=
 	sys-libs/zlib
 	X? (
@@ -119,8 +118,6 @@ PATCHES=(
 )
 
 pkg_setup() {
-	LLVM_MAX_SLOT=5 llvm_pkg_setup
-
 	use fortran && fortran-2_pkg_setup
 	use python && python-single-r1_pkg_setup
 
@@ -137,8 +134,6 @@ src_prepare() {
 
 	# CSS should use local images
 	sed -i -e 's,http://.*/,,' etc/html/ROOT.css || die "html sed failed"
-
-	hprefixify core/clingutils/CMakeLists.txt
 }
 
 # Note: ROOT uses bundled clang because it is patched and API-incompatible
@@ -152,8 +147,6 @@ src_configure() {
 		-DCMAKE_C_FLAGS="${CFLAGS}"
 		-DCMAKE_CXX_FLAGS="${CXXFLAGS}"
 		-DCMAKE_CXX_STANDARD=$((usev c++11 || usev c++14 || usev c++17) | cut -c4-)
-		-DPYTHON_EXECUTABLE="${PYTHON}"
-		-DLLVM_CONFIG="$(type -P "${CHOST}-llvm-config")"
 		-DCMAKE_INSTALL_PREFIX="${EPREFIX%/}/usr/lib/${PN}/$(ver_cut 1-2)"
 		-DCMAKE_INSTALL_MANDIR="${EPREFIX%/}/usr/lib/${PN}/$(ver_cut 1-2)/share/man"
 		-DCMAKE_INSTALL_LIBDIR="lib"
@@ -165,7 +158,7 @@ src_configure() {
 		-Dgnuinstall=OFF
 		-Dshared=ON
 		-Dsoversion=ON
-		-Dbuiltin_llvm=OFF
+		-Dbuiltin_llvm=ON
 		-Dbuiltin_clang=ON
 		-Dbuiltin_afterimage=OFF
 		-Dbuiltin_cfitsio=OFF
@@ -254,6 +247,7 @@ src_configure() {
 		${EXTRA_ECONF}
 	)
 
+	CMAKE_BUILD_TYPE=$(usex debug Debug Release) \
 	cmake-utils_src_configure
 }
 

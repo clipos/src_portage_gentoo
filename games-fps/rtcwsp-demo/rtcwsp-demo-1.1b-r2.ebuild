@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -8,14 +8,13 @@ MY_P="wolfspdemo-linux-${PV}.x86.run"
 
 DESCRIPTION="Return to Castle Wolfenstein - Single-player demo"
 HOMEPAGE="http://games.activision.com/games/wolfenstein/"
-SRC_URI="mirror://idsoftware/wolf/linux/old/${MY_P}
-	mirror://3dgamers/returnwolfenstein/${MY_P}"
+SRC_URI="mirror://idsoftware/wolf/linux/old/${MY_P}"
 
 LICENSE="RTCW"
 SLOT="0"
 KEYWORDS="-* ~amd64 ~x86"
 IUSE=""
-RESTRICT="strip mirror"
+RESTRICT="bindist strip mirror"
 
 RDEPEND="sys-libs/glibc
 	amd64? ( sys-libs/glibc[multilib] )

@@ -1,9 +1,15 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-# Aaron Bauman <bman@gentoo.org> (2019-04-14)
-# Masked due to vulnerability in dev-libs/ace
-dev-cpp/xsd ace
+# Peter Levine <plevine457@gmail.com> (2019-10-01)
+# Native inotify support is preferred on linux.
+# https://bugs.gentoo.org/697476
+net-fs/samba fam
+
+# Patrick McLean <chutzpah@gentoo.org> (2019-09-17)
+# Masked due to upstream build failures (bug #693018)
+# One example: https://tracker.ceph.com/issues/41523
+>=sys-cluster/ceph-14.2 dpdk
 
 # Jason Zaman <perfinion@gentoo.org> (2015-09-06)
 # This is masked in base/package.use.mask as Linux only.
@@ -12,12 +18,6 @@ sys-auth/consolekit -cgroups
 # Michael Palimaka <kensington@gentoo.org> (2015-09-03)
 # Native inotify support is preferred on linux.
 kde-frameworks/kcoreaddons fam
-
-# Christian Ruppert <idl0r@gentoo.org> (2015-08-23)
-# seccomp seems completely broken currently but has been added as global default
-# apparently... #558100
-# https://archives.gentoo.org/gentoo-dev/message/38503d86a1c41bccfa607745467b1be7
-net-dns/bind seccomp
 
 # Diego Elio Pettenò (2012-08-27)
 # The libpci access is only used for linux.

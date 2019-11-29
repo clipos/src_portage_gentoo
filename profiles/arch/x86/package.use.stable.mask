@@ -17,26 +17,31 @@
 
 #--- END OF EXAMPLES ---
 
+# Nick Sarnie <sarnex@gentoo.org> (2019-10-14)
+# Allow on stable for now
+app-emulation/wine-d3d9 -d3d9
+virtual/wine -d3d9
+
+# Andreas Sturmlechner <asturm@gentoo.org> (2019-09-13)
+# media-video/pipewire is not stable yet
+dev-libs/weston pipewire
+kde-apps/krfb wayland
+kde-plasma/xdg-desktop-portal-kde screencast
+sys-apps/xdg-desktop-portal screencast
+x11-wm/mutter screencast
+
 # Brian Evans <grknight@gentoo.org> (2019-05-22)
 # Allow python-exec to install all targets
 # Ack by mgorny
-dev-lang/python-exec -python_targets_python3_7
+dev-lang/python-exec -python_targets_python3_7 -python_targets_python3_8
 
 # Andreas Sturmlechner <asturm@gentoo.org> (2019-05-21)
 # dev-db/oracle-instantclient ain't stable
 dev-qt/qtsql oci8
 
-# Andreas Sturmlechner <asturm@gentoo.org> (2019-05-06)
-# media-libs/dav1d is not yet stable
-~media-video/vlc-3.0.6 dav1d
-
 # Amy Liffey <amynka@gentoo.org> (2019-01-15)
 # Mask experimental contrib repo
-media-libs/opencv contrib contrib_cvv contrib_dnn contrib_hdf contrib_sfm contrib_xfeatures2d gflags glog tesseract
-
-# Brian Evans <grknight@gentoo.org> (2018-12-06)
-# Unmask argon2 for php
-dev-lang/php -argon2
+media-libs/opencv contrib contribcvv contribdnn contribhdf contribsfm contribxfeatures2d gflags glog tesseract
 
 # Mikle Kolyada <zlogene@gentoo.org> (2018-11-07)
 # unmask sssd for sudo
@@ -45,8 +50,6 @@ app-admin/sudo -sssd
 # Mart Raudsepp <leio@gentoo.org> (2018-11-01)
 # net-wireless/iwd not stable yet
 net-misc/networkmanager iwd
-# Ben Kohler <bkohler@gentoo.org> (2019-05-22)
-net-misc/connman iwd
 
 # Thomas Deutschmann <whissi@gentoo.org> (2018-09-27)
 # sys-devel/lld is unstable

@@ -11,7 +11,7 @@ SRC_URI="https://github.com/${PN}/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="CC0-1.0 LGPL-2.1+ public-domain"
 SLOT="0"
-KEYWORDS="amd64 arm arm64 ~ia64 ~ppc ~ppc64 ~sparc x86"
+KEYWORDS="~alpha amd64 arm arm64 ~ia64 ppc ppc64 sparc x86"
 IUSE="+acl debug doc +pam +policykit selinux"
 
 COMMON_DEPEND="
@@ -19,7 +19,7 @@ COMMON_DEPEND="
 	sys-libs/libcap
 	virtual/libudev:=
 	acl? ( sys-apps/acl )
-	pam? ( virtual/pam )
+	pam? ( sys-libs/pam )
 	selinux? ( sys-libs/libselinux )
 "
 DEPEND="${COMMON_DEPEND}
@@ -55,7 +55,7 @@ src_prepare() {
 }
 
 src_configure() {
-	local rccgroupmode="$(grep rc_cgroup_mode /etc/rc.conf | cut -d '"' -f 2)"
+	local rccgroupmode="$(grep rc_cgroup_mode \"${EPREFIX}/etc/rc.conf\" | cut -d '"' -f 2)"
 	local cgroupmode="legacy"
 
 	if [[ "xhybrid" = "x${rccgroupmode}" ]] ; then
@@ -68,7 +68,7 @@ src_configure() {
 		-Ddocdir="${EPREFIX}/usr/share/doc/${PF}"
 		-Dhtmldir="${EPREFIX}/usr/share/doc/${PF}/html"
 		-Dpamlibdir=$(getpam_mod_dir)
-		-Dudevrulesdir="$(get_udevdir)"/rules.d
+		-Dudevrulesdir="${EPREFIX}$(get_udevdir)"/rules.d
 		--libdir="${EPREFIX}"/usr/$(get_libdir)
 		-Drootlibdir="${EPREFIX}"/$(get_libdir)
 		-Drootlibexecdir="${EPREFIX}"/$(get_libdir)/elogind

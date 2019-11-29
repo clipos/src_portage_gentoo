@@ -23,7 +23,7 @@ LICENSE="|| ( GPL-3 LGPL-3 )"
 # -r1 is a one-off subslot bump where SONAME changed for bug #666100
 SLOT="0/${PV}-r1"
 IUSE="64-bit-bfd multitarget nls static-libs"
-KEYWORDS="alpha amd64 arm arm64 ~hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86 ~amd64-fbsd ~x86-fbsd"
+KEYWORDS="alpha amd64 arm arm64 ~hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86"
 
 COMMON_DEPEND="sys-libs/zlib[${MULTILIB_USEDEP}]"
 DEPEND="${COMMON_DEPEND}
@@ -87,7 +87,7 @@ multilib_src_configure() {
 		# We pull in all USE-flags that change ABI in an incompatible
 		# way. #666100
 		# USE=multitarget change size of global arrays
-		# USE=64-bit-bfd changes data structures of exported API 
+		# USE=64-bit-bfd changes data structures of exported API
 		--with-extra-soversion-suffix=gentoo-${CATEGORY}-${PN}-$(usex multitarget mt st)-$(usex 64-bit-bfd 64 def)
 	)
 

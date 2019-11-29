@@ -9,14 +9,15 @@ HOMEPAGE="https://wiki.gnome.org/Apps/Calendar"
 
 LICENSE="GPL-3+"
 SLOT="0"
-KEYWORDS="amd64 x86"
+KEYWORDS="amd64 ~arm64 x86"
 IUSE="gtk-doc"
 
 # >=libical-1.0.1 for https://bugzilla.gnome.org/show_bug.cgi?id=751244
 RDEPEND="
 	>=dev-libs/libical-1.0.1:0=
 	>=gnome-base/gsettings-desktop-schemas-3.21.2
-	>=gnome-extra/evolution-data-server-3.17.1:=
+	>=gnome-extra/evolution-data-server-3.17.1:=[gtk]
+	<gnome-extra/evolution-data-server-3.31
 	net-libs/libsoup:2.4
 	>=dev-libs/libdazzle-3.26.1
 	>=dev-libs/glib-2.58.0:2

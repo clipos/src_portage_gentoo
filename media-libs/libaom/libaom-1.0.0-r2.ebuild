@@ -16,7 +16,7 @@ else
 		SRC_URI="mirror://gentoo/${P}.tar.gz"
 		S="${WORKDIR}"
 	fi
-	KEYWORDS="~alpha amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~x86"
+	KEYWORDS="alpha amd64 arm arm64 ~hppa ia64 ppc ppc64 ~sparc x86"
 fi
 
 DESCRIPTION="Alliance for Open Media AV1 Codec SDK"
@@ -47,6 +47,7 @@ PATCHES=(
 	"${FILESDIR}/pthread_lib2.patch"
 	"${FILESDIR}/${P}-version.patch"
 	"${FILESDIR}/${P}-armv7l.patch"
+	"${FILESDIR}/${P}-update-vsx-ppc.patch"
 )
 
 # the PATENTS file is required to be distributed with this package bug #682214

@@ -4,16 +4,16 @@
 # This file requires eapi 5 or later. New entries go on top.
 # Please use the same syntax as in use.mask
 
+# Ben Kohler <bkohler@gentoo.org> (2019-06-11)
+# Pulls in net-libs/axtls which is not stable for sparc
+curl_ssl_axtls
+
 # Sergei Trofimovich <slyfox@gentoo.org> (2019-02-02)
 # No stable app-arch/rpm on sparc.
 rpm
 
 # Andreas Sturmlechner <asturm@gentoo.org> (2019-04-23)
 openal
-
-# Andreas Sturmlechner <asturm@gentoo.org> (2019-04-09)
-# sys-auth/elogind not stable yet. bug #682158
-elogind
 
 # Sergei Trofimovich <slyfox@gentoo.org> (2019-02-02)
 # clamav has no stable versions yet
@@ -23,6 +23,8 @@ clamav
 # dev-lang/python:3.7 is not stable.
 python_targets_python3_7
 python_single_target_python3_7
+python_targets_python3_8
+python_single_target_python3_8
 
 # Andrey Grozin <grozin@gentoo.org> (2014-06-25)
 # no stable version on sparc

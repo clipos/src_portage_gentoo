@@ -1,5 +1,4 @@
 # Copyright 1999-2019 Gentoo Authors
-# Copyright 2017-2018 Sony Interactive Entertainment Inc.
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -12,14 +11,10 @@ SRC_URI="http://www.thekelleys.org.uk/dnsmasq/${P}.tar.xz"
 
 LICENSE="|| ( GPL-2 GPL-3 )"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~x86-fbsd"
+KEYWORDS="alpha amd64 arm arm64 hppa ia64 ~mips ppc ppc64 ~s390 ~sh sparc x86"
 
 IUSE="auth-dns conntrack dbus +dhcp dhcp-tools dnssec +dumpfile id idn libidn2"
 IUSE+=" +inotify ipv6 lua nls script selinux static tftp"
-
-PATCHES=(
-	"${FILESDIR}/${P}-nettle-3.5.patch"
-)
 
 DM_LINGUAS=(de es fi fr id it no pl pt_BR ro)
 
@@ -57,6 +52,11 @@ RDEPEND="${COMMON_DEPEND}
 REQUIRED_USE="dhcp-tools? ( dhcp )
 	lua? ( script )
 	libidn2? ( idn )"
+
+PATCHES=(
+	"${FILESDIR}/dnsmasq-2.80-nettle-3.5.patch"
+	"${FILESDIR}/dnsmasq-2.80-linux-headers-5.2.patch"
+)
 
 use_have() {
 	local useflag no_only uword

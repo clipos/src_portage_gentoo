@@ -10,7 +10,7 @@ inherit distutils-r1 flag-o-matic toolchain-funcs
 
 DESCRIPTION="I2C tools for bus probing, chip dumping, EEPROM decoding, and more"
 HOMEPAGE="https://www.kernel.org/pub/software/utils/i2c-tools"
-SRC_URI="${HOMEPAGE}/${P}.tar.xz"
+SRC_URI="https://www.kernel.org/pub/software/utils/${PN}/${P}.tar.xz"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -18,7 +18,7 @@ KEYWORDS="~amd64 ~arm ~arm64 ~mips ~ppc ~ppc64 ~sparc ~x86"
 IUSE="perl python static-libs"
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
 
-RDEPEND="!<sys-apps/lm_sensors-3
+RDEPEND="!<sys-apps/lm-sensors-3
 	python? ( ${PYTHON_DEPS} )"
 DEPEND="${RDEPEND}"
 RDEPEND+="

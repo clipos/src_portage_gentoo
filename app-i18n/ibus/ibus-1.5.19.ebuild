@@ -4,6 +4,7 @@
 EAPI="6"
 PYTHON_COMPAT=( python{2_7,3_5,3_6,3_7} )
 VALA_MIN_API_VERSION="0.34"
+VALA_MAX_API_VERSION="0.42"
 VALA_USE_DEPEND="vapigen"
 
 inherit autotools bash-completion-r1 gnome2-utils python-r1 vala virtualx xdg-utils
@@ -14,7 +15,7 @@ SRC_URI="https://github.com/${PN}/${PN}/releases/download/${PV}/${P}.tar.gz"
 
 LICENSE="LGPL-2.1"
 SLOT="0"
-KEYWORDS="alpha amd64 arm arm64 ia64 ppc ppc64 sparc x86 ~x86-fbsd"
+KEYWORDS="alpha amd64 arm arm64 ia64 ppc ppc64 sparc x86"
 IUSE="+X +emoji gconf +gtk +gtk2 +introspection kde +libnotify nls +python test +unicode vala wayland"
 REQUIRED_USE="emoji? ( gtk )
 	gtk2? ( gtk )

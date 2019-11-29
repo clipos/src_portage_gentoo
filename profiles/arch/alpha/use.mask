@@ -1,10 +1,6 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-# Andreas Sturmlechner <asturm@gentoo.org> (2019-03-31)
-# sys-auth/elogind is not yet keyworded here. bug #681200
-elogind
-
 # Matt Turner <mattst88@gentoo.org> (2018-12-22)
 # net-libs/zeromq is not keyworded
 zeromq
@@ -91,6 +87,7 @@ valgrind
 vaapi
 librtmp
 rtmp
+v4l
 vpx
 kde
 quvi
@@ -108,7 +105,6 @@ openexr
 afs
 ots
 frei0r
-libev
 prelude
 libtar
 aacplus
@@ -171,11 +167,15 @@ connman
 # sys-apps/entropy is not keyworded
 entropy
 
+# Anthony G. Basile <blueness@gentoo.org> (2012-04-15)
+# Pulls in net-libs/axtls which is not keyworded for arch
+curl_ssl_axtls
+
 # Alexandre Rostovtsev <tetromino@gentoo.org> (2012-12-31)
 # media-libs/xine-lib is not keyworded
 xine
 
-template_haskell
+template-haskell
 
 # nvidia cg toolkit for binary drivers
 cg

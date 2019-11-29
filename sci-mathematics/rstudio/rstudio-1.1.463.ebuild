@@ -78,9 +78,9 @@ RDEPEND="
 		>=dev-qt/qtwidgets-${QT_VER}:${QT_SLOT}
 		>=dev-qt/qtxml-${QT_VER}:${QT_SLOT}
 		>=dev-qt/qtxmlpatterns-${QT_VER}:${QT_SLOT}
-		server? ( virtual/pam )
+		server? ( sys-libs/pam )
 	)
-	dedicated? ( virtual/pam )
+	dedicated? ( sys-libs/pam )
 	!libressl? ( dev-libs/openssl:0= )
 	libressl? ( dev-libs/libressl:0= )"
 DEPEND="${RDEPEND}
@@ -101,6 +101,7 @@ PATCHES=(
 		"${FILESDIR}/${PN}-1.1.453-core.patch"
 		"${FILESDIR}/${PN}-1.1.463-boost-1.69.0_p1.patch"
 		"${FILESDIR}/${PN}-1.1.463-boost-1.69.0_p2.patch"
+		"${FILESDIR}/${PN}-1.1.463-boost-1.69.0_p3.patch"
 		"${FILESDIR}/${PN}-1.1.463-fix-ptr-int-compare.patch"
 )
 

@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
-PYTHON_COMPAT=( python2_7 python3_{5,6} pypy)
+PYTHON_COMPAT=( python2_7 python3_{5,6,7} pypy)
 
 inherit distutils-r1
 
@@ -21,7 +21,8 @@ RDEPEND="
 "
 DEPEND="
 	dev-python/setuptools[${PYTHON_USEDEP}]
-	test? ( $(python_gen_cond_dep 'dev-python/mock[${PYTHON_USEDEP}]' python2_7) )
+	test? ( dev-python/pytest
+		$(python_gen_cond_dep 'dev-python/mock[${PYTHON_USEDEP}]' python2_7) )
 	${RDEPEND}
 "
 

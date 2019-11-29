@@ -16,7 +16,7 @@ if [[ ${PV} == 9999* ]]; then
 else
 	SRC_URI="https://github.com/vim/vim/archive/v${PV}.tar.gz -> vim-${PV}.tar.gz
 		https://dev.gentoo.org/~radhermit/vim/vim-8.0.0938-gentoo-patches.tar.bz2"
-	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86 ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x86-macos ~x86-solaris"
+	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86 ~amd64-linux ~x86-linux ~ppc-macos ~x86-macos ~x86-solaris"
 fi
 
 DESCRIPTION="GUI version of the Vim text editor"
@@ -24,7 +24,7 @@ HOMEPAGE="https://vim.sourceforge.io/ https://github.com/vim/vim"
 
 SLOT="0"
 LICENSE="vim"
-IUSE="acl aqua cscope debug gtk gtk2 lua luajit motif neXt netbeans nls perl python racket ruby selinux session tcl"
+IUSE="acl aqua cscope debug gtk gtk2 lua luajit motif neXt netbeans nls perl python racket ruby selinux session sound tcl"
 REQUIRED_USE="
 	python? ( ${PYTHON_REQUIRED_USE} )
 "
@@ -69,6 +69,7 @@ RDEPEND="
 	ruby? ( ${RUBY_DEPS} )
 	selinux? ( sys-libs/libselinux )
 	session? ( x11-libs/libSM )
+	sound? ( media-libs/libcanberra )
 	tcl? ( dev-lang/tcl:0= )
 "
 DEPEND="${RDEPEND}
@@ -190,6 +191,7 @@ src_configure() {
 		--with-features=huge
 		--disable-gpm
 		--with-gnome=no
+		$(use_enable sound canberra)
 		$(use_enable acl)
 		$(use_enable cscope)
 		$(use_enable lua luainterp)

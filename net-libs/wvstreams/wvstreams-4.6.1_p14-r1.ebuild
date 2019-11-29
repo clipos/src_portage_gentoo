@@ -14,7 +14,7 @@ SRC_URI="
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~alpha ~amd64 ~hppa ~ppc ~sparc ~x86"
-IUSE="pam doc +ssl +dbus debug boost"
+IUSE="boost +dbus debug doc libressl pam"
 
 #Tests fail if openssl is not compiled with -DPURIFY. Gentoo's isn't. FAIL!
 RESTRICT="test"
@@ -24,11 +24,12 @@ RESTRICT="test"
 #more tightly this time. Probably for the better since upstream xplc seems dead.
 
 RDEPEND="
-	>=dev-libs/openssl-1.1:0=
 	sys-libs/readline:0=
 	sys-libs/zlib
 	dbus? ( >=sys-apps/dbus-1.4.20 )
-	pam? ( virtual/pam )
+	!libressl? ( >=dev-libs/openssl-1.1:0= )
+	libressl? ( dev-libs/libressl:0= )
+	pam? ( sys-libs/pam )
 "
 DEPEND="
 	${RDEPEND}
@@ -49,6 +50,7 @@ src_prepare() {
 	default
 
 	eapply $(awk '{ print "'"${WORKDIR}"'/debian/patches/" $0; }' < "${WORKDIR}"/debian/patches/series)
+	eapply "${FILESDIR}"/${P}-libressl.patch # bug 687096
 
 	eautoreconf
 }

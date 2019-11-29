@@ -4,6 +4,10 @@
 # Unmask the flag which corresponds to ARCH.
 -riscv
 
+# Sergei Trofimovich <slyfox@gentoo.org> (2019-11-27)
+# valgrind has no RICSV port.
+valgrind
+
 # The required library has not been ported to riscv yet.
 seccomp
 
@@ -13,6 +17,7 @@ consolekit
 dbus
 elogind
 emacs
+fontconfig
 fuse
 gtk
 gtk2
@@ -30,3 +35,7 @@ slang
 sqlite
 systemtap
 X
+
+# Mattéo Rossillol‑‑Laruelle <beatussum@protonmail.com> (2019‑08‑31)
+# Dependencies not keyworded.
+ayatana

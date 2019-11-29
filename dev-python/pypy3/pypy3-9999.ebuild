@@ -13,20 +13,21 @@ inherit check-reqs mercurial pax-utils python-any-r1 toolchain-funcs
 MY_P=pypy3.6-v${PV}
 
 DESCRIPTION="A fast, compliant alternative implementation of the Python (3.6) language"
-HOMEPAGE="http://pypy.org/"
+HOMEPAGE="https://pypy.org/"
 SRC_URI=""
 
 LICENSE="MIT"
 # pypy3 -c 'import sysconfig; print(sysconfig.get_config_var("SOABI"))'
-SLOT="0/71-py36"
+SLOT="0/72-py36"
 KEYWORDS=""
-IUSE="bzip2 gdbm +jit libressl low-memory ncurses sandbox sqlite tk"
+IUSE="bzip2 cpu_flags_x86_sse2 gdbm +jit libressl low-memory ncurses
+	sandbox sqlite tk"
 
 RDEPEND=">=sys-libs/zlib-1.1.3:0=
 	virtual/libffi:0=
 	virtual/libintl:0=
 	dev-libs/expat:0=
-	!libressl? ( dev-libs/openssl:0=[-bindist] )
+	!libressl? ( dev-libs/openssl:0= )
 	libressl? ( dev-libs/libressl:0= )
 	bzip2? ( app-arch/bzip2:0= )
 	gdbm? ( sys-libs/gdbm:0= )
@@ -95,7 +96,7 @@ src_prepare() {
 	eapply "${FILESDIR}/7.0.0-gentoo-path.patch"
 	eapply "${FILESDIR}/1.9-distutils.unixccompiler.UnixCCompiler.runtime_library_dir_option.patch"
 	eapply "${FILESDIR}"/5.9.0-shared-lib.patch	# 517002
-	eapply "${FILESDIR}"/7.0.0_all_distutils_cxx.patch
+	eapply "${FILESDIR}"/7.2.0-distutils-cxx.patch
 
 	sed -e "s^@EPREFIX@^${EPREFIX}^" \
 		-i lib-python/3/distutils/command/install.py || die
@@ -111,12 +112,32 @@ src_prepare() {
 src_configure() {
 	tc-export CC
 
+	local jit_backend
+	if use jit; then
+		jit_backend='--jit-backend='
+
+		# We only need the explicit sse2 switch for x86.
+		# On other arches we can rely on autodetection which uses
+		# compiler macros. Plus, --jit-backend= doesn't accept all
+		# the modern values...
+
+		if use x86; then
+			if use cpu_flags_x86_sse2; then
+				jit_backend+=x86
+			else
+				jit_backend+=x86-without-sse2
+			fi
+		else
+			jit_backend+=auto
+		fi
+	fi
+
 	local args=(
 		--shared
 		$(usex jit -Ojit -O2)
 		$(usex sandbox --sandbox '')
 
-		--jit-backend=auto
+		${jit_backend}
 
 		pypy/goal/targetpypystandalone
 	)
@@ -167,18 +188,18 @@ src_compile() {
 	# Generate cffi modules
 	# Please keep in sync with pypy/tool/build_cffi_imports.py!
 #cffi_build_scripts = {
+#    "_blake2": "_blake2/_blake2_build.py",
+#    "_ssl": "_ssl_build.py",
 #    "sqlite3": "_sqlite3_build.py",
 #    "audioop": "_audioop_build.py",
 #    "tk": "_tkinter/tklib_build.py",
 #    "curses": "_curses_build.py" if sys.platform != "win32" else None,
 #    "syslog": "_syslog_build.py" if sys.platform != "win32" else None,
-#    "_gdbm": "_gdbm_build.py"  if sys.platform != "win32" else None,
+#    "gdbm": "_gdbm_build.py"  if sys.platform != "win32" else None,
 #    "pwdgrp": "_pwdgrp_build.py" if sys.platform != "win32" else None,
 #    "resource": "_resource_build.py" if sys.platform != "win32" else None,
 #    "lzma": "_lzma_build.py",
 #    "_decimal": "_decimal_build.py",
-#    "_ssl": "_ssl_build.py",
-#    "_blake2": "_blake2/_blake2_build.py",
 #    "_sha3": "_sha3/_sha3_build.py",
 	cffi_targets=( blake2/_blake2 sha3/_sha3 ssl
 		audioop syslog pwdgrp resource lzma decimal )
@@ -186,9 +207,6 @@ src_compile() {
 	use ncurses && cffi_targets+=( curses )
 	use sqlite && cffi_targets+=( sqlite3 )
 	use tk && cffi_targets+=( tkinter/tklib )
-
-	einfo "Please disregard the import errors during CFFI cache generation."
-	einfo "They come from modules not built yet."
 
 	local t
 	# all modules except tkinter output to .
@@ -218,7 +236,7 @@ src_install() {
 	einfo "Installing PyPy ..."
 	exeinto "${dest}"
 	doexe pypy3-c libpypy3-c.so
-	pax-mark m "${ED%/}${dest}/pypy3-c" "${ED%/}${dest}/libpypy3-c.so"
+	pax-mark m "${ED}${dest}/pypy3-c" "${ED}${dest}/libpypy3-c.so"
 	insinto "${dest}"
 	# preserve mtimes to avoid obsoleting caches
 	insopts -p
@@ -227,22 +245,22 @@ src_install() {
 	dodoc README.rst
 
 	if ! use gdbm; then
-		rm -r "${ED%/}${dest}"/lib_pypy/_gdbm* || die
+		rm -r "${ED}${dest}"/lib_pypy/_gdbm* || die
 	fi
 	if ! use sqlite; then
-		rm -r "${ED%/}${dest}"/lib-python/*3/sqlite3 \
-			"${ED%/}${dest}"/lib_pypy/_sqlite3* \
-			"${ED%/}${dest}"/lib-python/*3/test/test_sqlite.py || die
+		rm -r "${ED}${dest}"/lib-python/*3/sqlite3 \
+			"${ED}${dest}"/lib_pypy/_sqlite3* \
+			"${ED}${dest}"/lib-python/*3/test/test_sqlite.py || die
 	fi
 	if ! use tk; then
-		rm -r "${ED%/}${dest}"/lib-python/*3/{idlelib,tkinter} \
-			"${ED%/}${dest}"/lib_pypy/_tkinter \
-			"${ED%/}${dest}"/lib-python/*3/test/test_{tcl,tk,ttk*}.py || die
+		rm -r "${ED}${dest}"/lib-python/*3/{idlelib,tkinter} \
+			"${ED}${dest}"/lib_pypy/_tkinter \
+			"${ED}${dest}"/lib-python/*3/test/test_{tcl,tk,ttk*}.py || die
 	fi
 
 	einfo "Generating caches and byte-compiling ..."
 
-	local -x PYTHON=${ED%/}${dest}/pypy3-c
+	local -x PYTHON=${ED}${dest}/pypy3-c
 	# we can't use eclass function since PyPy is dumb and always gives
 	# paths relative to the interpreter
 	local PYTHON_SITEDIR=${EPREFIX}/usr/lib/pypy3.6/site-packages
@@ -254,5 +272,5 @@ src_install() {
 	einfo "Byte-compiling Python standard library..."
 
 	# compile the installed modules
-	python_optimize "${ED%/}${dest}"
+	python_optimize "${ED}${dest}"
 }

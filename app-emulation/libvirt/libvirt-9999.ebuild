@@ -5,7 +5,7 @@ EAPI=7
 
 PYTHON_COMPAT=( python3_{5,6,7} )
 
-inherit autotools bash-completion-r1 eutils linux-info python-any-r1 readme.gentoo-r1 systemd user
+inherit autotools bash-completion-r1 eutils linux-info python-any-r1 readme.gentoo-r1 systemd
 
 if [[ ${PV} = *9999* ]]; then
 	inherit git-r3
@@ -23,10 +23,10 @@ DESCRIPTION="C toolkit to manipulate virtual machines"
 HOMEPAGE="http://www.libvirt.org/"
 LICENSE="LGPL-2.1"
 IUSE="
-	apparmor audit +caps +dbus firewalld fuse glusterfs iscsi iscsi-direct
-	+libvirtd lvm libssh lxc +macvtap nfs nls numa openvz parted pcap phyp
-	policykit +qemu rbd sasl selinux +udev +vepa virtualbox virt-network
-	wireshark-plugins xen zeroconf zfs
+	apparmor audit +caps +dbus dtrace firewalld fuse glusterfs iscsi
+	iscsi-direct +libvirtd lvm libssh lxc +macvtap nfs nls numa openvz
+	parted pcap phyp policykit +qemu rbd sasl selinux +udev +vepa
+	virtualbox virt-network wireshark-plugins xen zfs
 "
 
 REQUIRED_USE="
@@ -47,7 +47,10 @@ REQUIRED_USE="
 # package will use 3 by default. Since we don't have slot pinning in an API,
 # we must go with the most recent
 RDEPEND="
+	acct-user/qemu
+	policykit? ( acct-group/libvirt )
 	app-misc/scrub
+	>=dev-libs/glib-2.48.0
 	dev-libs/libgcrypt:0
 	dev-libs/libnl:3
 	>=dev-libs/libxml2-2.7.6
@@ -58,6 +61,7 @@ RDEPEND="
 	net-libs/rpcsvc-proto
 	>=net-misc/curl-7.18.0
 	sys-apps/dmidecode
+	!sys-apps/systemd[-cgroup-hybrid(+)]
 	>=sys-apps/util-linux-2.17
 	sys-devel/gettext
 	sys-libs/ncurses:0=
@@ -66,6 +70,7 @@ RDEPEND="
 	audit? ( sys-process/audit )
 	caps? ( sys-libs/libcap-ng )
 	dbus? ( sys-apps/dbus )
+	dtrace? ( dev-util/systemtap )
 	firewalld? ( >=net-firewall/firewalld-0.6.3 )
 	fuse? ( >=sys-fs/fuse-2.8.6:= )
 	glusterfs? ( >=sys-cluster/glusterfs-3.4.1 )
@@ -108,7 +113,6 @@ RDEPEND="
 		virtual/udev
 		>=x11-libs/libpciaccess-0.10.9
 	)
-	zeroconf? ( >=net-dns/avahi-0.6[dbus] )
 	zfs? ( sys-fs/zfs )"
 
 DEPEND="${RDEPEND}
@@ -120,19 +124,12 @@ DEPEND="${RDEPEND}
 	virtual/pkgconfig"
 
 PATCHES=(
-	"${FILESDIR}"/${PN}-5.2.0-do-not-use-sysconf.patch
+	"${FILESDIR}"/${PN}-5.7.0-do-not-use-sysconf.patch
 	"${FILESDIR}"/${PN}-1.2.16-fix_paths_in_libvirt-guests_sh.patch
-	"${FILESDIR}"/${PN}-5.0.0-fix-paths-for-apparmor.patch
+	"${FILESDIR}"/${PN}-5.2.0-fix-paths-for-apparmor.patch
 )
 
 pkg_setup() {
-	if use qemu; then
-		enewgroup qemu 77
-		enewuser qemu 77 -1 -1 "qemu,kvm"
-	fi
-
-	use policykit && enewgroup libvirt
-
 	# Check kernel configuration:
 	CONFIG_CHECK=""
 	use fuse && CONFIG_CHECK+="
@@ -235,11 +232,8 @@ src_prepare() {
 	fi
 
 	# Tweak the init script:
-	cp "${FILESDIR}/libvirtd.init-r16" "${S}/libvirtd.init" || die
+	cp "${FILESDIR}/libvirtd.init-r18" "${S}/libvirtd.init" || die
 	sed -e "s/USE_FLAG_FIREWALLD/$(usex firewalld 'need firewalld' '')/" \
-		-e "s/USE_FLAG_AVAHI/$(usex zeroconf 'use avahi-daemon' '')/" \
-		-e "s/USE_FLAG_ISCSI/$(usex iscsi 'use iscsid' '')/" \
-		-e "s/USE_FLAG_RBD/$(usex rbd 'use ceph' '')/" \
 		-i "${S}/libvirtd.init" || die "sed failed"
 
 	eautoreconf
@@ -252,6 +246,7 @@ src_configure() {
 		$(use_with audit)
 		$(use_with caps capng)
 		$(use_with dbus)
+		$(use_with dtrace)
 		$(use_with firewalld)
 		$(use_with fuse)
 		$(use_with glusterfs)
@@ -282,7 +277,6 @@ src_configure() {
 		$(use_with virt-network network)
 		$(use_with wireshark-plugins wireshark-dissector)
 		$(use_with xen libxl)
-		$(use_with zeroconf avahi)
 		$(use_with zfs storage-zfs)
 
 		--without-hal
@@ -300,7 +294,6 @@ src_configure() {
 		--disable-static
 		--disable-werror
 
-		--with-html-subdir=${PF}/html
 		--localstatedir=/var
 	)
 
@@ -353,7 +346,7 @@ src_install() {
 	systemd_newtmpfilesd "${FILESDIR}"/libvirtd.tmpfiles.conf libvirtd.conf
 
 	newinitd "${S}/libvirtd.init" libvirtd || die
-	newinitd "${FILESDIR}/libvirt-guests.init-r3" libvirt-guests || die
+	newinitd "${FILESDIR}/libvirt-guests.init-r4" libvirt-guests || die
 	newinitd "${FILESDIR}/virtlockd.init-r1" virtlockd || die
 	newinitd "${FILESDIR}/virtlogd.init-r1" virtlogd || die
 

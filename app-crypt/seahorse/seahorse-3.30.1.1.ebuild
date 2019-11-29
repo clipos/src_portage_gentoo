@@ -10,7 +10,7 @@ HOMEPAGE="https://wiki.gnome.org/Apps/Seahorse"
 LICENSE="GPL-2+ FDL-1.1+"
 SLOT="0"
 IUSE="ldap zeroconf"
-KEYWORDS="~alpha amd64 ~arm ~ia64 ~ppc ~ppc64 ~sparc x86 ~x86-fbsd"
+KEYWORDS="~alpha amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 ~sparc x86"
 
 RDEPEND="
 	>=dev-libs/glib-2.44:2
@@ -22,7 +22,7 @@ RDEPEND="
 	net-misc/openssh
 	ldap? ( net-nds/openldap:= )
 	>=net-libs/libsoup-2.33.92:2.4
-	zeroconf? ( >=net-dns/avahi-0.6:= )
+	zeroconf? ( >=net-dns/avahi-0.6:=[dbus] )
 "
 DEPEND="${RDEPEND}
 	$(vala_depend)

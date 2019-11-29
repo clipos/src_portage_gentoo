@@ -13,7 +13,7 @@ if [[ ${PV} == *9999 ]]; then
 	EGIT_REPO_URI="https://github.com/gabime/spdlog"
 else
 	SRC_URI="https://github.com/gabime/spdlog/archive/v${PV}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="~amd64"
+	KEYWORDS="amd64"
 fi
 
 LICENSE="MIT"
@@ -21,7 +21,7 @@ SLOT="0/1"
 IUSE="test"
 
 DEPEND="
-	>=dev-libs/libfmt-5.0.0
+	dev-libs/libfmt:0/5
 "
 RDEPEND="${DEPEND}"
 

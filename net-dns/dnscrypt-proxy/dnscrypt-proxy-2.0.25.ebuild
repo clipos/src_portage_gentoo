@@ -12,7 +12,7 @@ if [[ ${PV} == 9999 ]]; then
 	EGIT_REPO_URI="https://${EGO_PN}.git"
 else
 	SRC_URI="https://${EGO_PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="~amd64 ~arm ~x86"
+	KEYWORDS="amd64 ~arm ~x86"
 fi
 
 DESCRIPTION="A flexible DNS proxy, with support for encrypted DNS protocols"
@@ -39,7 +39,7 @@ src_prepare() {
 	# fixes $GOPATH/go.mod exists but should not
 	rm go.mod || die
 	mv "${PN}" "src/${EGO_PN}" || die
-	mv "vendor" "src/" || die
+	mv "vendor" "src/${EGO_PN}" || die
 }
 
 src_configure() {

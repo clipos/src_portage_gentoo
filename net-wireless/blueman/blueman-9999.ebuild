@@ -4,13 +4,13 @@
 EAPI="7"
 
 PYTHON_COMPAT=( python3_{5,6,7} )
-inherit gnome2-utils linux-info python-single-r1 systemd xdg-utils
+inherit autotools gnome2-utils linux-info python-single-r1 systemd xdg-utils
 
 DESCRIPTION="Simple and intuitive GTK+ Bluetooth Manager"
 HOMEPAGE="https://github.com/blueman-project/blueman"
 
 if [[ ${PV} == "9999" ]] ; then
-	inherit autotools git-r3
+	inherit git-r3
 	EGIT_REPO_URI="https://github.com/blueman-project/blueman.git"
 	KEYWORDS=""
 else
@@ -56,7 +56,12 @@ RDEPEND="${DEPEND}
 		)
 	)
 	policykit? ( sys-auth/polkit )
-	pulseaudio? ( media-sound/pulseaudio[bluetooth] )
+	pulseaudio? (
+		|| (
+			media-sound/pulseaudio[bluetooth]
+			media-sound/pulseaudio-modules-bt
+		)
+	)
 	!net-wireless/gnome-bluetooth
 "
 
@@ -76,7 +81,8 @@ pkg_setup() {
 
 src_prepare() {
 	default
-	[[ ${PV} == 9999 ]] && eautoreconf
+	# replace py-compile to fix py3
+	[[ ${PV} == 9999 ]] && eautoreconf || eautomake
 }
 
 src_configure() {

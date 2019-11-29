@@ -12,11 +12,12 @@ MY_P="${P/_/.}"
 DESCRIPTION="A virtual lighttable and darkroom for photographers"
 HOMEPAGE="https://www.darktable.org/"
 SRC_URI="https://github.com/darktable-org/${PN}/releases/download/release-${MY_PV}/${MY_P}.tar.xz
+	https://dev.gentoo.org/~asturm/distfiles/${P}-gcc9.patch.tar.xz
 	doc? ( https://github.com/darktable-org/${PN}/releases/download/release-${DOC_PV}/${PN}-usermanual.pdf -> ${PN}-usermanual-${DOC_PV}.pdf )"
 
 LICENSE="GPL-3 CC-BY-3.0"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="amd64 x86"
 LANGS=" ca cs de es fi fr hu ja nb nl pl pt-BR ru sl"
 # TODO add lua once dev-lang/lua-5.2 is unmasked
 IUSE="colord cups cpu_flags_x86_sse3 doc flickr geolocation gnome-keyring gphoto2 graphicsmagick jpeg2k kwallet
@@ -68,7 +69,11 @@ RDEPEND="${COMMON_DEPEND}
 	kwallet? ( >=kde-frameworks/kwallet-5.34.0-r1 )
 "
 
-PATCHES=( "${FILESDIR}"/"${PN}"-find-opencl-header.patch )
+PATCHES=(
+	"${FILESDIR}"/"${PN}"-find-opencl-header.patch
+	"${WORKDIR}"/"${P}"-gcc9.patch
+	"${FILESDIR}"/"${P}"-exiv2-0.27.patch
+)
 
 S="${WORKDIR}/${P/_/~}"
 

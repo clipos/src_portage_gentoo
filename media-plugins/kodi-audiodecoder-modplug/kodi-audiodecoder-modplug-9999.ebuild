@@ -1,7 +1,7 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 inherit cmake-utils kodi-addon
 
@@ -29,8 +29,7 @@ IUSE=""
 
 DEPEND="
 	~media-tv/kodi-9999
-	~media-libs/kodi-platform-9999
-	media-libs/libmodplug
+	>=media-libs/libmodplug-0.8.9.0
 	"
 
 RDEPEND="

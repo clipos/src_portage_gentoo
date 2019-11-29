@@ -19,7 +19,7 @@ REQUIRED_USE="
 	vala? ( introspection )
 "
 
-KEYWORDS="amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 x86 ~x86-fbsd"
+KEYWORDS="amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 x86"
 
 # FIXME:
 # Runtime dependency on gnome-session-2.91
@@ -64,6 +64,7 @@ DEPEND="${COMMON_DEPEND}
 	gtk-doc? ( >=dev-util/gtk-doc-1.14 )
 	dev-util/glib-utils
 	dev-util/itstool
+	>=dev-util/intltool-0.50.1
 	>=sys-devel/gettext-0.19.8
 	virtual/pkgconfig
 	x11-base/xorg-proto

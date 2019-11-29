@@ -6,7 +6,7 @@ EAPI=6
 inherit mate readme.gentoo-r1
 
 if [[ ${PV} != 9999 ]]; then
-	KEYWORDS="~amd64 ~arm ~arm64 ~x86"
+	KEYWORDS="amd64 ~arm ~arm64 x86"
 fi
 
 DESCRIPTION="Replaces xscreensaver, integrating with the MATE desktop"
@@ -44,7 +44,7 @@ COMMON_DEPEND="
 	consolekit? ( sys-auth/consolekit )
 	libnotify? ( >=x11-libs/libnotify-0.7:0 )
 	opengl? ( virtual/opengl )
-	pam? ( gnome-base/gnome-keyring virtual/pam )
+	pam? ( gnome-base/gnome-keyring sys-libs/pam )
 	!pam? ( kernel_linux? ( sys-apps/shadow ) )
 	elogind? ( sys-auth/elogind )
 	systemd? ( sys-apps/systemd:= )

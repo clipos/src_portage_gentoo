@@ -16,10 +16,10 @@ if [[ ${PV} == "9999" ]] ; then
 	EHG_REPO_URI="http://hg.code.sf.net/p/${PN}/code"
 else
 	SRC_URI="mirror://sourceforge/${PN}/${MY_P}.tar.xz"
-	KEYWORDS="alpha amd64 hppa ia64 ppc ppc64 sparc x86 ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos"
+	KEYWORDS="alpha amd64 hppa ia64 ppc ppc64 sparc x86 ~amd64-linux ~x86-linux ~ppc-macos"
 fi
 
-IUSE="bzip2 cxx debug fpx imagemagick jbig jpeg jpeg2k lcms lzma modules openmp
+IUSE="bzip2 cxx debug fpx imagemagick jbig jpeg lcms lzma modules openmp
 	perl png postscript q16 q32 static-libs svg threads tiff truetype
 	webp wmf X zlib"
 
@@ -29,10 +29,9 @@ RDEPEND="dev-libs/libltdl:0
 	imagemagick? ( !media-gfx/imagemagick )
 	jbig? ( media-libs/jbigkit )
 	jpeg? ( virtual/jpeg:0 )
-	jpeg2k? ( media-libs/jasper:= )
 	lcms? ( media-libs/lcms:2 )
 	lzma? ( app-arch/xz-utils )
-	perl? ( dev-lang/perl )
+	perl? ( dev-lang/perl:= )
 	png? ( media-libs/libpng:0= )
 	postscript? ( app-text/ghostscript-gpl )
 	svg? ( dev-libs/libxml2 )
@@ -93,7 +92,7 @@ src_configure() {
 		$(use_with jbig)
 		$(use_with webp)
 		$(use_with jpeg)
-		$(use_with jpeg2k jp2)
+		--without-jp2
 		$(use_with lcms lcms2)
 		$(use_with lzma)
 		$(use_with png)

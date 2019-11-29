@@ -1,10 +1,10 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 PYTHON_COMPAT=( python3_{6,7} )
 
-inherit python-single-r1 toolchain-funcs gnome2-utils
+inherit python-single-r1 toolchain-funcs xdg
 
 if [[ ${PV} == "9999" ]] ; then
 	EGIT_REPO_URI="https://github.com/kovidgoyal/kitty.git"
@@ -27,6 +27,7 @@ COMMON_DEPS="
 	>=media-libs/harfbuzz-1.5.0:=
 	sys-apps/dbus
 	sys-libs/zlib
+	media-libs/libcanberra
 	media-libs/libpng:0=
 	media-libs/freetype:2
 	media-libs/fontconfig
@@ -46,15 +47,15 @@ RDEPEND="
 	imagemagick? ( virtual/imagemagick-tools )
 "
 DEPEND="${RDEPEND}
-	media-libs/mesa
+	media-libs/mesa[X(+)]
 	sys-libs/ncurses
-	virtual/pkgconfig
 "
 [[ ${PV} == *9999 ]] && DEPEND+=" >=dev-python/sphinx-1.7[${PYTHON_USEDEP}]"
+BDEPEND="virtual/pkgconfig"
 
 PATCHES=(
 	"${FILESDIR}"/${P}-flags.patch
-	"${FILESDIR}"/${PN}-0.11.0-svg-icon.patch
+	"${FILESDIR}"/${P}-svg-icon.patch
 )
 
 src_prepare() {
@@ -89,8 +90,8 @@ src_test() {
 }
 
 src_install() {
-	mkdir -p "${ED}"usr || die
-	cp -r linux-package/* "${ED}usr" || die
+	mkdir -p "${ED}"/usr || die
+	cp -r linux-package/* "${ED}/usr" || die
 	python_fix_shebang "${ED}"
 
 	if ! use doc; then
@@ -99,9 +100,9 @@ src_install() {
 }
 
 pkg_postinst() {
-	gnome2_icon_cache_update
+	xdg_icon_cache_update
 }
 
 pkg_postrm() {
-	gnome2_icon_cache_update
+	xdg_icon_cache_update
 }

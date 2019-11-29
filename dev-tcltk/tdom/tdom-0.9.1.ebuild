@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -13,19 +13,13 @@ SRC_URI="http://tdom.org/downloads/${P}-src.tgz"
 
 LICENSE="MPL-1.1"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~s390 ~sparc ~x86 ~amd64-fbsd ~amd64-linux ~x86-linux"
+KEYWORDS="~alpha amd64 ~arm ~arm64 hppa ia64 ~mips ppc s390 sparc x86 ~amd64-linux ~x86-linux"
 IUSE="static-libs threads"
 
 DEPEND="
 	dev-lang/tcl:0=
 	dev-libs/expat"
 RDEPEND="${DEPEND}"
-
-PATCHES=(
-	"${FILESDIR}/"${P}.patch
-	"${FILESDIR}/"${P}-tnc.patch
-	"${FILESDIR}/"${PN}-0.8.3-soname.patch
-)
 
 src_prepare() {
 	append-libs -lm

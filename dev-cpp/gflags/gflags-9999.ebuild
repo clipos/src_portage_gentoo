@@ -1,7 +1,7 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI="6"
+EAPI=7
 
 inherit cmake-multilib
 
@@ -25,7 +25,6 @@ DOCS=( ChangeLog.txt README.md )
 
 multilib_src_configure() {
 	local mycmakeargs=(
-		-DBUILD_SHARED_LIBS=ON
 		-DBUILD_STATIC_LIBS=$(usex static-libs)
 		-DBUILD_TESTING=$(usex test)
 		# avoid installing .cmake/packages, e.g.:

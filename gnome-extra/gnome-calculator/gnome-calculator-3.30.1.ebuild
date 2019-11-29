@@ -2,6 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+VALA_MAX_API_VERSION="0.42"
 inherit gnome.org gnome2-utils meson vala xdg
 
 DESCRIPTION="A calculator application for GNOME"
@@ -10,7 +11,7 @@ HOMEPAGE="https://wiki.gnome.org/Apps/Calculator"
 LICENSE="GPL-3+"
 SLOT="0"
 IUSE=""
-KEYWORDS="~alpha amd64 ~arm ~ia64 ~ppc ~ppc64 ~sh ~sparc x86 ~x86-fbsd ~amd64-linux ~x86-linux"
+KEYWORDS="~alpha amd64 ~arm ~ia64 ~ppc ~ppc64 ~sh ~sparc x86 ~amd64-linux ~x86-linux"
 
 # gtksourceview vapi definitions in dev-lang/vala itself are too old, and newer vala removes them
 # altogether, thus we need them installed by gtksourceview[vala]

@@ -14,7 +14,7 @@ if [[ "${PV}" = *_rc* ]] ; then
 	S="${WORKDIR}/${PN}-${PN}-${MY_PV}"
 else
 	SRC_URI="mirror://sourceforge/nfs/${P}.tar.bz2"
-	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86"
+	KEYWORDS="alpha amd64 arm arm64 hppa ia64 ~mips ppc ppc64 ~riscv s390 sh sparc x86"
 fi
 
 LICENSE="GPL-2"
@@ -176,12 +176,14 @@ pkg_postinst() {
 	done
 
 	if systemd_is_booted; then
-		if [[ ${REPLACING_VERSIONS} < 1.3.0 ]]; then
-			ewarn "We have switched to upstream systemd unit files. Since"
-			ewarn "they got renamed, you should probably enable the new ones."
-			ewarn "You can run 'equery files nfs-utils | grep systemd'"
-			ewarn "to know what services you need to enable now."
-		fi
+		for v in ${REPLACING_VERSIONS}; do
+			if ver_test "${v}" -lt 1.3.0; then
+				ewarn "We have switched to upstream systemd unit files. Since"
+				ewarn "they got renamed, you should probably enable the new ones."
+				ewarn "You can run 'equery files nfs-utils | grep systemd'"
+				ewarn "to know what services you need to enable now."
+			fi
+		done
 	else
 		ewarn "If you use OpenRC, the nfsmount service has been replaced with nfsclient."
 		ewarn "If you were using nfsmount, please add nfsclient and netmount to the"

@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Jason Zaman
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -14,8 +14,10 @@ LICENSE="Apache-2.0"
 SLOT="0"
 KEYWORDS="~amd64"
 IUSE=""
+REQUIRED_USE=${PYTHON_REQUIRED_USE}
 
 RDEPEND="
+	${PYTHON_DEPS}
 	dev-python/bleach[${PYTHON_USEDEP}]
 	dev-python/grpcio[${PYTHON_USEDEP}]
 	dev-python/html5lib[${PYTHON_USEDEP}]
@@ -26,7 +28,8 @@ RDEPEND="
 	dev-python/werkzeug[${PYTHON_USEDEP}]
 	dev-python/wheel[${PYTHON_USEDEP}]
 	virtual/python-futures[${PYTHON_USEDEP}]"
-BDEPEND="app-arch/unzip"
+BDEPEND="app-arch/unzip
+	${PYTHON_DEPS}"
 PDEPEND="sci-libs/tensorflow[python,${PYTHON_USEDEP}]"
 
 S="${WORKDIR}"

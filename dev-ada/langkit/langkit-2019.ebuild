@@ -5,7 +5,7 @@ EAPI=7
 
 PYTHON_COMPAT=( python2_7 )
 
-inherit python-single-r1
+inherit python-single-r1 multiprocessing
 
 MYP=${P}-20190510-19B8C
 
@@ -16,8 +16,9 @@ SRC_URI="http://mirrors.cdn.adacore.com/art/5cdf8f8a31e87a8f1c967d31
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="amd64 x86"
 IUSE="test"
+RESTRICT="!test? ( test )"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 RDEPEND="${PYTHON_DEPS}
@@ -36,7 +37,7 @@ S="${WORKDIR}"/${MYP}-src
 PATCHES=( "${FILESDIR}"/${P}-gentoo.patch )
 
 src_test() {
-	testsuite/testsuite.py --show-error-output | tee testsuite.log
+	testsuite/testsuite.py -j $(makeopts_jobs) --show-error-output | tee testsuite.log
 	grep -q FAILED testsuite.log && die "Test failed"
 }
 

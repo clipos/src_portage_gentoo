@@ -14,7 +14,7 @@ LICENSE="GPL-2 LGPL-2.1"
 SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~s390 ~sparc ~x86 ~ppc-macos ~x64-macos ~x86-macos"
 IUSE="berkdb bidi +clients emacs gdbm sasl guile ipv6 kerberos kyotocabinet \
-	ldap mysql nls pam postgres python servers ssl static-libs +threads tcpd \
+	ldap mysql nls pam postgres python servers split-usr ssl static-libs +threads tcpd \
 	tokyocabinet"
 
 RDEPEND="!mail-client/nmh
@@ -35,7 +35,7 @@ RDEPEND="!mail-client/nmh
 	ldap? ( net-nds/openldap )
 	mysql? ( dev-db/mysql-connector-c )
 	nls? ( sys-devel/gettext )
-	pam? ( virtual/pam )
+	pam? ( sys-libs/pam )
 	postgres? ( dev-db/postgresql:= )
 	python? ( ${PYTHON_DEPS} )
 	sasl? ( virtual/gsasl )
@@ -105,7 +105,6 @@ src_configure() {
 
 src_install() {
 	default
-	emake DESTDIR="${D}" install
 
 	insinto /etc
 	# bug 613112
@@ -128,7 +127,11 @@ src_install() {
 	fi
 
 	# compatibility link
-	use clients && dosym /usr/bin/mail /bin/mail
+	if use clients && use split-usr; then
+		dosym ../usr/bin/mail /bin/mail
+	fi
 
-	use static-libs || find "${D}" -name "*.la" -delete
+	if ! use static-libs; then
+		find "${D}" -name "*.la" -delete || die
+	fi
 }

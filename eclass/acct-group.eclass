@@ -7,6 +7,7 @@
 # @AUTHOR:
 # Michael Orlitzky <mjo@gentoo.org>
 # Michał Górny <mgorny@gentoo.org>
+# @SUPPORTED_EAPIS: 7
 # @BLURB: Eclass used to create and maintain a single group entry
 # @DESCRIPTION:
 # This eclass represents and creates a single group entry.  The name
@@ -35,7 +36,7 @@ _ACCT_GROUP_ECLASS=1
 
 case ${EAPI:-0} in
 	7) ;;
-	*) die "EAPI=${EAPI} not supported";;
+	*) die "EAPI=${EAPI:-0} not supported";;
 esac
 
 inherit user
@@ -59,6 +60,9 @@ readonly ACCT_GROUP_NAME
 # @DESCRIPTION:
 # Preferred GID for the new group.  This variable is obligatory, and its
 # value must be unique across all group packages.
+#
+# Overlays should set this to -1 to dynamically allocate GID.  Using -1
+# in ::gentoo is prohibited by policy.
 
 # @ECLASS-VARIABLE: ACCT_GROUP_ENFORCE_ID
 # @DESCRIPTION:
@@ -70,9 +74,8 @@ readonly ACCT_GROUP_NAME
 
 # << Boilerplate ebuild variables >>
 : ${DESCRIPTION:="System group: ${ACCT_GROUP_NAME}"}
-: ${HOMEPAGE:=https://www.gentoo.org/}
 : ${SLOT:=0}
-: ${KEYWORDS:=alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 ~riscv s390 sh sparc x86 ~ppc-aix ~x64-cygwin ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~m68k-mint ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris}
+: ${KEYWORDS:=alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 ~riscv s390 sh sparc x86 ~ppc-aix ~x64-cygwin ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~m68k-mint ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris}
 S=${WORKDIR}
 
 
@@ -88,6 +91,7 @@ acct-group_pkg_pretend() {
 
 	# verify ACCT_GROUP_ID
 	[[ -n ${ACCT_GROUP_ID} ]] || die "Ebuild error: ACCT_GROUP_ID must be set!"
+	[[ ${ACCT_GROUP_ID} -eq -1 ]] && return
 	[[ ${ACCT_GROUP_ID} -ge 0 ]] || die "Ebuild errors: ACCT_GROUP_ID=${ACCT_GROUP_ID} invalid!"
 
 	# check for ACCT_GROUP_ID collisions early
@@ -105,7 +109,7 @@ acct-group_pkg_pretend() {
 		elif [[ -n ${group_by_name} ]]; then
 			eerror "The requested group exists already with wrong GID."
 			eerror "  groupname: ${ACCT_GROUP_NAME}"
-			eerror "  requested UID: ${ACCT_GROUP_ID}"
+			eerror "  requested GID: ${ACCT_GROUP_ID}"
 			eerror "  current entry: ${group_by_name}"
 			die "Group ${ACCT_GROUP_NAME} exists with wrong GID"
 		fi
@@ -118,7 +122,8 @@ acct-group_pkg_pretend() {
 acct-group_pkg_preinst() {
 	debug-print-function ${FUNCNAME} "${@}"
 
-	enewgroup -F "${ACCT_GROUP_NAME}" "${ACCT_GROUP_ID}"
+	enewgroup ${ACCT_GROUP_ENFORCE_ID:+-F} "${ACCT_GROUP_NAME}" \
+		"${ACCT_GROUP_ID}"
 }
 
 fi

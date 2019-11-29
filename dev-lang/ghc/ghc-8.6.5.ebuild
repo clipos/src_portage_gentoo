@@ -17,7 +17,7 @@ inherit autotools bash-completion-r1 eutils flag-o-matic ghc-package
 inherit multilib multiprocessing pax-utils toolchain-funcs versionator prefix
 inherit check-reqs
 DESCRIPTION="The Glasgow Haskell Compiler"
-HOMEPAGE="http://www.haskell.org/ghc/"
+HOMEPAGE="https://www.haskell.org/ghc/"
 
 # we don't have any binaries yet
 arch_binaries=""
@@ -27,12 +27,12 @@ BIN_PV=${PV}
 #arch_binaries="$arch_binaries alpha? ( https://slyfox.uni.cx/~slyfox/distfiles/ghc-bin-${PV}-alpha.tbz2 )"
 #arch_binaries="$arch_binaries arm? ( https://slyfox.uni.cx/~slyfox/distfiles/ghc-bin-${PV}-armv7a-hardfloat-linux-gnueabi.tbz2 )"
 #arch_binaries="$arch_binaries arm64? ( https://slyfox.uni.cx/~slyfox/distfiles/ghc-bin-${PV}-aarch64-unknown-linux-gnu.tbz2 )"
-#arch_binaries="$arch_binaries amd64? ( https://slyfox.uni.cx/~slyfox/distfiles/ghc-bin-${PV}-x86_64-pc-linux-gnu.tbz2 )"
+arch_binaries="$arch_binaries amd64? ( https://slyfox.uni.cx/~slyfox/distfiles/ghc-bin-${PV}-x86_64-pc-linux-gnu.tbz2 )"
 #arch_binaries="$arch_binaries ia64?  ( https://slyfox.uni.cx/~slyfox/distfiles/ghc-bin-${PV}-ia64-fixed-fiw.tbz2 )"
 #arch_binaries="$arch_binaries ppc? ( https://slyfox.uni.cx/~slyfox/distfiles/ghc-bin-${PV}-ppc.tbz2 )"
 #arch_binaries="$arch_binaries ppc64? ( https://slyfox.uni.cx/~slyfox/distfiles/ghc-bin-${PV}-ppc64.tbz2 )"
 #arch_binaries="$arch_binaries sparc? ( https://slyfox.uni.cx/~slyfox/distfiles/ghc-bin-${PV}-sparc.tbz2 )"
-#arch_binaries="$arch_binaries x86? ( https://slyfox.uni.cx/~slyfox/distfiles/ghc-bin-${PV}-i686-pc-linux-gnu.tbz2 )"
+arch_binaries="$arch_binaries x86? ( https://slyfox.uni.cx/~slyfox/distfiles/ghc-bin-${PV}-i686-pc-linux-gnu.tbz2 )"
 
 # various ports:
 #arch_binaries="$arch_binaries x86-fbsd? ( https://slyfox.uni.cx/~slyfox/distfiles/ghc-bin-${PV}-x86-fbsd.tbz2 )"
@@ -43,12 +43,12 @@ yet_binary() {
 		#alpha) return 0 ;;
 		#arm64) return 0 ;;
 		#arm) return 0 ;;
-		#amd64) return 0 ;;
+		amd64) return 0 ;;
 		#ia64) return 0 ;;
 		#ppc) return 0 ;;
 		#ppc64) return 0 ;;
 		#sparc) return 0 ;;
-		#x86) return 0 ;;
+		x86) return 0 ;;
 		*) return 1 ;;
 	esac
 }
@@ -58,8 +58,8 @@ GHC_PV=${PV}
 GHC_P=${PN}-${GHC_PV} # using ${P} is almost never correct
 
 SRC_URI="!binary? (
-	http://downloads.haskell.org/~ghc/${PV/_/-}/${GHC_P}-src.tar.xz
-	test? ( http://downloads.haskell.org/~ghc/${PV/_/-}/${GHC_P}-testsuite.tar.xz )
+	https://downloads.haskell.org/~ghc/${PV/_/-}/${GHC_P}-src.tar.xz
+	test? ( https://downloads.haskell.org/~ghc/${PV/_/-}/${GHC_P}-testsuite.tar.xz )
 )"
 S="${WORKDIR}"/${GHC_P}
 
@@ -71,7 +71,8 @@ BUMP_LIBRARIES=(
 
 LICENSE="BSD"
 SLOT="0/${PV}"
-KEYWORDS=""
+# to be rekeyworded when most of revdeps are updated
+#KEYWORDS="~amd64 ~x86"
 IUSE="doc ghcbootstrap ghcmakebinary +gmp profile test"
 IUSE+=" binary"
 
@@ -185,7 +186,7 @@ update_SRC_URI() {
 		set -- $p
 		pn=$1 pv=$2
 
-		SRC_URI+=" mirror://hackage/package/${pn}/${pn}-${pv}.tar.gz"
+		SRC_URI+=" https://hackage.haskell.org/package/${pn}-${pv}/${pn}-${pv}.tar.gz"
 	done
 }
 
@@ -264,7 +265,7 @@ ghc_setup_cflags() {
 		fi
 
 		# prevent from failing to build unregisterised ghc:
-		# http://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg171602.html
+		# https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg171602.html
 		use ppc64 && append-ghc-cflags persistent compile -mminimal-toc
 	fi
 }

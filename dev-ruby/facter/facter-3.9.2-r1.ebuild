@@ -26,12 +26,15 @@ CDEPEND="
 	app-emulation/virt-what
 	net-misc/curl
 	>=dev-libs/boost-1.54[nls]
+	<dev-libs/boost-1.70.0
 	>=dev-cpp/yaml-cpp-0.5.1
 	!<app-admin/puppet-4.0.0"
 
 RDEPEND="${CDEPEND}"
 DEPEND="${BDEPEND}
 	${CDEPEND}"
+
+RESTRICT="!test? ( test )"
 
 src_prepare() {
 	# Remove the code that installs facter.rb to the wrong directory.

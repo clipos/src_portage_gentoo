@@ -25,14 +25,14 @@ SLOT="0"
 IUSE="doc +fftw +hdf5 +jpeg mpi openexr +png +python test +tiff valgrind +zlib"
 
 REQUIRED_USE="
-	doc? ( hdf5 fftw )
+	doc? ( hdf5 fftw ${PYTHON_REQUIRED_USE} )
 	python? ( hdf5 ${PYTHON_REQUIRED_USE} )
 	test? ( hdf5 python fftw )"
 
 BDEPEND="
 	doc? (
 		app-doc/doxygen
-		>=dev-python/sphinx-1.1.3-r5[${PYTHON_USEDEP}]
+		>=dev-python/sphinx-1.1.3-r5
 	)
 	test? (
 		>=dev-python/nose-1.1.2-r1[${PYTHON_USEDEP}]
@@ -64,8 +64,12 @@ RDEPEND="${DEPEND}"
 RESTRICT="test"
 
 PATCHES=(
+	# git master
 	"${FILESDIR}/${P}-fix-incorrect-template-parameter-type.patch"
+	"${FILESDIR}/${P}-boost-python.patch"
+	# TODO: upstream
 	"${FILESDIR}/${P}-lib_suffix.patch"
+	"${FILESDIR}/${P}-sphinx.ext.pngmath.patch" # thanks to Debian; bug 678308
 )
 
 pkg_setup() {
@@ -97,6 +101,8 @@ src_prepare() {
 
 	# Don't use python_fix_shebang because we can't put this behind USE="python"
 	sed -i -e '/env/s:python:python2:' config/vigra-config.in || die
+
+	use test || cmake_comment_add_subdirectory test
 }
 
 src_configure() {

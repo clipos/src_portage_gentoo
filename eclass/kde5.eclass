@@ -4,25 +4,33 @@
 # @ECLASS: kde5.eclass
 # @MAINTAINER:
 # kde@gentoo.org
+# @SUPPORTED_EAPIS: 7
 # @BLURB: Support eclass for packages that follow KDE packaging conventions.
 # @DESCRIPTION:
-# This eclass is intended to streamline the creation of ebuilds for packages
-# that follow KDE upstream packaging conventions. It's primarily intended for
-# the three upstream release groups (Frameworks, Plasma, Applications) but
-# is also for any package that follows similar conventions.
+# This eclass is *deprecated*. Please read the PORTING notes for switching to
+# ecm.eclass in case the package is using extra-cmake-modules, otherwise just
+# use cmake-utils.eclass instead. For projects hosted on kde.org infrastructure,
+# inherit kde.org.eclass to fetch and unpack sources independent of the build
+# system being used.
 #
 # This eclass unconditionally inherits kde5-functions.eclass and all its public
 # functions and variables may be considered as part of this eclass's API.
 #
-# This eclass unconditionally inherits cmake-utils.eclass and all its public
-# variables and helper functions (not phase functions) may be considered as part
-# of this eclass's API.
+# This eclass unconditionally inherits kde.org.eclass and cmake-utils.eclass
+# and all their public variables and helper functions (not phase functions) may
+# be considered as part of this eclass's API.
 #
 # This eclass's phase functions are not intended to be mixed and matched, so if
 # any phase functions are overridden the version here should also be called.
 
 if [[ -z ${_KDE5_ECLASS} ]]; then
 _KDE5_ECLASS=1
+
+# Propagate KMNAME to kde.org.eclass
+# PORTING: Use KDE_ORG_NAME from kde.org.eclass instead
+if [[ -z ${KDE_ORG_NAME} ]]; then
+	KDE_ORG_NAME=${KMNAME:=$PN}
+fi
 
 # @ECLASS-VARIABLE: VIRTUALX_REQUIRED
 # @DESCRIPTION:
@@ -31,21 +39,13 @@ _KDE5_ECLASS=1
 # for tests you should proceed with setting VIRTUALX_REQUIRED=test.
 : ${VIRTUALX_REQUIRED:=manual}
 
-inherit cmake-utils flag-o-matic kde5-functions virtualx xdg
-
-case ${EAPI} in
-	6) inherit eapi7-ver eutils gnome2-utils ;;
-esac
-
-if [[ ${KDE_BUILD_TYPE} = live ]]; then
-	inherit git-r3
-fi
+inherit cmake-utils flag-o-matic kde.org kde5-functions virtualx xdg
 
 if [[ -v KDE_GCC_MINIMAL ]]; then
 	EXPORT_FUNCTIONS pkg_pretend
 fi
 
-EXPORT_FUNCTIONS pkg_setup pkg_nofetch src_unpack src_prepare src_configure src_compile src_test src_install pkg_preinst pkg_postinst pkg_postrm
+EXPORT_FUNCTIONS pkg_setup src_prepare src_configure src_compile src_test src_install pkg_preinst pkg_postinst pkg_postrm
 
 # @ECLASS-VARIABLE: ECM_KDEINSTALLDIRS
 # @DESCRIPTION:
@@ -60,19 +60,15 @@ EXPORT_FUNCTIONS pkg_setup pkg_nofetch src_unpack src_prepare src_configure src_
 # For any other value, add dependencies on dev-qt/qtcore:5, kde-frameworks/kf-env
 # and kde-frameworks/extra-cmake-modules:5. Additionally, required blockers may
 # be set depending on the value of CATEGORY.
+# PORTING: no replacement
 : ${KDE_AUTODEPS:=true}
-
-# @ECLASS-VARIABLE: KDE_BLOCK_SLOT4
-# @DESCRIPTION:
-# This variable only has any effect when when CATEGORY = "kde-apps" and
-# KDE_AUTODEPS is also set. If set to "true", add RDEPEND block on kde-apps/${PN}:4
-: ${KDE_BLOCK_SLOT4:=true}
 
 # @ECLASS-VARIABLE: KDE_DEBUG
 # @DESCRIPTION:
 # If set to "false", add -DNDEBUG (via cmake-utils_src_configure) and -DQT_NO_DEBUG
 # to CPPFLAGS.
 # Otherwise, add debug to IUSE.
+# PORTING: ECM_DEBUG in ecm.eclass
 : ${KDE_DEBUG:=true}
 
 # @ECLASS-VARIABLE: KDE_DESIGNERPLUGIN
@@ -80,12 +76,14 @@ EXPORT_FUNCTIONS pkg_setup pkg_nofetch src_unpack src_prepare src_configure src_
 # If set to "false", do nothing.
 # Otherwise, add "designer" to IUSE to toggle build of designer plugins
 # and add the necessary DEPENDs.
+# PORTING: ECM_DESIGNERPLUGIN in ecm.eclass
 : ${KDE_DESIGNERPLUGIN:=false}
 
 # @ECLASS-VARIABLE: KDE_EXAMPLES
 # @DESCRIPTION:
 # If set to "false", unconditionally ignore a top-level examples subdirectory.
 # Otherwise, add "examples" to IUSE to toggle adding that subdirectory.
+# PORTING: ECM_EXAMPLES in ecm.eclass
 : ${KDE_EXAMPLES:=false}
 
 # @ECLASS-VARIABLE: KDE_HANDBOOK
@@ -97,16 +95,19 @@ EXPORT_FUNCTIONS pkg_setup pkg_nofetch src_unpack src_prepare src_configure src_
 # when USE=!handbook. In case package requires KF5KDELibs4Support, see next:
 # If set to "forceoptional", remove a KF5DocTools dependency from the root
 # CMakeLists.txt in addition to the above.
+# PORTING: ECM_HANDBOOK in ecm.eclass
 : ${KDE_HANDBOOK:=false}
 
 # @ECLASS-VARIABLE: KDE_DOC_DIR
 # @DESCRIPTION:
 # Specifies the location of the KDE handbook if not the default.
+# PORTING: ECM_HANDBOOK_DIR in ecm.eclass
 : ${KDE_DOC_DIR:=doc}
 
 # @ECLASS-VARIABLE: KDE_PO_DIRS
 # @DESCRIPTION:
 # Specifies the possible locations of KDE l10n files if not the default.
+# PORTING: ECM_PO_DIRS in ecm.eclass
 : ${KDE_PO_DIRS:="po poqm"}
 
 # @ECLASS-VARIABLE: KDE_QTHELP
@@ -114,6 +115,7 @@ EXPORT_FUNCTIONS pkg_setup pkg_nofetch src_unpack src_prepare src_configure src_
 # If set to "false", do nothing.
 # Otherwise, add "doc" to IUSE, add the appropriate dependency, generate
 # and install Qt compressed help files with -DBUILD_QCH=ON when USE=doc.
+# PORTING: ECM_QTHELP in ecm.eclass
 if [[ ${CATEGORY} = kde-frameworks ]]; then
 	: ${KDE_QTHELP:=true}
 fi
@@ -131,17 +133,11 @@ fi
 # autotest(s), unittest(s) and test(s) subdirs from *any* CMakeLists.txt in ${S}
 # and below conditional on BUILD_TESTING. This is always meant as a short-term
 # fix and creates ${T}/${P}-tests-optional.patch to refine and submit upstream.
+# PORTING: ECM_TEST in ecm.eclass
 if [[ ${CATEGORY} = kde-frameworks ]]; then
 	: ${KDE_TEST:=true}
 fi
 : ${KDE_TEST:=false}
-
-# @ECLASS-VARIABLE: KDE_SELINUX_MODULE
-# @DESCRIPTION:
-# If set to "none", do nothing.
-# For any other value, add selinux to IUSE, and depending on that useflag
-# add a dependency on sec-policy/selinux-${KDE_SELINUX_MODULE} to (R)DEPEND.
-: ${KDE_SELINUX_MODULE:=none}
 
 # @ECLASS-VARIABLE: KDE_SUBSLOT
 # @DESCRIPTION:
@@ -149,24 +145,13 @@ fi
 # If set to "true", add a subslot to the package, where subslot is either
 # defined as major.minor version for kde-*/ categories or ${PV} if other.
 # For any other value, that value will be used as subslot.
+# PORTING: no replacement, define in ebuild
 : ${KDE_SUBSLOT:=false}
 
-# @ECLASS-VARIABLE: KDE_UNRELEASED
-# @INTERNAL
-# @DESCRIPTION
-# An array of $CATEGORY-$PV pairs of packages that are unreleased upstream.
-# Any package matching this will have fetch restriction enabled, and receive
-# a proper error message via pkg_nofetch.
-KDE_UNRELEASED=( )
-
-HOMEPAGE="https://kde.org/"
+# PORTING: LICENSE no longer set by eclass, define in ebuild
 LICENSE="GPL-2"
-
-SLOT=5
-
-if [[ ${CATEGORY} = kde-frameworks ]]; then
-	KDE_SUBSLOT=true
-fi
+# PORTING: SLOT no longer set by eclass except for kde-frameworks
+[[ ${CATEGORY} = kde-frameworks ]] || SLOT=5
 
 case ${KDE_SUBSLOT} in
 	false)  ;;
@@ -212,7 +197,11 @@ case ${KDE_DESIGNERPLUGIN} in
 	false)  ;;
 	*)
 		IUSE+=" designer"
-		BDEPEND+=" designer? ( $(add_frameworks_dep kdesignerplugin) )"
+		if [[ ${CATEGORY} = kde-apps && ${PV} = 19.0[48]* ]]; then
+			BDEPEND+=" designer? ( $(add_frameworks_dep kdesignerplugin) )"
+		else
+			BDEPEND+=" designer? ( $(add_qt_dep designer) )"
+		fi
 esac
 
 case ${KDE_EXAMPLES} in
@@ -250,153 +239,9 @@ case ${KDE_TEST} in
 		;;
 esac
 
-case ${KDE_SELINUX_MODULE} in
-	none)   ;;
-	*)
-		IUSE+=" selinux"
-		RDEPEND+=" selinux? ( sec-policy/selinux-${KDE_SELINUX_MODULE} )"
-		;;
-esac
-
-case ${EAPI} in
-	6) DEPEND+=" ${BDEPEND}" ;;
-esac
-
 DEPEND+=" ${COMMONDEPEND}"
 RDEPEND+=" ${COMMONDEPEND}"
 unset COMMONDEPEND
-
-if [[ -n ${KMNAME} && ${KMNAME} != ${PN} && ${KDE_BUILD_TYPE} = release ]]; then
-	S=${WORKDIR}/${KMNAME}-${PV}
-fi
-
-_kde_is_unreleased() {
-	local pair
-	for pair in "${KDE_UNRELEASED[@]}" ; do
-		if [[ "${pair}" = "${CATEGORY}-${PV}" ]]; then
-			return 0
-		fi
-	done
-
-	return 1
-}
-
-# Determine fetch location for released tarballs
-_calculate_src_uri() {
-	debug-print-function ${FUNCNAME} "$@"
-
-	local _kmname
-
-	if [[ -n ${KMNAME} ]]; then
-		_kmname=${KMNAME}
-	else
-		_kmname=${PN}
-	fi
-
-	case ${PN} in
-		kdelibs4support | \
-		khtml | \
-		kjs | \
-		kjsembed | \
-		kmediaplayer | \
-		kross)
-			_kmname="portingAids/${_kmname}"
-			;;
-	esac
-
-	case ${CATEGORY} in
-		kde-apps)
-			case ${PV} in
-				??.?.[6-9]? | ??.??.[6-9]? )
-					SRC_URI="mirror://kde/unstable/applications/${PV}/src/${_kmname}-${PV}.tar.xz"
-					RESTRICT+=" mirror"
-					;;
-				*)
-					SRC_URI="mirror://kde/stable/applications/${PV}/src/${_kmname}-${PV}.tar.xz" ;;
-			esac
-			;;
-		kde-frameworks)
-			SRC_URI="mirror://kde/stable/frameworks/${PV%.*}/${_kmname}-${PV}.tar.xz" ;;
-		kde-plasma)
-			local plasmapv=$(ver_cut 1-3)
-
-			case ${PV} in
-				5.?.[6-9]? | 5.??.[6-9]? )
-					# Plasma 5 beta releases
-					SRC_URI="mirror://kde/unstable/plasma/${plasmapv}/${_kmname}-${PV}.tar.xz"
-					RESTRICT+=" mirror"
-					;;
-				*)
-					# Plasma 5 stable releases
-					SRC_URI="mirror://kde/stable/plasma/${plasmapv}/${_kmname}-${PV}.tar.xz" ;;
-			esac
-			;;
-	esac
-
-	if [[ ${PN} = kdevelop* ]]; then
-		case ${PV} in
-			*.*.[6-9]? )
-				SRC_URI="mirror://kde/unstable/kdevelop/${PV}/src/${_kmname}-${PV}.tar.xz"
-				RESTRICT+=" mirror"
-				;;
-			*)
-				SRC_URI="mirror://kde/stable/kdevelop/${PV}/src/${_kmname}-${PV}.tar.xz" ;;
-		esac
-	fi
-
-	if _kde_is_unreleased ; then
-		RESTRICT+=" fetch"
-	fi
-}
-
-# Determine fetch location for live sources
-_calculate_live_repo() {
-	debug-print-function ${FUNCNAME} "$@"
-
-	SRC_URI=""
-
-	# @ECLASS-VARIABLE: EGIT_MIRROR
-	# @DESCRIPTION:
-	# This variable allows easy overriding of default kde mirror service
-	# (anongit) with anything else you might want to use.
-	EGIT_MIRROR=${EGIT_MIRROR:=https://anongit.kde.org}
-
-	local _kmname
-
-	# @ECLASS-VARIABLE: EGIT_REPONAME
-	# @DESCRIPTION:
-	# This variable allows overriding of default repository
-	# name. Specify only if this differ from PN and KMNAME.
-	if [[ -n ${EGIT_REPONAME} ]]; then
-		# the repository and kmname different
-		_kmname=${EGIT_REPONAME}
-	elif [[ -n ${KMNAME} ]]; then
-		_kmname=${KMNAME}
-	else
-		_kmname=${PN}
-	fi
-
-	if [[ ${PV} == ??.??.49.9999 && ${CATEGORY} = kde-apps ]]; then
-		EGIT_BRANCH="Applications/$(ver_cut 1-2)"
-	fi
-
-	if [[ ${PV} != 9999 && ${CATEGORY} = kde-plasma ]]; then
-		EGIT_BRANCH="Plasma/$(ver_cut 1-2)"
-	fi
-
-	if [[ ${PV} != 9999 && ${PN} = kdevelop* ]]; then
-		EGIT_BRANCH="$(ver_cut 1-2)"
-	fi
-
-	EGIT_REPO_URI="${EGIT_MIRROR}/${_kmname}"
-}
-
-case ${KDE_BUILD_TYPE} in
-	live) _calculate_live_repo ;;
-	*) _calculate_src_uri ;;
-esac
-
-debug-print "${LINENO} ${ECLASS} ${FUNCNAME}: SRC_URI is ${SRC_URI}"
 
 # @FUNCTION: kde5_pkg_pretend
 # @DESCRIPTION:
@@ -415,49 +260,12 @@ kde5_pkg_setup() {
 	_check_gcc_version
 }
 
-# @FUNCTION: kde5_pkg_nofetch
-# @DESCRIPTION:
-# Intended for use in the KDE overlay. If this package matches something in
-# KDE_UNRELEASED, display a giant warning that the package has not yet been
-# released upstream and should not be used.
-kde5_pkg_nofetch() {
-	if ! _kde_is_unreleased ; then
-		return
-	fi
-
-	eerror " _   _ _   _ ____  _____ _     _____    _    ____  _____ ____  "
-	eerror "| | | | \ | |  _ \| ____| |   | ____|  / \  / ___|| ____|  _ \ "
-	eerror "| | | |  \| | |_) |  _| | |   |  _|   / _ \ \___ \|  _| | | | |"
-	eerror "| |_| | |\  |  _ <| |___| |___| |___ / ___ \ ___) | |___| |_| |"
-	eerror " \___/|_| \_|_| \_\_____|_____|_____/_/   \_\____/|_____|____/ "
-	eerror "                                                               "
-	eerror " ____   _    ____ _  __    _    ____ _____ "
-	eerror "|  _ \ / \  / ___| |/ /   / \  / ___| ____|"
-	eerror "| |_) / _ \| |   | ' /   / _ \| |  _|  _|  "
-	eerror "|  __/ ___ \ |___| . \  / ___ \ |_| | |___ "
-	eerror "|_| /_/   \_\____|_|\_\/_/   \_\____|_____|"
-	eerror
-	eerror "${CATEGORY}/${P} has not been released to the public yet"
-	eerror "and is only available to packagers right now."
-	eerror ""
-	eerror "This is not a bug. Please do not file bugs or contact upstream about this."
-	eerror ""
-	eerror "Please consult the upstream release schedule to see when this "
-	eerror "package is scheduled to be released:"
-	eerror "https://community.kde.org/Schedules"
-}
-
 # @FUNCTION: kde5_src_unpack
 # @DESCRIPTION:
 # Unpack the sources, automatically handling both release and live ebuilds.
 kde5_src_unpack() {
 	debug-print-function ${FUNCNAME} "$@"
-
-	if [[ ${KDE_BUILD_TYPE} = live ]]; then
-		git-r3_src_unpack
-	else
-		default
-	fi
+	kde.org_src_unpack
 }
 
 # @FUNCTION: kde5_src_prepare
@@ -524,6 +332,7 @@ kde5_src_prepare() {
 		done
 	fi
 
+	# PORTING: bogus, overzealous 'en' docbook disabling is not carried over
 	if [[ ${KDE_BUILD_TYPE} = release && ${CATEGORY} != kde-apps ]] ; then
 		if [[ ${KDE_HANDBOOK} != false && -d ${KDE_DOC_DIR} && -v LINGUAS ]] ; then
 			pushd ${KDE_DOC_DIR} > /dev/null || die
@@ -600,8 +409,12 @@ kde5_src_configure() {
 		cmakeargs+=( -DCMAKE_DISABLE_FIND_PACKAGE_KF5DocTools=ON )
 	fi
 
-	if in_iuse designer && ! use designer && [[ ${KDE_DESIGNERPLUGIN} != false ]] ; then
-		cmakeargs+=( -DCMAKE_DISABLE_FIND_PACKAGE_KF5DesignerPlugin=ON )
+	if in_iuse designer && [[ ${KDE_DESIGNERPLUGIN} != false ]] ; then
+		if [[ ${CATEGORY} = kde-frameworks ]]; then
+			cmakeargs+=( -DBUILD_DESIGNERPLUGIN=$(usex designer) )
+		else
+			cmakeargs+=( $(cmake-utils_use_find_package designer KF5DesignerPlugin) )
+		fi
 	fi
 
 	if [[ ${KDE_QTHELP} != false ]]; then
@@ -612,9 +425,9 @@ kde5_src_configure() {
 		cmakeargs+=(
 			# install mkspecs in the same directory as qt stuff
 			-DKDE_INSTALL_USE_QT_SYS_PATHS=ON
+			# move handbook outside of doc dir, bug 667138
+			-DKDE_INSTALL_DOCBUNDLEDIR="${EPREFIX}/usr/share/help"
 		)
-		# move handbook outside of doc dir for at least two QA warnings, bug 667138
-		[[ ${EAPI} != 6 ]] && cmakeargs+=( -DKDE_INSTALL_DOCBUNDLEDIR="${EPREFIX}/usr/share/help" )
 	fi
 
 	# allow the ebuild to override what we set here
@@ -667,33 +480,11 @@ kde5_src_test() {
 
 # @FUNCTION: kde5_src_install
 # @DESCRIPTION:
-# Wrapper for cmake-utils_src_install with extra logic to avoid compressing
-# certain types of files. For example, khelpcenter is not able to read
-# compressed handbooks.
+# Wrapper for cmake-utils_src_install. Currently doesn't do anything extra.
 kde5_src_install() {
 	debug-print-function ${FUNCNAME} "$@"
 
 	cmake-utils_src_install
-
-	# We don't want QCH and tags files to be compressed, because then
-	# cmake can't find the tags and qthelp viewers can't find the docs
-	local p=$(best_version dev-qt/qtcore:5)
-	local pv=$(echo ${p/%-r[0-9]*/} | rev | cut -d - -f 1 | rev)
-	if [[ ${pv} = 5.11* ]]; then
-		#todo: clean up trailing slash check when EAPI <7 is removed
-		if [[ -d ${ED%/}/usr/share/doc/qt-${pv} ]]; then
-			docompress -x /usr/share/doc/qt-${pv}
-		fi
-	fi
-
-	if [[ ${EAPI} = 6 ]]; then
-		# We don't want /usr/share/doc/HTML to be compressed,
-		# because then khelpcenter can't find the docs
-		#todo: clean up trailing slash check when EAPI <7 is removed
-		if [[ -d ${ED%/}/usr/share/doc/HTML ]]; then
-			docompress -x /usr/share/doc/HTML
-		fi
-	fi
 }
 
 # @FUNCTION: kde5_pkg_preinst

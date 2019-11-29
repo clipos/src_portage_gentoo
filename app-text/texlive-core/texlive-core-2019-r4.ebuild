@@ -72,7 +72,7 @@ for i in ${TL_CORE_EXTRA_SRC_MODULES}; do
 done
 SRC_URI="${SRC_URI} )"
 
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
+KEYWORDS="alpha amd64 arm arm64 hppa ia64 ~mips ppc ppc64 s390 ~sh sparc x86 ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
 IUSE="cjk X doc source tk +luajittex xetex"
 
 TEXMF_PATH=/usr/share/texmf-dist
@@ -87,7 +87,6 @@ COMMON_DEPEND="${MODULAR_X_DEPEND}
 	sys-libs/zlib
 	>=media-libs/libpng-1.2.43-r2:0=
 	media-libs/gd[png]
-	>=app-text/poppler-0.58.0:=
 	>=x11-libs/cairo-1.12
 	>=x11-libs/pixman-0.18
 	dev-libs/zziplib
@@ -167,6 +166,11 @@ src_configure() {
 	# that don't have the same alphabetical order than ascii. Bug #242430
 	# So we set LC_ALL to C in order to avoid problems.
 	export LC_ALL=C
+
+	# Disable freetype-config as this is considered obsolete.
+	# Also only pkg-config works for prefix as described in bug #690094
+	export ac_cv_prog_ac_ct_FT2_CONFIG=no
+
 	tc-export CC CXX AR RANLIB
 	ECONF_SOURCE="${B}" \
 		econf -C \
@@ -228,6 +232,7 @@ src_configure() {
 		--disable-native-texlive-build \
 		--disable-largefile \
 		--disable-build-in-source-tree \
+		--with-banner-add=" Gentoo Linux" \
 		$(use_enable luajittex) \
 		$(use_enable luajittex mfluajit) \
 		$(use_enable xetex) \
@@ -246,7 +251,7 @@ src_configure() {
 
 src_compile() {
 	tc-export CC CXX AR RANLIB
-	emake SHELL="${EPREFIX}"/bin/sh texmf="${EPREFIX}"${TEXMF_PATH:-/usr/share/texmf-dist}
+	emake AR="$(tc-getAR)" SHELL="${EPREFIX}"/bin/sh texmf="${EPREFIX}"${TEXMF_PATH:-/usr/share/texmf-dist}
 
 	cd "${B}" || die
 	# Mimic updmap --syncwithtrees to enable only fonts installed
@@ -288,8 +293,8 @@ src_install() {
 	cd "${B}/texk/makeindexk" || die
 	dodoc ChangeLog NOTES README
 
-	docinto web2c || die
-	cd "${B}/texk/web2c"
+	docinto web2c
+	cd "${B}/texk/web2c" || die
 	dodoc ChangeLog NEWS PROJECTS README
 
 	use doc || rm -rf "${ED}/usr/share/texmf-dist/doc"

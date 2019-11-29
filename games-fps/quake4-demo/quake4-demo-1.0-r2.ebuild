@@ -1,4 +1,4 @@
-# Copyright 1999-2015 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=5
@@ -8,9 +8,6 @@ MY_P="quake4-linux-${PV}-demo"
 DESCRIPTION="Sequel to Quake 2, an Id 3D first-person shooter"
 HOMEPAGE="http://www.quake4game.com/"
 SRC_URI="mirror://idsoftware/quake4/demo/${MY_P}.x86.run
-	http://www.3ddownloads.com/Action/Quake%204/Demos/${MY_P}.x86.run
-	mirror://3dgamers/quake4/${MY_P}.x86.run
-	http://filebase.gmpf.de/quake4/${MY_P}.x86.run
 	http://www.holarse.de/mirror/${MY_P}.x86.run
 	http://sonic-lux.net/data/mirror/quake4/${MY_P}.x86.run"
 
@@ -18,7 +15,7 @@ LICENSE="QUAKE4"
 SLOT="0"
 KEYWORDS="-* ~amd64 ~x86"
 IUSE="dedicated"
-RESTRICT="strip"
+RESTRICT="bindist mirror strip"
 
 RDEPEND="sys-libs/glibc
 	sys-libs/libstdc++-v3:5

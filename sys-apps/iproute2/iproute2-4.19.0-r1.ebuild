@@ -9,8 +9,8 @@ if [[ ${PV} == "9999" ]] ; then
 	EGIT_REPO_URI="git://git.kernel.org/pub/scm/linux/kernel/git/shemminger/iproute2.git"
 	inherit git-r3
 else
-	SRC_URI="mirror://kernel/linux/utils/net/${PN}/${P}.tar.xz"
-	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86"
+	SRC_URI="https://www.kernel.org/pub/linux/utils/net/${PN}/${P}.tar.xz"
+	KEYWORDS="alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86"
 fi
 
 DESCRIPTION="kernel routing and traffic control utilities"
@@ -55,6 +55,9 @@ src_prepare() {
 	fi
 
 	default
+
+	# echo -n is not POSIX compliant
+	sed 's@echo -n@printf@' -i configure || die
 
 	sed -i \
 		-e '/^CC :\?=/d' \
@@ -125,6 +128,7 @@ src_install() {
 
 	emake \
 		DESTDIR="${D}" \
+		PREFIX="${EPREFIX%/}/usr" \
 		LIBDIR="${EPREFIX%/}"/$(get_libdir) \
 		SBINDIR="${EPREFIX%/}"/sbin \
 		CONFDIR="${EPREFIX%/}"/etc/iproute2 \

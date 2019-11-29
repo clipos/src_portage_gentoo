@@ -49,6 +49,7 @@ CDEPEND="
 	lmfit? ( sci-libs/lmfit )
 	mkl? ( sci-libs/mkl )
 	mpi? ( virtual/mpi )
+	${PYTHON_DEPS}
 	"
 DEPEND="${CDEPEND}
 	virtual/pkgconfig
@@ -56,6 +57,7 @@ DEPEND="${CDEPEND}
 		app-doc/doxygen
 		dev-python/sphinx[${PYTHON_USEDEP}]
 		media-gfx/mscgen
+		media-gfx/graphviz
 		dev-texlive/texlive-latex
 		dev-texlive/texlive-latexextra
 		media-gfx/imagemagick
@@ -66,9 +68,12 @@ REQUIRED_USE="
 	|| ( single-precision double-precision )
 	cuda? ( single-precision )
 	cuda? ( !opencl )
-	mkl? ( !blas !fftw !lapack )"
+	mkl? ( !blas !fftw !lapack )
+	${PYTHON_REQUIRED_USE}"
 
 DOCS=( AUTHORS README )
+
+RESTRICT="!test? ( test )"
 
 if [[ ${PV} != *9999 ]]; then
 	S="${WORKDIR}/${PN}-${PV/_/-}"
@@ -230,9 +235,11 @@ src_configure() {
 		mycmakeargs=(
 			${mycmakeargs_pre[@]} ${p}
 			-DGMX_THREAD_MPI=OFF
-			-DGMX_MPI=ON ${cuda}
+			-DGMX_MPI=ON
 			-DGMX_OPENMM=OFF
 			-DGMXAPI=OFF
+			"${opencl[@]}"
+			"${cuda[@]}"
 			-DGMX_BUILD_MDRUN_ONLY=ON
 			-DBUILD_SHARED_LIBS=OFF
 			-DGMX_BUILD_MANUAL=OFF

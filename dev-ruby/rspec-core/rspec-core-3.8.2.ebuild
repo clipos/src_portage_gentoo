@@ -22,7 +22,7 @@ SRC_URI="https://github.com/rspec/${PN}/archive/v${PV}.tar.gz -> ${P}-git.tgz"
 
 LICENSE="MIT"
 SLOT="3"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~s390 ~sparc ~x86 ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
+KEYWORDS="alpha amd64 arm ~arm64 hppa ia64 ppc ppc64 s390 sparc x86 ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
 IUSE="highlight"
 
 SUBVERSION="$(ver_cut 1-2)"
@@ -72,7 +72,7 @@ all_ruby_prepare() {
 	sed -i -e '/loads mocks and expectations when the constants are referenced/askip "gentoo: bug 662328"' spec/rspec/core_spec.rb || die
 
 	# Avoid a spec depending on specifics on local networks
-	# This fails when localhost resolves to ::1 which may be a 
+	# This fails when localhost resolves to ::1 which may be a
 	# ruby regression in the drb/acl code.
 	rm -f spec/rspec/core/bisect/server_spec.rb || die
 }

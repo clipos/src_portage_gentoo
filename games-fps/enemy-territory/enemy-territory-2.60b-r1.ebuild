@@ -1,4 +1,4 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=5
@@ -6,9 +6,7 @@ inherit eutils unpacker games
 
 DESCRIPTION="standalone multi-player game based on Return to Castle Wolfenstein"
 HOMEPAGE="http://www.idsoftware.com/"
-SRC_URI="mirror://3dgamers/wolfensteinet/et-linux-2.60.x86.run
-	mirror://idsoftware/et/linux/et-linux-2.60.x86.run
-	ftp://ftp.red.telefonica-wholesale.net/GAMES/ET/linux/et-linux-2.60.x86.run
+SRC_URI="mirror://idsoftware/et/linux/et-linux-2.60.x86.run
 	mirror://idsoftware/et/ET-${PV}.zip
 	dedicated? (
 		https://dev.gentoo.org/~wolf31o2/sources/dump/${PN}-all-0.1.tar.bz2
@@ -19,7 +17,7 @@ LICENSE="RTCW-ETEULA"
 SLOT="0"
 KEYWORDS="-* ~amd64 ~x86"
 IUSE="dedicated"
-RESTRICT="mirror strip"
+RESTRICT="bindist mirror strip"
 
 DEPEND="app-arch/unzip"
 RDEPEND="sys-libs/glibc

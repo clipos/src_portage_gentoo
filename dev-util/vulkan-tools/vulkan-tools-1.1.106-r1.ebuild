@@ -10,7 +10,7 @@ if [[ "${PV}" == "9999" ]]; then
 	inherit git-r3
 else
 	EGIT_COMMIT="2abb69904b9ad017d39d3da1e7fc3dec1a584cd8"
-	KEYWORDS="~amd64"
+	KEYWORDS="amd64"
 	SRC_URI="https://github.com/KhronosGroup/Vulkan-Tools/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
 	S="${WORKDIR}/Vulkan-Tools-${EGIT_COMMIT}"
 fi
@@ -22,7 +22,7 @@ HOMEPAGE="https://github.com/KhronosGroup/Vulkan-Tools"
 
 LICENSE="Apache-2.0"
 SLOT="0"
-IUSE="+cube +vulkaninfo X wayland"
+IUSE="+cube +vulkaninfo +X wayland"
 COMMON_DEPEND="media-libs/vulkan-loader:=[${MULTILIB_USEDEP},wayland?,X?]
 	wayland? ( dev-libs/wayland:=[${MULTILIB_USEDEP}] )
 	X? (
@@ -37,7 +37,7 @@ RDEPEND="${COMMON_DEPEND}"
 
 # Vulkaninfo does not support wayland
 REQUIRED_USE="|| ( X wayland )
-			  vulkaninfo? ( X )"
+			vulkaninfo? ( X )"
 
 pkg_setup() {
 	MULTILIB_CHOST_TOOLS=()

@@ -3,7 +3,7 @@
 
 EAPI="4"
 
-inherit libtool toolchain-funcs multilib-minimal
+inherit libtool toolchain-funcs multilib-minimal usr-ldscript
 
 DESCRIPTION="GNU charset conversion library for libc which doesn't implement it"
 HOMEPAGE="https://www.gnu.org/software/libiconv/"
@@ -11,7 +11,7 @@ SRC_URI="mirror://gnu/libiconv/${P}.tar.gz"
 
 LICENSE="LGPL-2+ GPL-3+"
 SLOT="0"
-KEYWORDS="amd64 arm ~mips ppc x86 ~amd64-fbsd ~x86-fbsd"
+KEYWORDS="amd64 arm ~mips ppc x86"
 IUSE="+static-libs"
 
 DEPEND="!sys-libs/glibc

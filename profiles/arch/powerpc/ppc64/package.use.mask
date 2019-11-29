@@ -1,5 +1,24 @@
-# Copyright 1999-2019 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
+
+# Eugene Bright <eugene@bright.gdn> (2019-09-09)
+# Missing keyword on dev-embedded/libjaylink
+sys-apps/flashrom jlink-spi
+
+# Matthew Thode <prometheanfire@gentoo.org> (2019-08-22)
+# context works with newer versions of boost
+# https://github.com/boostorg/context/commit/d4608a4e8ba2e8a0bdd45613243e6c53a23d23dc
+>=dev-libs/boost-1.71.0 -context
+
+# Jimi Huotari <chiitoo@gentoo.org> (2019-07-28)
+# Mask unkeyworded, untested dependencies.
+# https://bugs.gentoo.org/689606
+lxqt-base/lxqt-meta admin powermanagement processviewer screenshot sudo
+lxqt-base/lxqt-panel cpuload networkmonitor pulseaudio sysstat
+
+# Andreas Sturmlechner <asturm@gentoo.org> (2019-07-16)
+# sci-libs/dcmtk is not keyworded
+media-libs/openimageio dicom
 
 # Thomas Deutschmann <whissi@gentoo.org> (2018-12-10)
 # dev-lang/luajit lacks ppc64 keyword. luajit upstream does not support ppc64
@@ -12,11 +31,6 @@ media-sound/hydrogen portmidi
 # Gilles Dartiguelongue <eva@gentoo.org> (2017-08-16)
 # missing keyword on dev-python/dbusmock, bug #620024
 >=gnome-base/gnome-settings-daemon-3.24 test
-
-# Michał Górny <mgorny@gentoo.org> (2017-08-08)
-# package.use.force forces USE=binary, and USE=debug requires !binary,
-# so it can never be enabled.
-sys-firmware/seabios debug
 
 # Michał Górny <mgorny@gentoo.org> (2017-06-28)
 # app-misc/dtach is not keyworded, and tests are restricted anyway, so

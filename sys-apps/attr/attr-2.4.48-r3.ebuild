@@ -3,7 +3,7 @@
 
 EAPI="6"
 
-inherit libtool toolchain-funcs multilib-minimal
+inherit flag-o-matic libtool toolchain-funcs multilib-minimal usr-ldscript
 
 DESCRIPTION="Extended attributes tools"
 HOMEPAGE="https://savannah.nongnu.org/projects/attr"
@@ -11,7 +11,7 @@ SRC_URI="mirror://nongnu/${PN}/${P}.tar.gz"
 
 LICENSE="LGPL-2.1"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~riscv ~s390 ~sh ~sparc ~x86 ~amd64-linux ~x86-linux"
+KEYWORDS="alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 ~riscv s390 sh sparc x86 ~amd64-linux ~x86-linux"
 IUSE="debug nls static-libs"
 
 DEPEND="nls? ( sys-devel/gettext )"
@@ -20,6 +20,12 @@ PATCHES=(
 	"${FILESDIR}/${P}-perl-5.26.patch"
 	"${FILESDIR}/${P}-switch-back-to-syscall.patch"
 )
+
+pkg_setup() {
+	# Remove -flto* from flags as this breaks binaries (bug #644048)
+	filter-flags -flto*
+	append-ldflags "-Wl,--no-gc-sections" #700116
+}
 
 src_prepare() {
 	default

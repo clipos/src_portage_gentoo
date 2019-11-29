@@ -5,7 +5,7 @@
 		<email>crypto@gentoo.org</email>
 		<name>Crypto</name>
 	</maintainer>
-	<use>
-		<flag name="cpu_flags_x86_sha">Enable support for Intel's SHA instruction set (SHA-NI)</flag>
-	</use>
+	<upstream>
+		<remote-id type="cpe">cpe:/a:nettle_project:nettle</remote-id>
+	</upstream>
 </pkgmetadata>

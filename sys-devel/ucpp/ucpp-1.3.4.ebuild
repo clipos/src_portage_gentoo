@@ -3,13 +3,12 @@
 
 EAPI=7
 
-DESCRIPTION="A quick and light preprocessor, but anyway fully compliant to C99"
-HOMEPAGE="https://code.google.com/p/ucpp/"
+DESCRIPTION="Library for preprocessing C compliant to ISO-C99"
+HOMEPAGE="https://gitlab.com/scarabeusiv/ucpp"
 SRC_URI="http://dev.gentooexperimental.org/~scarabeus/${P}.tar.xz"
-
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="amd64 ~arm ~arm64 ppc ~ppc64 x86 ~amd64-linux"
+KEYWORDS="amd64 ~arm arm64 ppc ~ppc64 x86 ~amd64-linux"
 IUSE="static-libs"
 
 src_configure() {

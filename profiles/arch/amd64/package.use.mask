@@ -17,6 +17,31 @@
 
 #--- END OF EXAMPLES ---
 
+# Thomas Deutschmann <whissi@gentoo.org> (2019-11-11)
+# dev-python/pandas is keyworded for amd64
+sys-block/fio -gnuplot
+
+# Craig Andrews <candrews@gentoo.org> (2019-10-08)
+# net-misc/quiche is available on this arch
+net-misc/curl -quiche
+
+# Luke Dashjr <luke-jr+gentoobugs@utopios.org> (2019-09-21)
+# iasl is stable on amd64
+sys-firmware/seabios -debug
+
+# Georgy Yakovlev <gyakovlev@gentoo.org> (2019-08-28)
+# upstream provides docs and tools for tier-1 arches
+dev-lang/rust-bin -doc
+>=dev-lang/rust-bin-1.37 -clippy -rustfmt
+
+# Thomas Deutschmann <whissi@gentoo.org> (2019-08-03)
+# Early microcode loading is supported on amd64
+sys-kernel/linux-firmware -initramfs
+
+# Lars Wendler <polynomial-c@gentoo.org> (2019-07-26)
+# dev-libs/gumbo is keyworded on amd64
+mail-client/claws-mail -litehtml
+
 # Georgy Yakovlev <gyakovlev@gentoo.org> (2019-06-22)
 # openjfx is keyworded on amd64
 dev-java/openjdk:11 -javafx
@@ -56,16 +81,11 @@ media-gfx/imagemagick -heif
 
 # Ben Kohler <bkohler@gentoo.org> (2018-08-23)
 # Unmask iwd support where net-wireless/iwd is keyworded
-net-misc/connman -iwd
 net-misc/networkmanager -iwd
 
 # Thomas Deutschmann <whissi@gentoo.org> (2018-08-23)
 # Dependency sys-cluster/ceph is keyworded for amd64
 net-fs/samba -ceph
-
-# Göktürk Yüksek <gokturk@gentoo.org> (2018-07-06)
-# Dependency app-crypt/jitterentropy is keyworded for amd64
-sys-apps/rng-tools -jitterentropy
 
 # Rick Farina <zerochaos@gentoo.org> (2018-06-27)
 # Catalyst has support for assembling bootloader on this arch
@@ -94,15 +114,15 @@ sys-boot/grub -libzfs
 
 # Amy Liffey <amynka@gentoo.org> (2017-09-19)
 # [cuda] is unmasked in this profiles.
-media-libs/opencv -contrib_xfeatures2d
+media-libs/opencv -contribxfeatures2d
 
 # David Seifert <soap@gentoo.org> (2017-05-20)
 # cpyrit-cuda does not support GCC 4.9 or later
 net-wireless/pyrit cuda
 
 # Rick Farina <zerochaos@gentoo.org> (2017-05-11)
-# nexpose and openvas work on amd64
-net-analyzer/metasploit -nexpose -openvas
+# nexpose work on amd64
+net-analyzer/metasploit -nexpose
 
 # Thomas Deutschmann <whissi@gentoo.org> (2017-03-01)
 # dev-libs/libmaxminddb is keyworded on amd64
@@ -187,7 +207,7 @@ net-im/telepathy-connection-managers -steam
 
 # Mike Frysinger <vapier@gentoo.org> (2014-08-04)
 # Unmask flashrom drivers that only work on x86 due to in/out asm insns #454024
-sys-apps/flashrom -atahpt -nic3com -nicnatsemi -nicrealtek -rayer_spi -satamv
+sys-apps/flashrom -atahpt -nic3com -nicnatsemi -nicrealtek -rayer-spi -satamv
 
 # Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org> (2014-04-24)
 # It's only supported on amd64

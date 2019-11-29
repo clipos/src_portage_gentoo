@@ -6,7 +6,7 @@
 
 EAPI=6
 
-inherit toolchain-funcs multilib-minimal
+inherit toolchain-funcs multilib-minimal usr-ldscript
 
 DESCRIPTION="A high-quality data compressor used extensively by Gentoo Linux"
 HOMEPAGE="https://sourceware.org/bzip2/"
@@ -14,7 +14,7 @@ SRC_URI="mirror://gentoo/${P}.tar.gz"
 
 LICENSE="BZIP2"
 SLOT="0/1" # subslot = SONAME
-KEYWORDS="alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 ~riscv s390 sh sparc x86 ~amd64-fbsd ~x86-fbsd"
+KEYWORDS="alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 ~riscv s390 sh sparc x86"
 IUSE="static static-libs"
 
 PATCHES=(

@@ -1,10 +1,10 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=4
 inherit autotools eutils flag-o-matic multilib user
 
-KEYWORDS="alpha amd64 arm hppa ia64 ppc ppc64 s390 sh sparc x86 ~x86-fbsd"
+KEYWORDS="alpha amd64 arm hppa ia64 ppc ppc64 s390 sh sparc x86"
 
 DESCRIPTION="Courier authentication library"
 SRC_URI="mirror://sourceforge/courier/${P}.tar.bz2"
@@ -22,7 +22,7 @@ DEPEND="net-mail/mailbase
 		>=dev-libs/openssl-0.9.6
 		ldap? ( >=net-nds/openldap-1.2.11 )
 		mysql? ( virtual/mysql )
-		pam? ( virtual/pam )
+		pam? ( sys-libs/pam )
 		postgres? ( >=dev-db/postgresql-8.4 )
 		sqlite? ( dev-db/sqlite:3 )"
 

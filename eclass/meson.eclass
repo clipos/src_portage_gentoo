@@ -244,12 +244,13 @@ meson_src_configure() {
 }
 
 # @FUNCTION: meson_src_compile
+# @USAGE: [extra ninja arguments]
 # @DESCRIPTION:
 # This is the meson_src_compile function.
 meson_src_compile() {
 	debug-print-function ${FUNCNAME} "$@"
 
-	eninja -C "${BUILD_DIR}"
+	eninja -C "${BUILD_DIR}" "$@"
 }
 
 # @FUNCTION: meson_src_test
@@ -260,13 +261,12 @@ meson_src_test() {
 	debug-print-function ${FUNCNAME} "$@"
 
 	local mesontestargs=(
-		--verbose
 		-C "${BUILD_DIR}"
-		)
+	)
 	[[ -n ${NINJAOPTS} || -n ${MAKEOPTS} ]] &&
 		mesontestargs+=(
 			--num-processes "$(makeopts_jobs ${NINJAOPTS:-${MAKEOPTS}})"
-			)
+		)
 
 	# Append additional arguments from ebuild
 	mesontestargs+=("${emesontestargs[@]}")
@@ -277,12 +277,13 @@ meson_src_test() {
 }
 
 # @FUNCTION: meson_src_install
+# @USAGE: [extra ninja install arguments]
 # @DESCRIPTION:
 # This is the meson_src_install function.
 meson_src_install() {
 	debug-print-function ${FUNCNAME} "$@"
 
-	DESTDIR="${D}" eninja -C "${BUILD_DIR}" install
+	DESTDIR="${D}" eninja -C "${BUILD_DIR}" install "$@"
 	einstalldocs
 }
 

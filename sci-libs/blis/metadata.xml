@@ -5,9 +5,13 @@
     <bugs-to>https://github.com/flame/blis/issues/</bugs-to>
     <doc>https://github.com/flame/blis</doc>
   </upstream>
-  <maintainer type="project">
+  <maintainer type="person">
     <name>Mo Zhou</name>
     <email>lumin@debian.org</email>
+  </maintainer>
+  <maintainer type="project">
+    <email>sci@gentoo.org</email>
+    <name>Gentoo Science Project</name>
   </maintainer>
   <longdescription>
     BLIS is a portable software framework for instantiating high-performance

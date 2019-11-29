@@ -8,13 +8,13 @@ DESCRIPTION="Library to execute a function when a specific event occurs on a fil
 EGIT_BRANCH="patches-$(ver_cut 1-2)"
 EGIT_REPO_URI="https://github.com/libevent/libevent"
 HOMEPAGE="
-	http://libevent.org/
+	https://libevent.org/
 	${EGIT_REPO_URI}
 "
 
 LICENSE="BSD"
 # libevent-2.1.so.6
-SLOT="0/2.1-6"
+SLOT="0/2.1-7"
 KEYWORDS=""
 IUSE="debug libressl +ssl static-libs test +threads"
 RESTRICT="test"

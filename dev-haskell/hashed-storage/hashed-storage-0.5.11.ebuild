@@ -10,11 +10,11 @@ inherit haskell-cabal
 
 DESCRIPTION="Hashed file storage support code"
 HOMEPAGE="http://hackage.haskell.org/package/hashed-storage"
-SRC_URI="mirror://hackage/packages/archive/${PN}/${PV}/${P}.tar.gz"
+SRC_URI="https://hackage.haskell.org/package/${P}/${P}.tar.gz"
 
 LICENSE="BSD"
 SLOT="0/${PV}"
-KEYWORDS="alpha amd64 ia64 ppc ppc64 sparc x86 ~x86-fbsd ~amd64-linux ~ppc-macos ~x86-macos"
+KEYWORDS="alpha amd64 ia64 ppc ppc64 sparc x86 ~amd64-linux ~ppc-macos ~x86-macos"
 IUSE="diff hpc test"
 
 RDEPEND="dev-haskell/binary:=[profile?]

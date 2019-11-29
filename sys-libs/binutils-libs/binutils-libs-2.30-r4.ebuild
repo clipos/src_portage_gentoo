@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -21,7 +21,7 @@ LICENSE="|| ( GPL-3 LGPL-3 )"
 # The shared lib SONAMEs use the ${PV} in them.
 # -r1 is a one-off subslot bump where SONAME changed for bug #666100
 SLOT="0/${PV}-r1"
-KEYWORDS="alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
+KEYWORDS="alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86 ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
 IUSE="64-bit-bfd multitarget nls static-libs"
 
 COMMON_DEPEND="sys-libs/zlib[${MULTILIB_USEDEP}]"
@@ -82,7 +82,7 @@ multilib_src_configure() {
 		# We pull in all USE-flags that change ABI in an incompatible
 		# way. #666100
 		# USE=multitarget change size of global arrays
-		# USE=64-bit-bfd changes data structures of exported API 
+		# USE=64-bit-bfd changes data structures of exported API
 		--with-extra-soversion-suffix=gentoo-${CATEGORY}-${PN}-$(usex multitarget mt st)-$(usex 64-bit-bfd 64 def)
 	)
 

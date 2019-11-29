@@ -6,6 +6,10 @@
 
 # This file contains a list of useflags that cannot be used on sparc.
 
+# Mattéo Rossillol‑‑Laruelle <beatussum@protonmail.com> (2019‑08‑31)
+# Dependency not keyworded (dev-libs/libappindicator).
+ayatana
+
 # Sergei Trofimovich <slyfox@gentoo.org> (2018-12-12)
 # mongodb is not keyworded on sparc
 mongodb
@@ -56,10 +60,6 @@ xine
 # Diego Elio Pettenò <flameeyes@gentoo.org> (2012-08-17)
 # qstat is not available on sparc, as it is
 nagios-game
-
-# Samuli Suominen <ssuominen@gentoo.org> (2012-05-07)
-# Missing keywording in www-client/firefox wrt #360427
-mozilla
 
 # Alexandre Rostovtsev <tetromino@gmail.com> (2011-10-28)
 # x11-misc/colord and app-admin/packagekit-base not tested. Bug #387959.
@@ -152,7 +152,7 @@ zmq
 ifp
 chipcard
 hbci
-lm_sensors
+lm-sensors
 openct
 bluetooth
 dmraid
@@ -172,7 +172,6 @@ redis
 
 # USE-flags from differents origins
 brltty
-directfb
 djbfft
 dvb
 java
@@ -182,7 +181,6 @@ networkmanager
 pbs
 pcmcia
 rar
-uml
 valgrind
 wifi
 xvmc

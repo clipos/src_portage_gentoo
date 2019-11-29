@@ -13,7 +13,7 @@ SRC_URI="https://github.com/${MY_PN}/${MY_PN}/releases/download/${PV}/${MY_P}.ta
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="alpha amd64 arm ~arm64 ~hppa ia64 ppc ppc64 s390 ~sparc x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux"
+KEYWORDS="alpha amd64 arm ~arm64 ~hppa ia64 ppc ppc64 s390 ~sparc x86 ~amd64-linux ~x86-linux"
 IUSE="acl cgroups debug doc evdev kernel_linux pam pm-utils policykit selinux test udev"
 
 COMMON_DEPEND=">=dev-libs/glib-2.40:2=[dbus]
@@ -34,7 +34,7 @@ COMMON_DEPEND=">=dev-libs/glib-2.40:2=[dbus]
 		virtual/libudev
 		x11-libs/libdrm:=
 	)
-	pam? ( virtual/pam )
+	pam? ( sys-libs/pam )
 	policykit? ( >=sys-auth/polkit-0.110 )
 	selinux? ( sys-libs/libselinux )"
 # pm-utils: bug 557432

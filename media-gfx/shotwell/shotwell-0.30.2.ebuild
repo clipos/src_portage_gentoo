@@ -3,6 +3,7 @@
 
 EAPI=6
 VALA_MIN_API_VERSION="0.40"
+VALA_MAX_API_VERSION="0.42"
 
 inherit gnome.org gnome2-utils meson vala xdg
 
@@ -11,7 +12,7 @@ HOMEPAGE="https://wiki.gnome.org/Apps/Shotwell"
 
 LICENSE="LGPL-2.1"
 SLOT="0"
-KEYWORDS="~alpha amd64 ~arm ~ia64 ~ppc ~ppc64 ~sparc x86"
+KEYWORDS="~alpha amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 ~sparc x86"
 IUSE="opencv udev"
 
 COMMON_DEPEND="
@@ -26,8 +27,9 @@ COMMON_DEPEND="
 	media-libs/gstreamer:1.0
 	media-libs/gst-plugins-base:1.0
 	>=media-libs/libgphoto2-2.5:=
-	udev? ( >=virtual/libgudev-145:= )
+	udev? ( >=dev-libs/libgudev-145:= )
 	>=media-libs/gexiv2-0.10.4
+	<media-libs/gexiv2-0.11
 	>=media-libs/libraw-0.13.2:=
 	>=media-libs/libexif-0.6.16:=
 	dev-libs/libgdata

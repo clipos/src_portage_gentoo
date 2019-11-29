@@ -13,9 +13,9 @@ if [[ ${PV} == "9999" ]]; then
 	EGIT_REPO_URI="https://github.com/zfsonlinux/zfs.git"
 else
 	SRC_URI="https://github.com/zfsonlinux/zfs/releases/download/zfs-${PV}/zfs-${PV}.tar.gz"
-	KEYWORDS="~amd64"
+	KEYWORDS="~amd64 ~arm64 ~ppc64"
 	S="${WORKDIR}/zfs-${PV}"
-	ZFS_KERNEL_COMPAT="5.1"
+	ZFS_KERNEL_COMPAT="5.3"
 fi
 
 LICENSE="CDDL debug? ( GPL-2+ )"
@@ -63,11 +63,13 @@ pkg_setup() {
 			DEVTMPFS
 	"
 
-	use arm64 && CONFIG_CHECK="${CONFIG_CHECK} !PREEMPT"
+	if use arm64; then
+		kernel_is -ge 5 && CONFIG_CHECK="${CONFIG_CHECK} !PREEMPT"
+	fi
 
 	kernel_is -lt 5 && CONFIG_CHECK="${CONFIG_CHECK} IOSCHED_NOOP"
 
-	kernel_is -ge 2 6 32 || die "Linux 2.6.32 or newer required"
+	kernel_is -ge 3 10 || die "Linux 3.10 or newer required"
 
 	if [[ ${PV} != "9999" ]]; then
 		local kv_major_max kv_minor_max zcompat

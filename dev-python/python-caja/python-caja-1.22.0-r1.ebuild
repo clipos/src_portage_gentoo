@@ -9,14 +9,14 @@ PYTHON_COMPAT=( python2_7 )
 inherit mate python-single-r1
 
 if [[ ${PV} != 9999 ]]; then
-	KEYWORDS="~amd64 ~arm ~x86"
+	KEYWORDS="amd64 ~arm x86"
 fi
 
 DESCRIPTION="Python bindings for the Caja file manager"
 LICENSE="GPL-2"
 SLOT="0"
-
 IUSE="doc"
+REQUIRED_USE=${PYTHON_REQUIRED_USE}
 
 COMMON_DEPEND="${PYTHON_DEPS}
 	>=dev-libs/glib-2.50:2

@@ -15,7 +15,7 @@ HOMEPAGE="https://mpv.io/"
 
 if [[ ${PV} != *9999* ]]; then
 	SRC_URI="https://github.com/mpv-player/mpv/archive/v${PV}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="~amd64 ~arm ~hppa ~ppc ~ppc64 ~x86 ~amd64-linux"
+	KEYWORDS="alpha amd64 ~arm ~arm64 ~hppa ppc ppc64 x86 ~amd64-linux"
 	DOCS=( RELEASE_NOTES )
 else
 	EGIT_REPO_URI="https://github.com/mpv-player/mpv.git"
@@ -66,8 +66,8 @@ COMMON_DEPEND="
 	cdda? ( dev-libs/libcdio-paranoia )
 	drm? ( x11-libs/libdrm )
 	dvd? (
-		>=media-libs/libdvdnav-4.2.0
-		>=media-libs/libdvdread-4.1.0
+		>=media-libs/libdvdnav-4.2.0:=
+		>=media-libs/libdvdread-4.1.0:=
 	)
 	egl? ( media-libs/mesa[egl,gbm(-)?,wayland(-)?] )
 	iconv? (
@@ -138,6 +138,7 @@ RDEPEND="${COMMON_DEPEND}
 
 PATCHES=(
 	"${FILESDIR}/${PN}-0.29.0-make-ffmpeg-version-check-non-fatal.patch"
+	"${FILESDIR}/${PN}-0.29.1-egl-bound.patch"
 )
 
 src_prepare() {

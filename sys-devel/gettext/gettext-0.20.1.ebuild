@@ -15,7 +15,7 @@ SRC_URI="mirror://gnu/${PN}/${P}.tar.gz"
 # so put that license behind USE=cxx.
 LICENSE="GPL-3+ cxx? ( LGPL-2.1+ )"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~riscv ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~x86-fbsd"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~riscv ~s390 ~sh ~sparc ~x86"
 IUSE="acl -cvs +cxx doc emacs git java ncurses nls openmp static-libs"
 
 # only runtime goes multilib
@@ -36,6 +36,9 @@ RDEPEND="${DEPEND}
 	!git? ( cvs? ( dev-vcs/cvs ) )
 	git? ( dev-vcs/git )
 	java? ( >=virtual/jre-1.4 )"
+BDEPEND="
+	git? ( dev-vcs/git )
+"
 PDEPEND="emacs? ( app-emacs/po-mode )"
 
 MULTILIB_WRAPPED_HEADERS=(
@@ -114,7 +117,7 @@ multilib_src_configure() {
 }
 
 multilib_src_install() {
-	emake -j1 DESTDIR="${D}" install
+	emake DESTDIR="${D}" install
 
 	if multilib_is_native_abi ; then
 		dosym msgfmt /usr/bin/gmsgfmt #43435

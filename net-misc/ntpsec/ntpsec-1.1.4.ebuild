@@ -17,7 +17,7 @@ else
 	SRC_URI="ftp://ftp.ntpsec.org/pub/releases/${PN}-${PV}.tar.gz"
 	RESTRICT="mirror"
 	BDEPEND=""
-	KEYWORDS="~amd64 ~arm ~arm64 ~x86"
+	KEYWORDS="amd64 ~arm ~arm64 ~x86"
 fi
 
 DESCRIPTION="The NTP reference implementation, refactored"
@@ -32,7 +32,7 @@ IUSE_NTPSEC_REFCLOCK=${NTPSEC_REFCLOCK[@]/#/rclock_}
 
 LICENSE="HPND MIT BSD-2 BSD CC-BY-SA-4.0"
 SLOT="0"
-IUSE="${IUSE_NTPSEC_REFCLOCK} debug doc early gdb heat libressl nist ntpviz samba seccomp smear tests" #ionice
+IUSE="${IUSE_NTPSEC_REFCLOCK} debug doc early gdb heat libbsd nist ntpviz samba seccomp smear tests" #ionice
 REQUIRED_USE="${PYTHON_REQUIRED_USE} nist? ( rclock_local )"
 
 # net-misc/pps-tools oncore,pps
@@ -40,8 +40,8 @@ CDEPEND="${PYTHON_DEPS}
 	${BDEPEND}
 	sys-libs/libcap
 	dev-python/psutil[${PYTHON_USEDEP}]
-	libressl? ( dev-libs/libressl:0= )
-	!libressl? ( dev-libs/openssl:0= )
+	libbsd? ( dev-libs/libbsd:0= )
+	dev-libs/openssl:0=
 	seccomp? ( sys-libs/libseccomp )
 "
 RDEPEND="${CDEPEND}
@@ -51,6 +51,7 @@ RDEPEND="${CDEPEND}
 "
 DEPEND="${CDEPEND}
 	app-text/asciidoc
+	dev-libs/libxslt
 	app-text/docbook-xsl-stylesheets
 	sys-devel/bison
 	rclock_oncore? ( net-misc/pps-tools )
@@ -68,6 +69,9 @@ src_prepare() {
 	default
 	# Remove autostripping of binaries
 	sed -i -e '/Strip binaries/d' wscript
+	if ! use libbsd ; then
+		epatch "${FILESDIR}/${PN}-no-bsd.patch"
+	fi
 	python_copy_sources
 }
 

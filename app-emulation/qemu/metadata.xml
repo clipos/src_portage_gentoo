@@ -37,9 +37,9 @@
 		<flag name="ssh">Enable SSH based block device support via <pkg>net-libs/libssh2</pkg></flag>
 		<flag name="static-user">Build the User targets as static binaries</flag>
 		<flag name="static">Build the User and Software MMU (system) targets as well as tools as static binaries</flag>
-		<flag name="snappy">Enable support for snappy compression</flag>
 		<flag name="systemtap">Enable SystemTAP/DTrace tracing</flag>
 		<flag name="tci">Enable the TCG Interpreter which can speed up or slowdown workloads depending on the host and guest CPUs being emulated. In the future it will be a runtime option but for now its compile time.</flag>
+		<flag name="jemalloc">Enable jemalloc allocator support</flag>
 		<flag name="jpeg">Enable jpeg image support for the VNC console server</flag>
 		<flag name="png">Enable png image support for the VNC console server</flag>
 		<flag name="usb">Enable USB passthrough via <pkg>dev-libs/libusb</pkg></flag>
@@ -55,5 +55,6 @@
 		<flag name="xen">Enables support for Xen backends</flag>
 		<flag name="xfs">Support xfsctl() notification and syncing for XFS backed
 		virtual disks.</flag>
+		<flag name="xkb">Depend on x11-libs/libxkbcommon to build qemu-keymap tool for converting xkb keymaps</flag>
 	</use>
 </pkgmetadata>

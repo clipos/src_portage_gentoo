@@ -13,12 +13,13 @@ HOMEPAGE="https://wiki.gnome.org/Projects/NetworkManager"
 LICENSE="GPL-2+"
 SLOT="0"
 IUSE="ayatana +introspection +gcr +modemmanager selinux teamd"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 ~sparc ~x86"
+KEYWORDS="~alpha amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 ~sparc x86"
 
 RDEPEND="
 	>=app-crypt/libsecret-0.18
 	>=dev-libs/glib-2.38:2[dbus]
 	>=dev-libs/dbus-glib-0.88
+	dev-libs/libgudev:=
 	>=sys-apps/dbus-1.4.1
 	>=sys-auth/polkit-0.96-r1
 	>=x11-libs/gtk+-3.10:3[introspection?]
@@ -33,7 +34,6 @@ RDEPEND="
 		>=dev-libs/libdbusmenu-16.04.0 )
 	introspection? ( >=dev-libs/gobject-introspection-0.9.6:= )
 	virtual/freedesktop-icon-theme
-	virtual/libgudev:=
 	gcr? ( >=app-crypt/gcr-3.14:=[gtk] )
 	modemmanager? ( net-misc/modemmanager )
 	selinux? ( sys-libs/libselinux )
@@ -41,7 +41,7 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}
 	>=dev-util/gtk-doc-am-1.0
-	>=dev-util/intltool-0.50.1
+	>=sys-devel/gettext-0.18
 	virtual/pkgconfig
 "
 

@@ -11,7 +11,7 @@ SRC_URI="https://www.monitorix.org/${P}.tar.gz"
 
 LICENSE="GPL-2+"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="amd64 x86"
 IUSE=""
 
 RDEPEND="dev-perl/Config-General
@@ -94,7 +94,7 @@ pkg_postinst() {
 	elog "  app-admin/hddtemp   (disk drive temperatures and health)"
 	elog "  mail-mta/postfix    (email reports/statics)"
 	elog "  mail-mta/sendmail   (email reports/statics)"
-	elog "  sys-apps/lm_sensors (lm_sensors and GPU temperatures)"
+	elog "  sys-apps/lm-sensors (lm-sensors and GPU temperatures)"
 	elog "  sys-power/apcupsd   (APC UPS statistics)"
 	elog "  sys-power/nut       (Network UPS Tools statistics)"
 	elog

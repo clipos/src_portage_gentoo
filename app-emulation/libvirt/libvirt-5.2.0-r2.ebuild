@@ -5,7 +5,7 @@ EAPI=7
 
 PYTHON_COMPAT=( python3_{5,6,7} )
 
-inherit autotools bash-completion-r1 eutils linux-info python-any-r1 readme.gentoo-r1 systemd user
+inherit autotools bash-completion-r1 eutils linux-info python-any-r1 readme.gentoo-r1 systemd
 
 if [[ ${PV} = *9999* ]]; then
 	inherit git-r3
@@ -47,6 +47,8 @@ REQUIRED_USE="
 # package will use 3 by default. Since we don't have slot pinning in an API,
 # we must go with the most recent
 RDEPEND="
+	acct-user/qemu
+	policykit? ( acct-group/libvirt )
 	app-misc/scrub
 	dev-libs/libgcrypt:0
 	dev-libs/libnl:3
@@ -58,6 +60,7 @@ RDEPEND="
 	net-libs/rpcsvc-proto
 	>=net-misc/curl-7.18.0
 	sys-apps/dmidecode
+	!sys-apps/systemd[-cgroup-hybrid(+)]
 	>=sys-apps/util-linux-2.17
 	sys-devel/gettext
 	sys-libs/ncurses:0=
@@ -122,18 +125,11 @@ DEPEND="${RDEPEND}
 PATCHES=(
 	"${FILESDIR}"/${PN}-5.2.0-do-not-use-sysconf.patch
 	"${FILESDIR}"/${PN}-1.2.16-fix_paths_in_libvirt-guests_sh.patch
-	"${FILESDIR}"/${PN}-5.0.0-fix-paths-for-apparmor.patch
+	"${FILESDIR}"/${PN}-5.2.0-fix-paths-for-apparmor.patch
 	"${FILESDIR}"/${PN}-5.2.0-md-clear.patch
 )
 
 pkg_setup() {
-	if use qemu; then
-		enewgroup qemu 77
-		enewuser qemu 77 -1 -1 "qemu,kvm"
-	fi
-
-	use policykit && enewgroup libvirt
-
 	# Check kernel configuration:
 	CONFIG_CHECK=""
 	use fuse && CONFIG_CHECK+="

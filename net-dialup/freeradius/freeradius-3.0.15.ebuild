@@ -15,7 +15,7 @@ SRC_URI="
 "
 HOMEPAGE="http://www.freeradius.org/"
 
-KEYWORDS="amd64 ~arm ~ppc ~ppc64 ~sparc x86 ~x86-fbsd"
+KEYWORDS="amd64 ~arm ~ppc ~ppc64 ~sparc x86"
 LICENSE="GPL-2"
 SLOT="0"
 
@@ -37,7 +37,7 @@ RDEPEND="!net-dialup/cistronradius
 	mysql? ( dev-db/mysql-connector-c:= )
 	postgres? ( dev-db/postgresql:= )
 	firebird? ( dev-db/firebird )
-	pam? ( virtual/pam )
+	pam? ( sys-libs/pam )
 	ssl? (
 		!libressl? ( dev-libs/openssl:0= )
 		libressl? ( dev-libs/libressl:0= )

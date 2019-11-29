@@ -15,6 +15,7 @@ LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="~amd64 ~x86 ~amd64-linux ~x86-linux ~ppc-macos ~x86-macos"
 IUSE="+boehm-gc doc emacs examples fftw gsl +imagemagick latex offscreen +opengl python sigsegv svg test vim-syntax X"
+RESTRICT="!test? ( test )"
 
 REQUIRED_USE="
 	${PYTHON_REQUIRED_USE}
@@ -25,7 +26,7 @@ RDEPEND="
 	>=sys-libs/ncurses-5.4-r5:0=
 	>=sys-libs/readline-4.3-r5:0=
 	imagemagick? ( media-gfx/imagemagick[png] )
-	opengl? ( >=media-libs/mesa-8 )
+	opengl? ( >=media-libs/mesa-8[X(+)] )
 	offscreen? ( media-libs/mesa[osmesa] )
 	svg? ( app-text/dvisvgm )
 	sigsegv? ( dev-libs/libsigsegv )

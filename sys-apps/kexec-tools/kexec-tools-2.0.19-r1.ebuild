@@ -9,8 +9,8 @@ if [[ ${PV} == "9999" ]] ; then
 	inherit git-r3 autotools
 	EGIT_REPO_URI="https://git.kernel.org/pub/scm/utils/kernel/kexec/kexec-tools.git"
 else
-	SRC_URI="mirror://kernel/linux/utils/kernel/kexec/${P}.tar.xz"
-	KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
+	SRC_URI="https://www.kernel.org/pub/linux/utils/kernel/kexec/${P}.tar.xz"
+	KEYWORDS="amd64 ~arm64 ~ppc64 x86"
 fi
 
 DESCRIPTION="Load another kernel from the currently executing Linux kernel"

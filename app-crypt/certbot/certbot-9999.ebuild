@@ -20,6 +20,7 @@ HOMEPAGE="https://github.com/certbot/certbot https://letsencrypt.org/"
 LICENSE="Apache-2.0"
 SLOT="0"
 IUSE="test"
+RESTRICT="!test? ( test )"
 
 CDEPEND="dev-python/setuptools[${PYTHON_USEDEP}]"
 RDEPEND="
@@ -27,7 +28,8 @@ RDEPEND="
 	>=app-crypt/acme-0.29.0[${PYTHON_USEDEP}]
 	>=dev-python/configargparse-0.9.3[${PYTHON_USEDEP}]
 	dev-python/configobj[${PYTHON_USEDEP}]
-	>=dev-python/cryptography-1.2[${PYTHON_USEDEP}]
+	>=dev-python/cryptography-1.2.3[${PYTHON_USEDEP}]
+	>=dev-python/distro-1.0.1[${PYTHON_USEDEP}]
 	>=dev-python/josepy-1.1.0[${PYTHON_USEDEP}]
 	dev-python/mock[${PYTHON_USEDEP}]
 	>=dev-python/parsedatetime-1.3[${PYTHON_USEDEP}]

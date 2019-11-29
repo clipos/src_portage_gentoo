@@ -30,6 +30,7 @@ RDEPEND="!app-emulation/virtinst
 	app-cdr/cdrtools
 	>=app-emulation/libvirt-glib-1.0.0[introspection]
 	dev-libs/libxml2[python,${PYTHON_USEDEP}]
+	dev-python/argcomplete[${PYTHON_USEDEP}]
 	dev-python/ipaddr[${PYTHON_USEDEP}]
 	dev-python/libvirt-python[${PYTHON_USEDEP}]
 	dev-python/pygobject:3[${PYTHON_USEDEP}]
@@ -41,7 +42,7 @@ RDEPEND="!app-emulation/virtinst
 		net-misc/spice-gtk[usbredir,gtk3,introspection,sasl?]
 		net-misc/x11-ssh-askpass
 		x11-libs/gtk+:3[introspection]
-		x11-libs/gtksourceview:4
+		x11-libs/gtksourceview:4[introspection]
 		x11-libs/vte:2.91[introspection]
 		gnome-keyring? ( gnome-base/libgnome-keyring )
 		policykit? ( sys-auth/polkit[introspection] )

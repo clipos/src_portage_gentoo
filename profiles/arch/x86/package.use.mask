@@ -3,6 +3,31 @@
 
 # This file requires >=portage-2.1.1
 
+# Andreas Sturmlechner <asturm@gentoo.org> (2019-11-20)
+# media-libs/libplacebo is keyworded on x86
+media-video/vlc -libplacebo
+
+# Thomas Deutschmann <whissi@gentoo.org> (2019-11-11)
+# dev-python/pandas is keyworded for x86
+sys-block/fio -gnuplot
+
+# Luke Dashjr <luke-jr+gentoobugs@utopios.org> (2019-09-21)
+# iasl is stable on x86
+sys-firmware/seabios -debug
+
+# Georgy Yakovlev <gyakovlev@gentoo.org> (2019-08-28)
+# upstream provides docs and tools for tier-1 arches
+dev-lang/rust-bin -doc
+>=dev-lang/rust-bin-1.37 -clippy -rustfmt
+
+# Thomas Deutschmann <whissi@gentoo.org> (2019-08-03)
+# Early microcode loading is supported on x86
+sys-kernel/linux-firmware -initramfs
+
+# Lars Wendler <polynomial-c@gentoo.org> (2019-07-26)
+# dev-libs/gumbo is keyworded on x86
+mail-client/claws-mail -litehtml
+
 # Matt Turner <mattst88@gentoo.org> (2019-06-20)
 # dev-lang/spidermonkey:60[jit] fails to build on most platforms, but does
 # build on x86.
@@ -47,7 +72,6 @@ media-video/orion qtav
 
 # Ben Kohler <bkohler@gentoo.org> (2018-08-23)
 # Unmask iwd support where net-wireless/iwd is keyworded
-net-misc/connman -iwd
 net-misc/networkmanager -iwd
 
 # Thomas Deutschmann <whissi@gentoo.org> (2018-08-23)
@@ -177,7 +201,7 @@ net-im/telepathy-connection-managers -steam
 
 # Mike Frysinger <vapier@gentoo.org> (2014-08-04)
 # Unmask flashrom drivers that only work on x86 due to in/out asm insns #454024
-sys-apps/flashrom -atahpt -nic3com -nicnatsemi -nicrealtek -rayer_spi -satamv
+sys-apps/flashrom -atahpt -nic3com -nicnatsemi -nicrealtek -rayer-spi -satamv
 
 # Yixun Lan <dlan@gentoo.org> (2014-05-21)
 # sys-fs/zfs not keyworded on x86
@@ -280,3 +304,7 @@ x11-terms/eterm cpu_flags_x86_sse2
 
 # Steve Dibb <beandog@gentoo.org> (2008-09-29)
 media-video/mplayer -cpudetection
+
+# Tomáš Mózes <hydrapolic@gmail.com> (2019-11-02)
+# Requires dev-db/mongodb which has dropped x86 support
+dev-php/pecl-mongodb test

@@ -1,7 +1,7 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 inherit cmake-utils kodi-addon
 
@@ -17,8 +17,9 @@ case ${PV} in
 	;;
 *)
 	KEYWORDS="~amd64 ~x86"
-	SRC_URI="https://github.com/xbmc/visualization.projectm/archive/v${PV}.tar.gz -> ${P}.tar.gz"
-	S="${WORKDIR}/visualization.projectm-${PV}"
+	CODENAME="Leia"
+	SRC_URI="https://github.com/xbmc/visualization.projectm/archive/${PV}-${CODENAME}.tar.gz -> ${P}.tar.gz"
+	S="${WORKDIR}/visualization.projectm-${PV}-${CODENAME}"
 	;;
 esac
 
@@ -29,7 +30,8 @@ IUSE=""
 DEPEND="
 	~media-tv/kodi-9999
 	~media-libs/kodi-platform-9999
-	>=media-libs/libprojectm-3.1.0
+	>=media-libs/libprojectm-3.1.1_rc4:=
+	>=media-libs/glm-0.9.9.5
 	virtual/opengl
 	"
 
@@ -37,8 +39,7 @@ RDEPEND="
 	${DEPEND}
 	"
 
-src_prepare() {
-	# Delete bundled libprojectM
-	rm src/libprojectM -rf || die
-	default
+src_prepare(){
+	[ -d depends ] && rm -rf depends || die
+	cmake-utils_src_prepare
 }

@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 if [[ ${CATEGORY}/${PN} == app-arch/xz-utils
@@ -198,21 +198,14 @@ cygwin-rebase-merge() {
 }
 
 cygwin-rebase-post_pkg_prerm() {
-	# The pending list is installed as part of the package, but
-	# the merged list is not.  Move from merged back to pending,
-	# in case the unmerge fails...
-	local pendingdir=$(cygwin-rebase-get_pendingdir)
+	# The pending list is registered as being installed with the package, but
+	# the merged list is not.  Just remove the unregistered one.
 	local mergeddir=$(cygwin-rebase-get_mergeddir)
 	local listname=$(cygwin-rebase-get_listname)
 	(
 		set -e
 		cd "${EROOT}"
 		[[ -w ./${mergeddir}/. ]]
-		[[ -w ./${pendingdir}/. ]]
-		if [[ -s ./${mergeddir}/${listname} ]]
-		then
-			mv -f "./${mergeddir}/${listname}" "./${pendingdir}/${listname}" || :
-		fi
 		rm -f "./${mergeddir}/${listname}"
 	)
 }

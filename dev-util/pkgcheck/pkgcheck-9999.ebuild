@@ -17,9 +17,10 @@ fi
 DESCRIPTION="pkgcore-based QA utility"
 HOMEPAGE="https://github.com/pkgcore/pkgcheck"
 
-LICENSE="|| ( BSD GPL-2 )"
+LICENSE="BSD"
 SLOT="0"
-IUSE="doc"
+IUSE="doc network perl test"
+RESTRICT="!test? ( test )"
 
 if [[ ${PV} == *9999 ]]; then
 	RDEPEND="
@@ -27,13 +28,21 @@ if [[ ${PV} == *9999 ]]; then
 		~sys-apps/pkgcore-9999[${PYTHON_USEDEP}]"
 else
 	RDEPEND="
-		>=dev-python/snakeoil-0.8.0[${PYTHON_USEDEP}]
-		>=sys-apps/pkgcore-0.10.0[${PYTHON_USEDEP}]"
+		>=dev-python/snakeoil-0.8.3[${PYTHON_USEDEP}]
+		>=sys-apps/pkgcore-0.10.7[${PYTHON_USEDEP}]"
 fi
-RDEPEND+=" dev-python/lxml[${PYTHON_USEDEP}]"
+RDEPEND+="
+	dev-python/chardet[${PYTHON_USEDEP}]
+	dev-python/lxml[${PYTHON_USEDEP}]
+	dev-python/pathspec[${PYTHON_USEDEP}]
+	network? ( dev-python/requests[${PYTHON_USEDEP}] )
+	perl? ( dev-perl/Gentoo-PerlMod-Version )
+"
 DEPEND="${RDEPEND}
+	dev-python/setuptools[${PYTHON_USEDEP}]
 	doc? ( dev-python/sphinx[${PYTHON_USEDEP}] )
-	dev-python/setuptools[${PYTHON_USEDEP}]"
+	test? ( dev-python/pytest[${PYTHON_USEDEP}] )
+"
 
 python_compile_all() {
 	use doc && esetup.py build_man

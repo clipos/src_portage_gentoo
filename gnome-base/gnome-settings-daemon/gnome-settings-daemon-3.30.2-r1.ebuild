@@ -18,7 +18,7 @@ REQUIRED_USE="
 	input_devices_wacom? ( udev )
 	wayland? ( udev )
 "
-KEYWORDS="~alpha amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 ~sparc x86 ~x86-fbsd ~amd64-linux ~x86-linux ~x86-solaris"
+KEYWORDS="~alpha amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 ~sparc x86 ~amd64-linux ~x86-linux ~x86-solaris"
 
 # >=polkit-0.114 for ITS translation rules of .policy files
 COMMON_DEPEND="
@@ -39,7 +39,7 @@ COMMON_DEPEND="
 	>=sys-power/upower-0.99:=
 	x11-libs/libX11
 	x11-libs/libXtst
-	udev? ( virtual/libgudev:= )
+	udev? ( dev-libs/libgudev:= )
 	wayland? ( dev-libs/wayland )
 	input_devices_wacom? ( >=dev-libs/libwacom-0.7
 		>=x11-libs/pango-1.20.0

@@ -3,7 +3,7 @@
 
 EAPI=7
 
-inherit meson multilib-minimal
+inherit meson multilib-minimal usr-ldscript
 
 DESCRIPTION="A high-quality data compressor used extensively by Gentoo Linux"
 HOMEPAGE="https://gitlab.com/federicomenaquintero/bzip2"
@@ -12,7 +12,7 @@ if [[ "${PV}" == 9999 ]] ; then
 	EGIT_REPO_URI="https://gitlab.com/federicomenaquintero/bzip2.git"
 else
 	SRC_URI=""
-	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~riscv ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~x86-fbsd"
+	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~riscv ~s390 ~sh ~sparc ~x86"
 fi
 LICENSE="BZIP2"
 SLOT="0/1" # subslot = SONAME

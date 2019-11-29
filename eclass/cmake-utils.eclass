@@ -612,7 +612,7 @@ cmake-utils_src_configure() {
 		fi
 	fi
 
-	if [[ ${EPREFIX} ]]; then
+	if use prefix-guest; then
 		cat >> "${build_rules}" <<- _EOF_ || die
 			# in Prefix we need rpath and must ensure cmake gets our default linker path
 			# right ... except for Darwin hosts
@@ -649,7 +649,7 @@ cmake-utils_src_configure() {
 	if [[ ${EAPI} != [56] ]]; then
 		cat >> "${common_config}" <<- _EOF_ || die
 			SET (CMAKE_INSTALL_DOCDIR "${EPREFIX}/usr/share/doc/${PF}" CACHE PATH "")
-			SET (BUILD_SHARED_LIBS ON CACHE BOOLEAN "")
+			SET (BUILD_SHARED_LIBS ON CACHE BOOL "")
 		_EOF_
 	fi
 

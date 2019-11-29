@@ -15,6 +15,7 @@ LICENSE="CROSSOVER-3"
 SLOT="0"
 KEYWORDS="-* ~amd64 ~x86"
 IUSE="+capi +cups doc +gphoto2 +gsm +jpeg +lcms +ldap +mp3 +nls +openal +opencl +opengl +png +scanner +ssl +v4l"
+REQUIRED_USE=${PYTHON_REQUIRED_USE}
 RESTRICT="bindist test"
 QA_FLAGS_IGNORED="opt/cxoffice/.*"
 QA_PRESTRIPPED="opt/cxoffice/lib/.*
@@ -63,7 +64,7 @@ RDEPEND="${DEPEND}
 	>=media-libs/freetype-2.0.0[abi_x86_32(-)]
 	media-libs/mesa[abi_x86_32(-)]
 	sys-apps/util-linux[abi_x86_32(-)]
-	sys-libs/ncurses:5/5[abi_x86_32(-)]
+	sys-libs/ncurses-compat:5[abi_x86_32(-)]
 	sys-libs/zlib[abi_x86_32(-)]
 	x11-libs/libICE[abi_x86_32(-)]
 	x11-libs/libSM[abi_x86_32(-)]

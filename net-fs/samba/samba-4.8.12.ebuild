@@ -60,7 +60,7 @@ CDEPEND="
 	>=sys-libs/tevent-0.9.36[python?,${PYTHON_USEDEP},${MULTILIB_USEDEP}]
 	sys-libs/zlib[${MULTILIB_USEDEP}]
 	virtual/libiconv
-	pam? ( virtual/pam )
+	pam? ( sys-libs/pam )
 	acl? ( virtual/acl )
 	addns? (
 		net-dns/bind-tools[gssapi]
@@ -84,6 +84,7 @@ CDEPEND="
 	system-heimdal? ( >=app-crypt/heimdal-1.5[-ssl,${MULTILIB_USEDEP}] )
 	system-mitkrb5? ( >=app-crypt/mit-krb5-1.15.1[${MULTILIB_USEDEP}] )
 	systemd? ( sys-apps/systemd:0= )
+	zeroconf? ( net-dns/avahi )
 "
 DEPEND="${CDEPEND}
 	${PYTHON_DEPS}

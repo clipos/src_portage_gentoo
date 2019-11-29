@@ -17,6 +17,10 @@
 
 #--- END OF EXAMPLES ---
 
+# Matt Turner <mattst88@gentoo.org> (2019-10-13)
+# Depends on php which is stable.mask'd
+net-analyzer/nagios-core web
+
 # Andreas Sturmlechner <asturm@gentoo.org> (2018-12-02)
 # gnome-base/nautilus is not stable
 media-sound/easytag nautilus
@@ -25,12 +29,6 @@ media-sound/easytag nautilus
 # Needs net-mail/mailutils and net-libs/webkit-gtk which are not
 # stable (yet?), bug #663248
 app-editors/emacs mailutils xwidgets
-
-# Tobias Klausmann <klausman@gentoo.org> (2015-09-17)
-# Move this mask here (from package.use.mask) until net-fs/libnfs goes stable.
-# Gilles Dartiguelongue <eva@gentoo.org> (2015-06-09)
-# net-fs/libnfs lacks alpha keyword, bug #551576
-gnome-base/gvfs nfs
 
 # Pacho Ramos <pacho@gentoo.org> (2014-07-02)
 # Mask due Gnome3 not going to be stabilized on this arch

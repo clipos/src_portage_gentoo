@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # Variables to specify in an ebuild which uses this eclass:
@@ -133,7 +133,7 @@ DESCRIPTION="${GAME_NAME} ${MOD_NAME} - ${MOD_DESC}"
 
 SLOT="0"
 IUSE="dedicated opengl"
-RESTRICT="mirror strip"
+RESTRICT="bindist mirror strip"
 
 DEPEND="app-arch/unzip"
 RDEPEND="dedicated? ( $(games-mods_get_rdepend --ded) )

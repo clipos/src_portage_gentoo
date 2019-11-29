@@ -5,7 +5,7 @@ EAPI=6
 GNOME2_LA_PUNT="yes"
 VALA_USE_DEPEND="vapigen"
 
-inherit gnome2 user readme.gentoo-r1 systemd udev vala
+inherit gnome2 readme.gentoo-r1 systemd udev vala
 
 DESCRIPTION="Modem and mobile broadband management libraries"
 HOMEPAGE="https://www.freedesktop.org/wiki/Software/ModemManager/"
@@ -23,7 +23,7 @@ REQUIRED_USE="
 
 RDEPEND="
 	>=dev-libs/glib-2.36.0:2
-	udev? ( >=virtual/libgudev-230:= )
+	udev? ( >=dev-libs/libgudev-230:= )
 	introspection? ( >=dev-libs/gobject-introspection-0.9.6:= )
 	mbim? ( >=net-libs/libmbim-1.16.0 )
 	policykit? ( >=sys-auth/polkit-0.106[introspection] )
@@ -39,6 +39,8 @@ DEPEND="${RDEPEND}
 	virtual/pkgconfig
 	vala? ( $(vala_depend) )
 "
+RDEPEND="${RDEPEND}
+	policykit? ( acct-group/plugdev )"
 
 S="${WORKDIR}/ModemManager-${PV}"
 
@@ -96,8 +98,6 @@ src_install() {
 
 pkg_postinst() {
 	gnome2_pkg_postinst
-
-	use policykit && enewgroup plugdev
 
 	# The polkit rules file moved to /usr/share
 	old_rules="${EROOT}etc/polkit-1/rules.d/01-org.freedesktop.ModemManager.rules"

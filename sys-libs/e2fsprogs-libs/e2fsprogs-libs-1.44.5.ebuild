@@ -3,7 +3,7 @@
 
 EAPI="6"
 
-inherit toolchain-funcs multilib-minimal
+inherit toolchain-funcs multilib-minimal usr-ldscript
 
 MY_PN=${PN%-libs}
 MY_P="${MY_PN}-${PV}"
@@ -11,11 +11,11 @@ MY_P="${MY_PN}-${PV}"
 DESCRIPTION="e2fsprogs libraries (common error and subsystem)"
 HOMEPAGE="http://e2fsprogs.sourceforge.net/"
 SRC_URI="mirror://sourceforge/e2fsprogs/${MY_P}.tar.xz
-	mirror://kernel/linux/kernel/people/tytso/e2fsprogs/v${PV}/${MY_P}.tar.xz"
+	https://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v${PV}/${MY_P}.tar.xz"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~m68k-mint ~x86-solaris"
+KEYWORDS="alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86 ~amd64-linux ~x86-linux ~m68k-mint ~x86-solaris"
 IUSE="static-libs"
 
 RDEPEND="!sys-libs/com_err

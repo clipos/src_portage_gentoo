@@ -44,7 +44,7 @@ _PYTHON_ALL_IMPLS=(
 	jython2_7
 	pypy pypy3
 	python2_7
-	python3_5 python3_6 python3_7
+	python3_5 python3_6 python3_7 python3_8
 )
 readonly _PYTHON_ALL_IMPLS
 
@@ -80,7 +80,7 @@ _python_impl_supported() {
 	# keep in sync with _PYTHON_ALL_IMPLS!
 	# (not using that list because inline patterns shall be faster)
 	case "${impl}" in
-		python2_7|python3_[567]|jython2_7)
+		python2_7|python3_[5678]|jython2_7)
 			return 0
 			;;
 		pypy1_[89]|pypy2_0|python2_[56]|python3_[1234])
@@ -183,10 +183,9 @@ _python_impl_matches() {
 
 	for pattern; do
 		if [[ ${pattern} == -2 ]]; then
-			! python_is_python3 "${impl}"
-			return
+			python_is_python3 "${impl}" || return 0
 		elif [[ ${pattern} == -3 ]]; then
-			python_is_python3 "${impl}"
+			python_is_python3 "${impl}" && return 0
 			return
 		# unify value style to allow lax matching
 		elif [[ ${impl/./_} == ${pattern/./_} ]]; then
@@ -692,7 +691,7 @@ python_optimize() {
 			if [[ ${f} == /* && -d ${D%/}${f} ]]; then
 				set -- "${D%/}${f}" "${@}"
 			fi
-		done < <("${PYTHON}" -c 'import sys; print("\0".join(sys.path))' || die)
+		done < <("${PYTHON}" -c 'import sys; print("".join(x + "\0" for x in sys.path))' || die)
 
 		debug-print "${FUNCNAME}: using sys.path: ${*/%/;}"
 	fi
@@ -1342,6 +1341,31 @@ python_export_utf8_locale() {
 	fi
 
 	return 0
+}
+
+# @FUNCTION: build_sphinx
+# @USAGE: <directory>
+# @DESCRIPTION:
+# Build HTML documentation using dev-python/sphinx in the specified
+# <directory>.  Takes care of disabling Intersphinx and appending
+# to HTML_DOCS.
+#
+# If <directory> is relative to the current directory, care needs
+# to be taken to run einstalldocs from the same directory
+# (usually ${S}).
+build_sphinx() {
+	debug-print-function ${FUNCNAME} "${@}"
+	[[ ${#} -eq 1 ]] || die "${FUNCNAME} takes 1 arg: <directory>"
+
+	local dir=${1}
+
+	sed -i -e 's:^intersphinx_mapping:disabled_&:' \
+		"${dir}"/conf.py || die
+	# not all packages include the Makefile in pypi tarball
+	sphinx-build -b html -d "${dir}"/_build/doctrees "${dir}" \
+		"${dir}"/_build/html || die
+
+	HTML_DOCS+=( "${dir}/_build/html/." )
 }
 
 # -- python.eclass functions --

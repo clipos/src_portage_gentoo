@@ -13,7 +13,6 @@ if [[ "${PV}" == *9999 ]] ; then
 	EGIT_REPO_URI="https://github.com/storaged-project/libblockdev.git"
 	BDEPEND="
 		sys-devel/autoconf-archive
-		gtk-doc? ( dev-util/gtk-doc )
 	"
 else
 	MY_PV="${PV}-1"
@@ -60,6 +59,7 @@ DEPEND="
 BDEPEND+="
 	>=dev-libs/gobject-introspection-1.3.0
 	dev-util/gtk-doc-am
+	gtk-doc? ( dev-util/gtk-doc )
 "
 
 REQUIRED_USE="${PYTHON_REQUIRED_USE}
@@ -112,4 +112,9 @@ src_configure() {
 src_install() {
 	default
 	find "${ED}" -type f -name "*.la" -delete || die
+	# This is installed even with USE=-lvm, but libbd_lvm are omitted so it
+	# doesn't work at all.
+	if ! use lvm; then
+		rm -f "${ED}"/usr/bin/lvm-cache-stats || die
+	fi
 }

@@ -27,7 +27,7 @@ media-libs/mesa vulkan vulkan-overlay
 
 # Michał Górny <mgorny@gentoo.org> (2017-08-08)
 # Requires USE=opencl that is masked in this profile.
-net-misc/bfgminer adl lm_sensors
+net-misc/bfgminer adl lm-sensors
 
 # Michał Górny <mgorny@gentoo.org> (2017-06-28)
 # app-misc/dtach is not keyworded, and tests are restricted anyway, so
@@ -57,6 +57,10 @@ app-portage/g-sorcery bson
 # dev-python/attrs fails tests on slow mips, couldn't test service_identity test path (crypt), bug 608570
 # dev-python/gmpy also a test depend, so minimize the features until can test properly (http2 soap test)
 dev-python/twisted conch crypt http2 soap test
+
+# Fabian Groffen <grobian@gentoo.org> (2016-12-07)
+# unkeyworded notmuch dependency, bug #587560
+mail-client/mutt notmuch
 
 # Felix Janda <felix.janda@posteo.de> (2016-09-24)
 # net-libs/libnetfilter_conntrack is not keyworded on mips

@@ -8,12 +8,12 @@ PLOCALES="af am ar as ast az be bg bn bn_IN br bs byn ca crh cs cy da de dz el e
 inherit eutils l10n python-any-r1
 
 DESCRIPTION="ISO language, territory, currency, script codes and their translations"
-HOMEPAGE="http://pkg-isocodes.alioth.debian.org/"
+HOMEPAGE="https://salsa.debian.org/iso-codes-team/iso-codes"
 SRC_URI="http://pkg-isocodes.alioth.debian.org/downloads/${P}.tar.xz"
 
 LICENSE="LGPL-2.1+"
 SLOT="0"
-KEYWORDS="alpha amd64 arm arm64 hppa ia64 ~mips ppc ppc64 ~sh sparc x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~x86-solaris"
+KEYWORDS="alpha amd64 arm arm64 hppa ia64 ~mips ppc ppc64 ~sh sparc x86 ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~x86-solaris"
 IUSE=""
 
 RDEPEND=""

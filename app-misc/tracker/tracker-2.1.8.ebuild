@@ -3,8 +3,9 @@
 
 EAPI=6
 PYTHON_COMPAT=( python3_{5,6,7} )
+VALA_MAX_API_VERSION="0.44"
 
-inherit bash-completion-r1 eapi7-ver gnome.org linux-info meson python-any-r1 systemd vala xdg
+inherit bash-completion-r1 eapi7-ver gnome.org gnome2-utils linux-info meson python-any-r1 systemd vala xdg
 
 DESCRIPTION="A tagging metadata database, search tool and indexer"
 HOMEPAGE="https://wiki.gnome.org/Projects/Tracker"
@@ -49,6 +50,7 @@ PATCHES=(
 	"${FILESDIR}"/${PV}-test-fix.patch # https://gitlab.gnome.org/GNOME/tracker/merge_requests/59
 	"${FILESDIR}"/${PV}-prevent-stack-smashing.patch
 	"${FILESDIR}"/${PV}-fix-library-symlinks.patch
+	"${FILESDIR}"/${PV}-vala-0.44-compat.patch # upstream commit e93ea9167dc
 )
 
 function inotify_enabled() {
@@ -93,4 +95,14 @@ src_configure() {
 
 src_test() {
 	dbus-run-session meson test -C "${BUILD_DIR}" || die 'tests failed'
+}
+
+pkg_postinst() {
+	xdg_pkg_postinst
+	gnome2_schemas_update
+}
+
+pkg_postrm() {
+	xdg_pkg_postrm
+	gnome2_schemas_update
 }
