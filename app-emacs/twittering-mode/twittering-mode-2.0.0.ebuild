@@ -3,7 +3,7 @@
 
 EAPI=6
 
-inherit elisp elisp-common eutils
+inherit elisp eutils
 
 if [[ ${PV} == *9999 ]]; then
 	EGIT_REPO_URI="https://github.com/hayamiz/twittering-mode.git"
@@ -26,7 +26,7 @@ DEPEND=""
 RDEPEND="app-crypt/gnupg"
 
 src_compile() {
-	elisp-compile twittering-mode.el || die
+	elisp-compile twittering-mode.el
 	[[ ${PV} == *9999 ]] && use doc && emake -C doc/manual
 }
 
@@ -36,5 +36,5 @@ src_test() {
 
 src_install() {
 	[[ ${PV} == *9999 ]] && use doc && dodoc doc/manual/twmode/twmode.html
-	elisp-install ${PN} twittering-mode.el *.elc || die
+	elisp-install ${PN} twittering-mode.el *.elc
 }

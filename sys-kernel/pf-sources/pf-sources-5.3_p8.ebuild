@@ -1,11 +1,11 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 ETYPE="sources"
 KEYWORDS="~amd64 ~ppc ~ppc64 ~x86"
 
-HOMEPAGE="https://gitlab.com/post-factum/pf-kernel/wikis/README
+HOMEPAGE="https://gitlab.com/post-factum/pf-kernel/-/wikis/README
 	https://dev.gentoo.org/~mpagano/genpatches/"
 
 IUSE=""
@@ -53,7 +53,7 @@ PATCHES=(
 K_EXTRAEINFO="For more info on pf-sources and details on how to report problems,
 see: ${HOMEPAGE}."
 
-pkg_setup(){
+pkg_setup() {
 	ewarn
 	ewarn "${PN} is *not* supported by the Gentoo Kernel Project in any way."
 	ewarn "If you need support, please contact the pf developers directly."

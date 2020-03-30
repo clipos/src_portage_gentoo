@@ -1,18 +1,18 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 PYTHON_COMPAT=( python2_7 )
 
 [[ "${PV}" = "9999" ]] && inherit git-r3
-inherit elisp-common autotools python-single-r1 xdg-utils
+inherit elisp-common autotools python-single-r1 toolchain-funcs xdg-utils
 
 if [[ "${PV}" = "9999" ]]; then
 	EGIT_REPO_URI="git://git.sv.gnu.org/lilypond.git"
 else
 	MAIN_VER=$(ver_cut 1-2)
 	SRC_URI="http://lilypond.org/download/sources/v${MAIN_VER}/${P}.tar.gz"
-	KEYWORDS="amd64 ~arm ~arm64 ~hppa ~x86"
+	KEYWORDS="amd64 ~arm arm64 ~hppa x86"
 fi
 
 DESCRIPTION="GNU Music Typesetter"
@@ -29,7 +29,7 @@ RDEPEND=">=app-text/ghostscript-gpl-8.15
 	media-libs/fontconfig
 	media-libs/freetype:2
 	>=x11-libs/pango-1.12.3
-	emacs? ( virtual/emacs )
+	emacs? ( >=app-editors/emacs-23.1:* )
 	guile2? ( >=dev-scheme/guile-2:12 )
 	!guile2? (
 		>=dev-scheme/guile-1.8.2:12=[deprecated,regex]
@@ -122,7 +122,7 @@ src_compile() {
 	fi
 }
 
-src_install () {
+src_install() {
 	emake DESTDIR="${D}" vimdir=/usr/share/vim/vimfiles install
 
 	# remove elisp files since they are in the wrong directory

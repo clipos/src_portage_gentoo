@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-PYTHON_COMPAT=( python{2_7,3_5,3_6,3_7} )
+PYTHON_COMPAT=( python3_{6,7} )
 inherit distutils-r1
 
 DESCRIPTION="Python client library for MariaDB/MySQL"
@@ -44,7 +44,7 @@ python_install() {
 		--with-protoc="${EPREFIX}/usr/bin/protoc"
 }
 
-python_install_all(){
+python_install_all() {
 	distutils-r1_python_install_all
 	if use examples ; then
 		dodoc -r examples

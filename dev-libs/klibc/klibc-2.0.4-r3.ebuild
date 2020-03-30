@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # Robin H. Johnson <robbat2@gentoo.org>, 12 Nov 2007:
@@ -63,7 +63,8 @@ KS="${WORKDIR}/linux-${OKV}"
 # Klibc has no PT_GNU_STACK support, so scanning for execstacks is moot
 QA_EXECSTACK="*"
 # Do not strip
-RESTRICT="strip"
+RESTRICT="strip
+	!test? ( test )"
 
 kernel_asm_arch() {
 	a="${1:${ARCH}}"
@@ -155,7 +156,7 @@ src_compile() {
 	unset KBUILD_OUTPUT # we are using a private copy
 
 	cd "${KS}"
-	emake ${defconfig} CC="${CC}" HOSTCC="${HOSTCC}" ARCH="${KLIBCASMARCH}" || die "No defconfig"
+	emake ${defconfig} CC="${CC}" HOSTCC="${HOSTCC}" ARCH="${KLIBCASMARCH}"
 	if [[ "${KLIBCARCH/arm}" != "${KLIBCARCH}" ]] && \
 	   [[ "${CHOST/eabi}" != "${CHOST}" ]]; then
 		# The delete and insert are seperate statements
@@ -169,7 +170,7 @@ src_compile() {
 		"${KS}"/.config \
 		"${S}"/defconfig
 	fi
-	emake prepare CC="${CC}" HOSTCC="${HOSTCC}" ARCH="${KLIBCASMARCH}" || die "Failed to prepare kernel sources for header usage"
+	emake prepare CC="${CC}" HOSTCC="${HOSTCC}" ARCH="${KLIBCASMARCH}"
 
 	cd "${S}"
 
@@ -196,7 +197,7 @@ src_compile() {
 		$(use custom-cflags || echo SKIP_)HOSTCFLAGS="${CFLAGS}" \
 		$(use custom-cflags || echo SKIP_)HOSTLDFLAGS="${LDFLAGS}" \
 		$(use custom-cflags || echo SKIP_)KLIBCOPTFLAGS="${CFLAGS}" \
-		${myargs} || die "Compile failed!"
+		${myargs}
 
 		#SHLIBDIR="/${libdir}" \
 
@@ -248,7 +249,7 @@ src_install() {
 		$(use custom-cflags || echo SKIP_)HOSTLDFLAGS="${LDFLAGS}" \
 		$(use custom-cflags || echo SKIP_)KLIBCOPTFLAGS="${CFLAGS}" \
 		${myargs} \
-		install || die "Install failed!"
+		install
 
 		#SHLIBDIR="/${libdir}" \
 

@@ -12,7 +12,7 @@ if [[ ${PV} == 9999 ]]; then
 	EGIT_REPO_URI="https://${EGO_PN}.git"
 else
 	SRC_URI="https://${EGO_PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="~amd64 ~arm ~ppc64 ~x86"
+	KEYWORDS="amd64 ~arm ~ppc64 ~x86"
 fi
 
 DESCRIPTION="A flexible DNS proxy, with support for encrypted DNS protocols"
@@ -57,7 +57,7 @@ src_install() {
 	insinto /usr/share/dnscrypt-proxy
 	doins -r "utils/generate-domains-blacklists/."
 
-	newinitd "${FILESDIR}"/dnscrypt-proxy.initd-r1 dnscrypt-proxy
+	newinitd "${FILESDIR}"/dnscrypt-proxy.initd dnscrypt-proxy
 	newconfd "${FILESDIR}"/dnscrypt-proxy.confd dnscrypt-proxy
 	systemd_newunit "${FILESDIR}"/dnscrypt-proxy.service dnscrypt-proxy.service
 	systemd_newunit "${FILESDIR}"/dnscrypt-proxy.socket dnscrypt-proxy.socket

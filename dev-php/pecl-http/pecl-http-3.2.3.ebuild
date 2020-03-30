@@ -25,7 +25,7 @@ IUSE="ssl curl_ssl_gnutls curl_ssl_libressl curl_ssl_nss +curl_ssl_openssl"
 DEPEND="app-arch/brotli:=
 	dev-libs/libevent
 	dev-php/pecl-propro:7[php_targets_php7-1?,php_targets_php7-2?,php_targets_php7-3?,php_targets_php7-4?]
-	dev-php/pecl-raphf:7[php_targets_php7-1?,php_targets_php7-2?,php_targets_php7-3?,php_targets_php7-4?]
+	>=dev-php/pecl-raphf-2.0.1:7[php_targets_php7-1?,php_targets_php7-2?,php_targets_php7-3?,php_targets_php7-4?]
 	net-dns/libidn2
 	sys-libs/zlib
 	ssl? ( net-misc/curl[ssl,curl_ssl_gnutls=,curl_ssl_libressl=,curl_ssl_nss=,curl_ssl_openssl=] )
@@ -64,7 +64,7 @@ src_test() {
 		sed -i \
 			's/PHP_TEST_SHARED_EXTENSIONS)/PHP_TEST_SHARED_EXTENSIONS) -d extension=propro.so -d extension=raphf.so/' \
 			Makefile || die
-		NO_INTERACTION="yes" emake test
+		SKIP_ONLINE_TESTS=yes NO_INTERACTION="yes" emake test
 		# Clean up testing links
 		rm modules/propro.so modules/raphf.so || die
 	done

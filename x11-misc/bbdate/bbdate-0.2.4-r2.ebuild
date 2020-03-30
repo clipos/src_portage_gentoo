@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -28,11 +28,11 @@ src_prepare() {
 	eautoreconf
 }
 
-src_install () {
+src_install() {
 	default
 	rm "${ED%/}"/usr/share/bbtools/README.bbdate || die
 	# since multiple bbtools packages provide this file, install
 	# it in /usr/share/doc/${PF}
 	mv "${ED%/}"/usr/share/bbtools/bbtoolsrc.in \
-		"${ED%/}"/usr/share/doc/${PF}/bbtoolsrc.example || die
+		"${ED%/}"/usr/share/doc/${PF}/bbtoolsrc.example || die
 }

@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 inherit desktop flag-o-matic linux-info linux-mod multilib-minimal \
-	nvidia-driver portability toolchain-funcs unpacker user udev
+	nvidia-driver portability toolchain-funcs unpacker udev
 
 DESCRIPTION="NVIDIA Accelerated Graphics Driver"
 HOMEPAGE="https://www.nvidia.com/"
@@ -26,7 +26,7 @@ KEYWORDS="-* amd64"
 LICENSE="GPL-2 NVIDIA-r2"
 SLOT="0/${PV%.*}"
 
-IUSE="acpi compat +driver gtk3 kernel_FreeBSD kernel_linux +kms libglvnd multilib static-libs +tools uvm wayland +X"
+IUSE="acpi compat +driver gtk3 kernel_FreeBSD kernel_linux +kms +libglvnd multilib static-libs +tools uvm wayland +X"
 REQUIRED_USE="
 	tools? ( X )
 	static-libs? ( tools )
@@ -34,6 +34,7 @@ REQUIRED_USE="
 
 COMMON="
 	app-eselect/eselect-opencl
+	driver? ( kernel_linux? ( acct-group/video ) )
 	kernel_linux? ( >=sys-libs/glibc-2.6.1 )
 	tools? (
 		dev-libs/atk
@@ -153,10 +154,14 @@ src_prepare() {
 	done
 
 	if use tools; then
+		cp "${FILESDIR}"/nvidia-settings-fno-common.patch "${WORKDIR}" || die
 		cp "${FILESDIR}"/nvidia-settings-linker.patch "${WORKDIR}" || die
 		sed -i \
 			-e "s:@PV@:${PV}:g" \
-			"${WORKDIR}"/nvidia-settings-linker.patch || die
+			"${WORKDIR}"/nvidia-settings-fno-common.patch \
+			"${WORKDIR}"/nvidia-settings-linker.patch \
+			|| die
+		eapply "${WORKDIR}"/nvidia-settings-fno-common.patch
 		eapply "${WORKDIR}"/nvidia-settings-linker.patch
 	fi
 
@@ -231,12 +236,10 @@ donvidia() {
 	# If the library has a SONAME and SONAME does not match the library name,
 	# then we need to create a symlink
 	if [[ ${nv_SOVER} ]] && ! [[ "${nv_SOVER}" = "${nv_LIBNAME}" ]]; then
-		dosym ${nv_LIBNAME} ${nv_DEST}/${nv_SOVER} \
-			|| die "failed to create ${nv_DEST}/${nv_SOVER} symlink"
+		dosym ${nv_LIBNAME} ${nv_DEST}/${nv_SOVER}
 	fi
 
-	dosym ${nv_LIBNAME} ${nv_DEST}/${nv_LIBNAME/.so*/.so} \
-		|| die "failed to create ${nv_LIBNAME/.so*/.so} symlink"
+	dosym ${nv_LIBNAME} ${nv_DEST}/${nv_LIBNAME/.so*/.so}
 }
 
 src_install() {
@@ -503,7 +506,7 @@ pkg_preinst() {
 	if use driver && use kernel_linux; then
 		linux-mod_pkg_preinst
 
-		local videogroup="$(egetent group video | cut -d ':' -f 3)"
+		local videogroup="$(getent group video | cut -d ':' -f 3)"
 		if [ -z "${videogroup}" ]; then
 			eerror "Failed to determine the video group gid"
 			die "Failed to determine the video group gid"

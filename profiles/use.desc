@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # Keep them sorted
@@ -102,10 +102,6 @@ gimp - Build a plugin for the GIMP
 git - Enable git (version control system) support
 glut - Build an OpenGL plugin using the GLUT library
 gmp - Add support for dev-libs/gmp (GNU MP library)
-gnat_2016 - Compile with dev-lang/gnat-gpl-2016
-gnat_2017 - Compile with dev-lang/gnat-gpl-2017
-gnat_2018 - Compile with dev-lang/gnat-gpl-2018
-gnat_2019 - Compile with dev-lang/gnat-gpl-2019
 gnome - Add GNOME support
 gnome-keyring - Enable support for storing passwords via gnome-keyring
 gnuplot - Enable support for gnuplot (data and function plotting)
@@ -120,6 +116,7 @@ gsm - Add support for the gsm lossy speech compression codec
 gstreamer - Add support for media-libs/gstreamer (Streaming media)
 gtk - Add support for x11-libs/gtk+ (The GIMP Toolkit)
 gtk-doc - Build and install gtk-doc based developer documentation for dev-util/devhelp, IDE and offline use
+gui - Enable support for a graphical user interface
 guile - Add support for the guile Scheme interpreter
 gzip - Compress files with Lempel-Ziv coding (LZ77)
 handbook - Enable handbooks generation for packages by KDE

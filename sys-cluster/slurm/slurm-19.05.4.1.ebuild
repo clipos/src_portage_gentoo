@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -28,7 +28,7 @@ HOMEPAGE="https://www.schedmd.com https://github.com/SchedMD/slurm"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="debug hdf5 html ipmi json lua multiple-slurmd +munge mysql netloc numa ofed pam perl slurmdbd ssl static-libs ucx torque X"
+IUSE="debug hdf5 html ipmi json lua multiple-slurmd +munge mysql netloc numa ofed pam perl slurmdbd static-libs ucx torque X"
 
 COMMON_DEPEND="
 	!sys-cluster/torque
@@ -41,7 +41,6 @@ COMMON_DEPEND="
 		)
 	munge? ( sys-auth/munge )
 	pam? ( sys-libs/pam )
-	ssl? ( dev-libs/openssl:0= )
 	lua? ( dev-lang/lua:0= )
 	!lua? ( !dev-lang/lua )
 	ipmi? ( sys-libs/freeipmi )
@@ -67,8 +66,8 @@ REQUIRED_USE="torque? ( perl )"
 
 S="${WORKDIR}/${PN}-${MY_P}"
 
-LIBSLURM_PERL_S="${WORKDIR}/${MY_P}/contribs/perlapi/libslurm/perl"
-LIBSLURMDB_PERL_S="${WORKDIR}/${MY_P}/contribs/perlapi/libslurmdb/perl"
+LIBSLURM_PERL_S="${S}/contribs/perlapi/libslurm/perl"
+LIBSLURMDB_PERL_S="${S}/contribs/perlapi/libslurmdb/perl"
 
 RESTRICT="test"
 
@@ -82,6 +81,7 @@ src_unpack() {
 
 src_prepare() {
 	tc-ld-disable-gold
+	eapply "${FILESDIR}"/disable-sview.patch
 	default
 
 	# pids should go to /var/run/slurm
@@ -113,8 +113,7 @@ src_configure() {
 	local myconf=(
 		--sysconfdir="${EPREFIX}/etc/${PN}"
 		--with-hwloc="${EPREFIX}/usr"
-		--docdir="${EPREFIX}/usr/share/doc/${P}"
-		--htmldir="${EPREFIX}/usr/share/doc/${P}"
+		--htmldir="${EPREFIX}/usr/share/doc/${PF}"
 	)
 	use pam && myconf+=( --with-pam_dir=$(getpam_mod_dir) )
 	use mysql || myconf+=( --without-mysql_config )
@@ -123,7 +122,6 @@ src_configure() {
 		$(use_enable debug) \
 		$(use_enable pam) \
 		$(use_enable X x11) \
-		$(use_with ssl) \
 		$(use_with munge) \
 		$(use_with json) \
 		$(use_with hdf5) \

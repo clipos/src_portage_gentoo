@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-PYTHON_COMPAT=( python2_7 python3_{5,6,7} pypy{,3} )
+PYTHON_COMPAT=( python2_7 python3_{6,7} pypy3 )
 PYTHON_REQ_USE="ssl(+),threads(+)"
 
 inherit bash-completion-r1 distutils-r1 multiprocessing
@@ -24,7 +24,7 @@ SRC_URI="
 # setuptools & wheel .whl files are required for testing, exact version is not very important.
 
 LICENSE="MIT"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="amd64 arm64 ~hppa ~sparc ~x86"
 SLOT="0"
 IUSE="test -vanilla"
 
@@ -64,7 +64,7 @@ python_prepare_all() {
 	fi
 }
 
-python_test () {
+python_test() {
 	# pip test suite likes to test installed version of pip, both the module and the executable.
 	# Here we install it into a temporary dir and add to PATHs in a subshell.
 	EPYTHON_ROOT="${T}/${EPYTHON}_root"
@@ -95,6 +95,10 @@ python_test () {
 }
 
 python_install_all() {
+	# Prevent dbus auto-launch
+	# https://bugs.gentoo.org/692178
+	export DBUS_SESSION_BUS_ADDRESS="disabled:"
+
 	local DOCS=( AUTHORS.txt docs/html/**/*.rst )
 	distutils-r1_python_install_all
 

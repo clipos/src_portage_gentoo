@@ -47,6 +47,7 @@ test-distutils_enable_tests() {
 	tend ${ret}
 }
 
+DISTUTILS_USE_SETUPTOOLS=no
 inherit distutils-r1
 
 tbegin "sane function names"
@@ -69,9 +70,9 @@ einfo "empty RDEPEND"
 eindent
 RDEPEND=""
 test-distutils_enable_tests pytest \
-	"${BASE_IUSE} test" "${TEST_RESTRICT}" "${BASE_DEPS} test? ( dev-python/pytest[${PYTHON_USEDEP}]  )"
+	"${BASE_IUSE} test" "${TEST_RESTRICT}" "${BASE_DEPS} test? (  dev-python/pytest[${PYTHON_USEDEP}] )"
 test-distutils_enable_tests nose \
-	"${BASE_IUSE} test" "${TEST_RESTRICT}" "${BASE_DEPS} test? ( dev-python/nose[${PYTHON_USEDEP}]  )"
+	"${BASE_IUSE} test" "${TEST_RESTRICT}" "${BASE_DEPS} test? (  dev-python/nose[${PYTHON_USEDEP}] )"
 test-distutils_enable_tests unittest \
 	"${BASE_IUSE}" "" "${BASE_DEPS}"
 test-distutils_enable_tests setup.py \
@@ -83,13 +84,13 @@ eindent
 BASE_RDEPEND="dev-python/foo[${PYTHON_USEDEP}]"
 RDEPEND=${BASE_RDEPEND}
 test-distutils_enable_tests pytest \
-	"${BASE_IUSE} test" "${TEST_RESTRICT}" "${BASE_DEPS} test? ( dev-python/pytest[${PYTHON_USEDEP}] ${BASE_RDEPEND} )"
+	"${BASE_IUSE} test" "${TEST_RESTRICT}" "${BASE_DEPS} test? ( ${BASE_RDEPEND} dev-python/pytest[${PYTHON_USEDEP}] )"
 test-distutils_enable_tests nose \
-	"${BASE_IUSE} test" "${TEST_RESTRICT}" "${BASE_DEPS} test? ( dev-python/nose[${PYTHON_USEDEP}] ${BASE_RDEPEND} )"
+	"${BASE_IUSE} test" "${TEST_RESTRICT}" "${BASE_DEPS} test? ( ${BASE_RDEPEND} dev-python/nose[${PYTHON_USEDEP}] )"
 test-distutils_enable_tests unittest \
-	"${BASE_IUSE} test" "${TEST_RESTRICT}" "${BASE_DEPS} test? (  ${BASE_RDEPEND} )"
+	"${BASE_IUSE} test" "${TEST_RESTRICT}" "${BASE_DEPS} test? ( ${BASE_RDEPEND} )"
 test-distutils_enable_tests setup.py \
-	"${BASE_IUSE} test" "${TEST_RESTRICT}" "${BASE_DEPS} test? (  ${BASE_RDEPEND} )"
+	"${BASE_IUSE} test" "${TEST_RESTRICT}" "${BASE_DEPS} test? ( ${BASE_RDEPEND} )"
 eoutdent
 
 eoutdent

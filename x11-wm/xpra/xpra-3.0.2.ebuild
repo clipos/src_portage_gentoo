@@ -1,10 +1,10 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 
 # PyCObject_Check and PyCObject_AsVoidPtr vanished with python 3.3
-PYTHON_COMPAT=( python3_6 )
+PYTHON_COMPAT=( python3_{6,7} )
 inherit xdg distutils-r1 eutils flag-o-matic user tmpfiles prefix
 
 DESCRIPTION="X Persistent Remote Apps (xpra) and Partitioning WM (parti) based on wimpiggy"
@@ -13,7 +13,7 @@ SRC_URI="http://xpra.org/src/${P}.tar.xz"
 
 LICENSE="GPL-2 BSD"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="amd64 x86"
 IUSE="+client +clipboard csc cups dbus dec_avcodec2 enc_ffmpeg enc_x264 enc_x265 jpeg libav +lz4 lzo opengl pillow pulseaudio server sound test vpx webcam webp"
 
 REQUIRED_USE="${PYTHON_REQUIRED_USE}
@@ -25,6 +25,7 @@ REQUIRED_USE="${PYTHON_REQUIRED_USE}
 
 COMMON_DEPEND="${PYTHON_DEPS}
 	dev-python/pygobject:3[${PYTHON_USEDEP}]
+	x11-libs/gtk+:3[introspection]
 	x11-libs/libX11
 	x11-libs/libXcomposite
 	x11-libs/libXdamage
@@ -52,7 +53,7 @@ COMMON_DEPEND="${PYTHON_DEPS}
 		!libav? ( >=media-video/ffmpeg-2:0=[x264] )
 		libav? ( media-video/libav:0=[x264] ) )
 	jpeg? ( media-libs/libjpeg-turbo )
-	opengl? ( dev-python/pygtkglext )
+	opengl? ( dev-python/pyopengl )
 	pulseaudio? ( media-sound/pulseaudio )
 	sound? ( media-libs/gstreamer:1.0
 		media-libs/gst-plugins-base:1.0
@@ -83,8 +84,13 @@ DEPEND="${COMMON_DEPEND}
 	virtual/pkgconfig
 	>=dev-python/cython-0.16[${PYTHON_USEDEP}]"
 
-PATCHES=( "${FILESDIR}"/${PN}-3.0.2_ignore-gentoo-no-compile.patch
-	"${FILESDIR}"/${PN}-2.0-suid-warning.patch )
+RESTRICT="!test? ( test )"
+
+PATCHES=(
+	"${FILESDIR}"/${PN}-3.0.2_ignore-gentoo-no-compile.patch
+	"${FILESDIR}"/${PN}-2.0-suid-warning.patch
+	"${FILESDIR}"/${PN}-3.0.2-ldconfig.patch
+)
 
 pkg_postinst() {
 	enewgroup ${PN}
@@ -94,6 +100,8 @@ pkg_postinst() {
 }
 
 python_prepare_all() {
+	use dbus || eapply ${FILESDIR}/${PN}-3.0.2-dbus.patch
+
 	hprefixify -w '/os.path/' setup.py
 	hprefixify tmpfiles.d/xpra.conf xpra/server/server_util.py \
 		xpra/platform{/xposix,}/paths.py xpra/scripts/server.py
@@ -145,10 +153,4 @@ python_configure_all() {
 	append-cflags -fno-strict-aliasing
 
 	export XPRA_SOCKET_DIRS="${EPREFIX}/run/xpra"
-}
-
-src_compile() {
-	# xpra calls `ldconfig -p` during compile to locate libraries.
-	addpredict /etc
-	distutils-r1_src_compile
 }

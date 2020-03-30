@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -11,7 +11,7 @@ SRC_URI="https://download.enlightenment.org/rel/apps/${PN}/${P}.tar.xz"
 
 LICENSE="BSD-2"
 SLOT="0.17/${PV%%_*}"
-KEYWORDS="~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~sh ~sparc ~x86"
+KEYWORDS="amd64 ~arm ~hppa ~ppc ~ppc64 x86"
 IUSE="acpi bluetooth connman doc geolocation nls packagekit pam systemd udisks wayland wifi xwayland"
 
 REQUIRED_USE="xwayland? ( wayland )"
@@ -104,6 +104,7 @@ pkg_postinst() {
 	optfeature "ConnMan user interface for Enlightenment" net-misc/econnman
 	optfeature "system and process monitor" sys-process/evisum
 	optfeature "feature rich terminal emulator" x11-terms/terminology
+	optfeature "a modern flat enlightenment WM theme" x11-themes/e-flat-theme
 	optfeature "a matching GTK theme" x11-themes/e-gtk-theme
 }
 

@@ -67,6 +67,8 @@ if [[ -x /usr/bin/python2.7 ]]; then
 	test_var PYTHON_INCLUDEDIR python2_7 /usr/include/python2.7
 	test_var PYTHON_LIBPATH python2_7 "/usr/lib*/libpython2.7$(get_libname)"
 	test_var PYTHON_CONFIG python2_7 /usr/bin/python2.7-config
+	test_var PYTHON_CFLAGS python2_7 "*-I/usr/include/python2.7*"
+	test_var PYTHON_LIBS python2_7 "*-lpython2.7*"
 fi
 test_var PYTHON_PKG_DEP python2_7 '*dev-lang/python*:2.7'
 test_var PYTHON_SCRIPTDIR python2_7 /usr/lib/python-exec/python2.7
@@ -79,6 +81,8 @@ if [[ -x /usr/bin/python3.6 ]]; then
 	test_var PYTHON_INCLUDEDIR python3_6 "/usr/include/python3.6${abiflags}"
 	test_var PYTHON_LIBPATH python3_6 "/usr/lib*/libpython3.6${abiflags}$(get_libname)"
 	test_var PYTHON_CONFIG python3_6 "/usr/bin/python3.6${abiflags}-config"
+	test_var PYTHON_CFLAGS python3_6 "*-I/usr/include/python3.6*"
+	test_var PYTHON_LIBS python3_6 "*-lpython3.6*"
 fi
 test_var PYTHON_PKG_DEP python3_6 '*dev-lang/python*:3.6'
 test_var PYTHON_SCRIPTDIR python3_6 /usr/lib/python-exec/python3.6
@@ -91,6 +95,8 @@ if [[ -x /usr/bin/python3.7 ]]; then
 	test_var PYTHON_INCLUDEDIR python3_7 "/usr/include/python3.7${abiflags}"
 	test_var PYTHON_LIBPATH python3_7 "/usr/lib*/libpython3.7${abiflags}$(get_libname)"
 	test_var PYTHON_CONFIG python3_7 "/usr/bin/python3.7${abiflags}-config"
+	test_var PYTHON_CFLAGS python3_7 "*-I/usr/include/python3.7*"
+	test_var PYTHON_LIBS python3_7 "*-lpython3.7*"
 fi
 test_var PYTHON_PKG_DEP python3_7 '*dev-lang/python*:3.7'
 test_var PYTHON_SCRIPTDIR python3_7 /usr/lib/python-exec/python3.7
@@ -109,7 +115,7 @@ if [[ -x /usr/bin/pypy ]]; then
 	test_var PYTHON_SITEDIR pypy "/usr/lib*/pypy2.7/site-packages"
 	test_var PYTHON_INCLUDEDIR pypy "/usr/lib*/pypy2.7/include"
 fi
-test_var PYTHON_PKG_DEP pypy '*virtual/pypy*:0='
+test_var PYTHON_PKG_DEP pypy '*dev-python/pypy*:0='
 test_var PYTHON_SCRIPTDIR pypy /usr/lib/python-exec/pypy
 
 test_var EPYTHON pypy3 pypy3
@@ -118,7 +124,7 @@ if [[ -x /usr/bin/pypy3 ]]; then
 	test_var PYTHON_SITEDIR pypy3 "/usr/lib*/pypy3.?/site-packages"
 	test_var PYTHON_INCLUDEDIR pypy3 "/usr/lib*/pypy3.?/include"
 fi
-test_var PYTHON_PKG_DEP pypy3 '*virtual/pypy3*:0='
+test_var PYTHON_PKG_DEP pypy3 '*dev-python/pypy3*:0='
 test_var PYTHON_SCRIPTDIR pypy3 /usr/lib/python-exec/pypy3
 
 test_is "python_is_python3 python2.7" 1
@@ -181,16 +187,16 @@ test_is "_python_impl_supported python3_1" 1
 test_is "_python_impl_supported python3_2" 1
 test_is "_python_impl_supported python3_3" 1
 test_is "_python_impl_supported python3_4" 1
-test_is "_python_impl_supported python3_5" 0
+test_is "_python_impl_supported python3_5" 1
 test_is "_python_impl_supported python3_6" 0
 test_is "_python_impl_supported python3_7" 0
 test_is "_python_impl_supported python3_8" 0
 test_is "_python_impl_supported pypy1_8" 1
 test_is "_python_impl_supported pypy1_9" 1
 test_is "_python_impl_supported pypy2_0" 1
-test_is "_python_impl_supported pypy" 0
+test_is "_python_impl_supported pypy" 1
 test_is "_python_impl_supported pypy3" 0
-test_is "_python_impl_supported jython2_7" 0
+test_is "_python_impl_supported jython2_7" 1
 
 # check _python_impl_matches behavior
 test_is "_python_impl_matches python2_7 -2" 0

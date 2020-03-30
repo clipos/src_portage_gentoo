@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -12,11 +12,12 @@ KEYWORDS="amd64"
 DESCRIPTION="Prometheus monitoring system and time series database"
 HOMEPAGE="https://github.com/prometheus/prometheus"
 SRC_URI="https://${EGO_PN}/archive/${MY_PV}.tar.gz -> ${P}.tar.gz"
-LICENSE="Apache-2.0"
+LICENSE="Apache-2.0 BSD BSD-2 ISC MIT MPL-2.0"
 SLOT="0"
 IUSE=""
 
 DEPEND="
+	!app-metrics/prometheus-bin
 	>=dev-lang/go-1.12
 	>=dev-util/promu-0.3.0"
 

@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # @ECLASS: ecm.eclass
@@ -13,7 +13,7 @@
 # upstream release groups (Frameworks, Plasma, Applications) but also for any
 # other package that follows similar conventions.
 #
-# This eclass unconditionally inherits cmake-utils.eclass and all its public
+# This eclass unconditionally inherits cmake.eclass and all its public
 # variables and helper functions (not phase functions) may be considered as part
 # of this eclass's API.
 #
@@ -27,8 +27,8 @@
 # - Rename vars and function names as needed, see kde5.eclass PORTING comments
 # - Instead of FRAMEWORKS_MINIMAL, define KFMIN in ebuilds and use it for deps
 
-if [[ -z ${_ECM_UTILS_ECLASS} ]]; then
-_ECM_UTILS_ECLASS=1
+if [[ -z ${_ECM_ECLASS} ]]; then
+_ECM_ECLASS=1
 
 # @ECLASS-VARIABLE: VIRTUALX_REQUIRED
 # @DESCRIPTION:
@@ -49,7 +49,7 @@ if [[ ${CATEGORY} = kde-frameworks ]] ; then
 fi
 : ${ECM_NONGUI:=false}
 
-inherit cmake-utils flag-o-matic toolchain-funcs virtualx
+inherit cmake flag-o-matic toolchain-funcs virtualx
 
 if [[ ${ECM_NONGUI} = false ]] ; then
 	inherit xdg
@@ -74,7 +74,7 @@ EXPORT_FUNCTIONS pkg_setup src_prepare src_configure src_test pkg_preinst pkg_po
 
 # @ECLASS-VARIABLE: ECM_DEBUG
 # @DESCRIPTION:
-# Add "debug" to IUSE. If !debug, add -DNDEBUG (via cmake-utils_src_configure)
+# Add "debug" to IUSE. If !debug, add -DNDEBUG (via cmake_src_configure)
 # and -DQT_NO_DEBUG to CPPFLAGS. If set to "false", do nothing.
 : ${ECM_DEBUG:=true}
 
@@ -152,10 +152,15 @@ fi
 : ${ECM_TEST:=false}
 
 # @ECLASS-VARIABLE: KFMIN
+# @DEFAULT_UNSET
 # @DESCRIPTION:
-# Minimum version of Frameworks to require. The default value is not going to
-# be changed unless we also bump EAPI, which usually implies (rev-)bumping.
+# Minimum version of Frameworks to require. Default value for kde-frameworks
+# is ${PV} and 5.64.0 baseline for everything else. This is not going to be
+# changed unless we also bump EAPI, which usually implies (rev-)bumping.
 # Version will later be used to differentiate between KF5/Qt5 and KF6/Qt6.
+if [[ ${CATEGORY} = kde-frameworks ]]; then
+	: ${KFMIN:=$(ver_cut 1-2)}
+fi
 : ${KFMIN:=5.64.0}
 
 # @ECLASS-VARIABLE: KFSLOT
@@ -210,27 +215,6 @@ case ${ECM_DESIGNERPLUGIN} in
 	*)
 		eerror "Unknown value for \${ECM_DESIGNERPLUGIN}"
 		die "Value ${ECM_DESIGNERPLUGIN} is not supported"
-		;;
-esac
-
-# @ECLASS-VARIABLE: KDE_DESIGNERPLUGIN
-# @DESCRIPTION:
-# If set to "false", do nothing.
-# Otherwise, add "designer" to IUSE to toggle build of designer plugins
-# and add the necessary BDEPEND.
-# TODO: drop after KDE Applications 19.08.3 removal
-: ${KDE_DESIGNERPLUGIN:=false}
-case ${KDE_DESIGNERPLUGIN} in
-	true)
-		IUSE+=" designer"
-		BDEPEND+="
-			designer? ( >=kde-frameworks/kdesignerplugin-${KFMIN}:${KFSLOT} )
-		"
-		;;
-	false) ;;
-	*)
-		eerror "Unknown value for \${KDE_DESIGNERPLUGIN}"
-		die "Value ${KDE_DESIGNERPLUGIN} is not supported"
 		;;
 esac
 
@@ -304,6 +288,24 @@ fi
 DEPEND+=" ${COMMONDEPEND}"
 RDEPEND+=" ${COMMONDEPEND}"
 unset COMMONDEPEND
+
+# @FUNCTION: _ecm_banned_var
+# @INTERNAL
+# @DESCRIPTION:
+# Banned kde5*.eclass variables are banned.
+_ecm_banned_var() {
+	die "$1 is banned. use $2 instead."
+}
+
+if [[ -z ${_KDE5_ECLASS} ]] ; then
+	[[ -n ${KDE_DEBUG} ]] && _ecm_banned_var KDE_DEBUG ECM_DEBUG
+	[[ -n ${KDE_EXAMPLES} ]] && _ecm_banned_var KDE_EXAMPLES ECM_EXAMPLES
+	[[ -n ${KDE_HANDBOOK} ]] && _ecm_banned_var KDE_HANDBOOK ECM_HANDBOOK
+	[[ -n ${KDE_DOC_DIR} ]] && _ecm_banned_var KDE_DOC_DIR ECM_HANDBOOK_DIR
+	[[ -n ${KDE_PO_DIRS} ]] && _ecm_banned_var KDE_PO_DIRS ECM_PO_DIRS
+	[[ -n ${KDE_QTHELP} ]] && _ecm_banned_var KDE_QTHELP ECM_QTHELP
+	[[ -n ${KDE_TEST} ]] && _ecm_banned_var KDE_TEST ECM_TEST
+fi
 
 # @ECLASS-VARIABLE: KDE_GCC_MINIMAL
 # @DEFAULT_UNSET
@@ -413,12 +415,12 @@ ecm_pkg_setup() {
 
 # @FUNCTION: ecm_src_prepare
 # @DESCRIPTION:
-# Wrapper for cmake-utils_src_prepare with lots of extra logic for magic
+# Wrapper for cmake_src_prepare with lots of extra logic for magic
 # handling of linguas, tests, handbook etc.
 ecm_src_prepare() {
 	debug-print-function ${FUNCNAME} "$@"
 
-	cmake-utils_src_prepare
+	cmake_src_prepare
 
 	# only build examples when required
 	if ! { in_iuse examples && use examples; } ; then
@@ -494,12 +496,12 @@ ecm_src_prepare() {
 
 # @FUNCTION: ecm_src_configure
 # @DESCRIPTION:
-# Wrapper for cmake-utils_src_configure with extra logic for magic handling of
+# Wrapper for cmake_src_configure with extra logic for magic handling of
 # handbook, tests etc.
 ecm_src_configure() {
 	debug-print-function ${FUNCNAME} "$@"
 
-	# we rely on cmake-utils.eclass to append -DNDEBUG too
+	# we rely on cmake.eclass to append -DNDEBUG too
 	if in_iuse debug && ! use debug; then
 		append-cppflags -DQT_NO_DEBUG
 	fi
@@ -522,11 +524,6 @@ ecm_src_configure() {
 		cmakeargs+=( -DBUILD_DESIGNERPLUGIN=$(usex designer) )
 	fi
 
-	# TODO: drop after KDE Applications 19.08.3 removal
-	if in_iuse designer && [[ ${KDE_DESIGNERPLUGIN} != false ]] ; then
-		cmakeargs+=( $(cmake-utils_use_find_package designer KF5DesignerPlugin) )
-	fi
-
 	if [[ ${ECM_QTHELP} = true ]]; then
 		cmakeargs+=( -DBUILD_QCH=$(usex doc) )
 	fi
@@ -543,22 +540,22 @@ ecm_src_configure() {
 	# allow the ebuild to override what we set here
 	mycmakeargs=("${cmakeargs[@]}" "${mycmakeargs[@]}")
 
-	cmake-utils_src_configure
+	cmake_src_configure
 }
 
 # @FUNCTION: ecm_src_compile
 # @DESCRIPTION:
-# Wrapper for cmake-utils_src_compile. Currently doesn't do anything extra, but
+# Wrapper for cmake_src_compile. Currently doesn't do anything extra, but
 # is included as part of the API just in case it's needed in the future.
 ecm_src_compile() {
 	debug-print-function ${FUNCNAME} "$@"
 
-	cmake-utils_src_compile "$@"
+	cmake_src_compile "$@"
 }
 
 # @FUNCTION: ecm_src_test
 # @DESCRIPTION:
-# Wrapper for cmake-utils_src_test with extra logic for magic handling of dbus
+# Wrapper for cmake_src_test with extra logic for magic handling of dbus
 # and virtualx.
 ecm_src_test() {
 	debug-print-function ${FUNCNAME} "$@"
@@ -568,7 +565,7 @@ ecm_src_test() {
 			export $(dbus-launch)
 		fi
 
-		cmake-utils_src_test
+		cmake_src_test
 	}
 
 	# When run as normal user during ebuild development with the ebuild command,
@@ -590,12 +587,12 @@ ecm_src_test() {
 
 # @FUNCTION: ecm_src_install
 # @DESCRIPTION:
-# Wrapper for cmake-utils_src_install. Currently doesn't do anything extra, but
+# Wrapper for cmake_src_install. Currently doesn't do anything extra, but
 # is included as part of the API just in case it's needed in the future.
 ecm_src_install() {
 	debug-print-function ${FUNCNAME} "$@"
 
-	cmake-utils_src_install
+	cmake_src_install
 }
 
 # @FUNCTION: ecm_pkg_preinst

@@ -1,26 +1,27 @@
-diff --git a/setup.py b/setup.py
-index 22423119..b1f4dfe0 100755
+Respect user CFLAGS.
+
 --- a/setup.py
 +++ b/setup.py
-@@ -202,7 +202,7 @@ def init_env(
-     df = '-g3'
+@@ -236,7 +236,7 @@
      if ccver >= (5, 0):
          df += ' -Og'
+         float_conversion = '-Wfloat-conversion'
+     fortify_source = '-D_FORTIFY_SOURCE=2'
 -    optimize = df if debug or sanitize else '-O3'
 +    optimize = ''
      sanitize_args = get_sanitize_args(cc, ccver) if sanitize else set()
-     cppflags = os.environ.get(
+     cppflags_ = os.environ.get(
          'OVERRIDE_CPPFLAGS', '-D{}DEBUG'.format('' if debug else 'N'),
-@@ -213,7 +213,7 @@ def init_env(
+@@ -217,7 +217,7 @@
      cflags = os.environ.get(
          'OVERRIDE_CFLAGS', (
-             '-Wextra -Wfloat-conversion -Wno-missing-field-initializers -Wall -Wstrict-prototypes -std=c11'
+             '-Wextra {} -Wno-missing-field-initializers -Wall -Wstrict-prototypes -std=c11'
 -            ' -pedantic-errors -Werror {} {} -fwrapv {} {} -pipe {} -fvisibility=hidden'
 +            ' -pedantic-errors {} {} -fwrapv {} {} {} -fvisibility=hidden'
          ).format(
+             float_conversion, std,
              optimize,
-             ' '.join(sanitize_args),
-@@ -227,7 +227,7 @@ def init_env(
+@@ -232,7 +232,7 @@
      )
      ldflags = os.environ.get(
          'OVERRIDE_LDFLAGS',
@@ -29,7 +30,7 @@ index 22423119..b1f4dfe0 100755
      )
      ldflags = shlex.split(ldflags)
      ldflags.append('-shared')
-@@ -606,20 +606,17 @@ def safe_makedirs(path):
+@@ -614,7 +614,7 @@
  
  
  def build_launcher(args, launcher_dir='.', bundle_type='source'):
@@ -38,11 +39,7 @@ index 22423119..b1f4dfe0 100755
      cppflags = []
      libs = []
      if args.profile or args.sanitize:
-         if args.sanitize:
--            cflags.append('-g3')
-             cflags.extend(get_sanitize_args(env.cc, env.ccver))
-             libs += ['-lasan'] if env.cc == 'gcc' and not is_macos else []
-         else:
+@@ -626,8 +626,6 @@
              cflags.append('-g')
          if args.profile:
              libs.append('-lprofiler')

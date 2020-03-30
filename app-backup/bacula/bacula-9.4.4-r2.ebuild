@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -14,7 +14,7 @@ SRC_URI="mirror://sourceforge/bacula/${MY_P}.tar.gz"
 
 LICENSE="AGPL-3"
 SLOT="0"
-KEYWORDS="~amd64 ~ppc ~sparc ~x86"
+KEYWORDS="amd64 ppc ~sparc x86"
 IUSE="acl bacula-clientonly bacula-nodir bacula-nosd +batch-insert examples ipv6 libressl logwatch mysql postgres qt5 readline +sqlite ssl static tcpd vim-syntax X"
 
 DEPEND="
@@ -214,9 +214,6 @@ src_configure() {
 		$(use_with tcpd tcp-wrappers)"
 
 	econf \
-		--libdir=/usr/$(get_libdir) \
-		--docdir=/usr/share/doc/${PF} \
-		--htmldir=/usr/share/doc/${PF}/html \
 		--with-pid-dir=/var/run \
 		--sysconfdir=/etc/bacula \
 		--with-archivedir=/var/lib/bacula/tmp \

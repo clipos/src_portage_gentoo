@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="6"
@@ -6,7 +6,7 @@ EAPI="6"
 PYTHON_COMPAT=( python2_7 )
 PYTHON_REQ_USE="gdbm"
 
-inherit autotools eutils flag-o-matic multilib multilib-minimal mono-env python-r1 systemd user
+inherit autotools eutils flag-o-matic ltprune multilib multilib-minimal mono-env python-r1 systemd user
 
 DESCRIPTION="System which facilitates service discovery on a local network"
 HOMEPAGE="http://avahi.org/"
@@ -14,7 +14,7 @@ SRC_URI="https://github.com/lathiat/avahi/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="LGPL-2.1"
 SLOT="0"
-KEYWORDS="alpha amd64 arm arm64 ~hppa ia64 ~mips ppc ppc64 ~s390 ~sparc x86"
+KEYWORDS="~alpha amd64 arm arm64 hppa ia64 ~mips ppc ppc64 ~s390 sparc x86"
 IUSE="autoipd bookmarks dbus doc gdbm gtk gtk3 howl-compat +introspection ipv6 kernel_linux mdnsresponder-compat mono nls python qt5 selinux test"
 RESTRICT="!test? ( test )"
 
@@ -190,7 +190,7 @@ multilib_src_install() {
 		docinto html
 		dodoc -r doxygen/html/.
 		insinto /usr/share/devhelp/books/avahi
-		doins avahi.devhelp || die
+		doins avahi.devhelp
 	fi
 
 	# The build system creates an empty "/run" directory, so we clean it up here

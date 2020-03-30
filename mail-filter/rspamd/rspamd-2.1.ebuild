@@ -1,25 +1,28 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 
-inherit cmake-utils pax-utils systemd tmpfiles user
+inherit cmake-utils pax-utils systemd tmpfiles
 
 if [[ ${PV} == *9999 ]] ; then
-	EGIT_REPO_URI="https://github.com/vstakhov/rspamd.git"
+	EGIT_REPO_URI="https://github.com/rspamd/rspamd.git"
 	inherit git-r3
 else
-	SRC_URI="https://github.com/vstakhov/rspamd/archive/${PV}.tar.gz -> ${P}.tar.gz"
+	SRC_URI="https://github.com/rspamd/rspamd/archive/${PV}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64 ~x86"
 fi
 
 DESCRIPTION="Rapid spam filtering system"
-HOMEPAGE="https://github.com/vstakhov/rspamd"
-LICENSE="Apache-2.0"
+HOMEPAGE="https://rspamd.com/ https://github.com/rspamd/rspamd"
+LICENSE="Apache-2.0 Boost-1.0 BSD BSD-1 BSD-2 CC0-1.0 LGPL-3 MIT public-domain unicode ZLIB"
 SLOT="0"
 IUSE="blas cpu_flags_x86_ssse3 jemalloc +jit libressl pcre2"
 
-RDEPEND="dev-db/sqlite:3
+RDEPEND="
+	acct-group/rspamd
+	acct-user/rspamd
+	dev-db/sqlite:3
 	dev-libs/glib:2
 	dev-libs/icu:=
 	dev-libs/libev
@@ -31,20 +34,18 @@ RDEPEND="dev-db/sqlite:3
 	cpu_flags_x86_ssse3? ( dev-libs/hyperscan )
 	jemalloc? ( dev-libs/jemalloc )
 	jit? ( dev-lang/luajit:2 )
+	!jit? ( dev-lang/lua:* )
 	!libressl? ( dev-libs/openssl:0=[-bindist] )
 	libressl? ( dev-libs/libressl:0= )
 	pcre2? ( dev-libs/libpcre2[jit=] )
 	!pcre2? ( dev-libs/libpcre[jit=] )"
 DEPEND="${RDEPEND}"
 
-pkg_setup() {
-	enewgroup rspamd
-	enewuser rspamd -1 -1 /var/lib/rspamd rspamd
-}
-
 src_prepare() {
 	cmake-utils_src_prepare
 
+	sed -i -e '/PROJECT/s/LANGUAGES C ASM/LANGUAGES C CXX ASM/' CMakeLists.txt \
+		|| die "sed CMakeLists.txt failed"
 	sed -i -e 's/User=_rspamd/User=rspamd/g' \
 		rspamd.service \
 		|| die

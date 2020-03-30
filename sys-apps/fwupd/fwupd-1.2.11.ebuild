@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{5,6,7} )
+PYTHON_COMPAT=( python3_{6,7} )
 
 inherit meson python-single-r1 vala xdg-utils
 
@@ -13,8 +13,9 @@ SRC_URI="https://github.com/hughsie/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="LGPL-2.1+"
 SLOT="0"
-KEYWORDS="~amd64 ~arm ~x86"
+KEYWORDS="amd64 ~arm x86"
 IUSE="agent colorhug consolekit dell doc elogind +gpg +man nvme pkcs7 redfish systemd test thunderbolt uefi"
+RESTRICT="!test? ( test )"
 
 REQUIRED_USE="${PYTHON_REQUIRED_USE}
 	^^ ( consolekit elogind systemd )
@@ -31,9 +32,11 @@ RDEPEND="${PYTHON_DEPS}
 	dev-libs/libgudev:=
 	>=dev-libs/libgusb-0.2.9[introspection]
 	>=dev-libs/libxmlb-0.1.7
-	dev-python/pillow[${PYTHON_USEDEP}]
-	dev-python/pycairo[${PYTHON_USEDEP}]
-	dev-python/pygobject:3[cairo,${PYTHON_USEDEP}]
+	$(python_gen_cond_dep '
+		dev-python/pillow[${PYTHON_MULTI_USEDEP}]
+		dev-python/pycairo[${PYTHON_MULTI_USEDEP}]
+		dev-python/pygobject:3[cairo,${PYTHON_MULTI_USEDEP}]
+	')
 	>=net-libs/libsoup-2.51.92:2.4[introspection]
 	>=sys-auth/polkit-0.103
 	virtual/libelf:0=
@@ -52,7 +55,6 @@ RDEPEND="${PYTHON_DEPS}
 	pkcs7? ( >=net-libs/gnutls-3.4.4.1:= )
 	redfish? ( sys-libs/efivar )
 	systemd? ( >=sys-apps/systemd-211 )
-	thunderbolt? ( sys-apps/thunderbolt-software-user-space )
 	uefi? (
 		media-libs/fontconfig
 		media-libs/freetype

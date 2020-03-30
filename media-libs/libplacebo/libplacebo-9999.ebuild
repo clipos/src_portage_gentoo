@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -7,7 +7,7 @@ if [[ "${PV}" == "9999" ]]; then
 	EGIT_REPO_URI="https://code.videolan.org/videolan/libplacebo.git"
 	inherit git-r3
 else
-	KEYWORDS="~amd64"
+	KEYWORDS="~amd64 ~ppc64"
 	SRC_URI="https://code.videolan.org/videolan/libplacebo/-/archive/v${PV}/libplacebo-v${PV}.tar.gz"
 	S="${WORKDIR}/${PN}-v${PV}"
 fi
@@ -18,6 +18,7 @@ DESCRIPTION="Reusable library for GPU-accelerated image processing primitives"
 HOMEPAGE="https://github.com/haasn/libplacebo"
 
 LICENSE="LGPL-2.1+"
+# Please add a sub-slot for releases depending on libplacebo.so version
 SLOT="0"
 IUSE="glslang lcms +shaderc test +vulkan"
 REQUIRED_USE="vulkan? ( || ( glslang shaderc ) )"

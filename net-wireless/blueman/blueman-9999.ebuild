@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="7"
 
-PYTHON_COMPAT=( python3_{5,6,7} )
+PYTHON_COMPAT=( python3_{6,7} )
 inherit autotools gnome2-utils linux-info python-single-r1 systemd xdg-utils
 
 DESCRIPTION="Simple and intuitive GTK+ Bluetooth Manager"
@@ -15,6 +15,7 @@ if [[ ${PV} == "9999" ]] ; then
 	KEYWORDS=""
 else
 	SRC_URI="https://github.com/blueman-project/${PN}/releases/download/${PV/_/.}/${P/_/.}.tar.xz"
+	S=${WORKDIR}/${P/_/.}
 	KEYWORDS="~amd64 ~ppc ~ppc64 ~x86"
 fi
 
@@ -25,15 +26,21 @@ SLOT="0"
 IUSE="appindicator network nls policykit pulseaudio"
 
 DEPEND="
-	dev-python/pygobject:3[${PYTHON_USEDEP}]
+	$(python_gen_cond_dep '
+		dev-python/pygobject:3[${PYTHON_MULTI_USEDEP}]
+	')
 	>=net-wireless/bluez-5:=
 	${PYTHON_DEPS}"
 BDEPEND="
-	dev-python/cython[${PYTHON_USEDEP}]
+	$(python_gen_cond_dep '
+		dev-python/cython[${PYTHON_MULTI_USEDEP}]
+	')
 	virtual/pkgconfig
 	nls? ( dev-util/intltool sys-devel/gettext )"
 RDEPEND="${DEPEND}
-	dev-python/pycairo[${PYTHON_USEDEP}]
+	$(python_gen_cond_dep '
+		dev-python/pycairo[${PYTHON_MULTI_USEDEP}]
+	')
 	sys-apps/dbus
 	x11-libs/gtk+:3[introspection]
 	x11-libs/libnotify[introspection]
@@ -87,7 +94,6 @@ src_prepare() {
 
 src_configure() {
 	local myconf=(
-		--docdir=/usr/share/doc/${PF}
 		--disable-runtime-deps-check
 		--disable-static
 		--with-systemdsystemunitdir="$(systemd_get_systemunitdir)"

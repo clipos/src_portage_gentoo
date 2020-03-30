@@ -1,11 +1,11 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{5,6,7} )
+PYTHON_COMPAT=( python3_{6,7} )
 
-inherit distutils-r1 xdg-utils
+inherit distutils-r1 xdg
 
 DESCRIPTION="DevedeNG is a program to create video DVDs and CDs (VCD, sVCD or CVD)"
 HOMEPAGE="http://www.rastersoft.com/programas/devede.html"
@@ -41,12 +41,4 @@ src_prepare() {
 
 	# Desktop icon
 	sed -e "/^Icon/s/.svg$//#" -i data/devede_ng.py.desktop || die
-}
-
-pkg_postinst() {
-	xdg_icon_cache_update
-}
-
-pkg_postrm() {
-	xdg_icon_cache_update
 }

@@ -1,8 +1,8 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
-PYTHON_COMPAT=( python2_7 python3_{5,6,7} )
+PYTHON_COMPAT=( python3_{6,7} )
 
 inherit distutils-r1
 
@@ -22,8 +22,6 @@ RESTRICT="!test? ( test )"
 
 RDEPEND="
 	!dev-python/pyro:0
-	$(python_gen_cond_dep \
-		'dev-python/selectors34[${PYTHON_USEDEP}]' -2)
 	>=dev-python/serpent-1.27[${PYTHON_USEDEP}]"
 DEPEND="${RDEPEND}
 	dev-python/setuptools[${PYTHON_USEDEP}]

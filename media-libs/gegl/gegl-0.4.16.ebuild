@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -25,6 +25,7 @@ LICENSE="|| ( GPL-3+ LGPL-3 )"
 SLOT="0.4"
 
 IUSE="cairo cpu_flags_x86_mmx cpu_flags_x86_sse debug ffmpeg introspection lcms lensfun libav openexr pdf raw sdl svg test tiff umfpack vala v4l webp zlib"
+RESTRICT="!test? ( test )"
 REQUIRED_USE="
 	svg? ( cairo )
 	vala? ( introspection )
@@ -112,7 +113,6 @@ src_configure() {
 		--disable-docs
 		# never enable altering of CFLAGS via profile option
 		--disable-profile
-		--disable-silent-rules
 		#  - Parameter --disable-workshop disables any use of Lua, effectivly
 		--disable-workshop
 		--program-suffix=-${SLOT}

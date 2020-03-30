@@ -11,16 +11,16 @@ SRC_URI="http://kokkinizita.linuxaudio.org/linuxaudio/downloads/${P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~amd64 ~ppc ~x86"
+KEYWORDS="amd64 ~ppc x86"
 IUSE=""
 
 CDEPEND="
+	dev-libs/libclthreads
 	>=media-libs/zita-alsa-pcmi-0.3
-	media-libs/libclthreads
-	media-libs/libclxclient
 	sci-libs/fftw:3.0=
 	virtual/jack
 	x11-libs/gtk+:2
+	x11-libs/libclxclient
 "
 RDEPEND="${CDEPEND}"
 DEPEND="${CDEPEND}"

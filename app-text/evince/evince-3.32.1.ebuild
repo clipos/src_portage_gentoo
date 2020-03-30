@@ -14,7 +14,7 @@ LICENSE="GPL-2+ CC-BY-SA-3.0"
 # subslot = evd3.(suffix of libevdocument3)-evv3.(suffix of libevview3)
 SLOT="0/evd3.4-evv3.3"
 IUSE="djvu dvi gstreamer gnome gnome-keyring +introspection nautilus nsplugin postscript spell t1lib tiff xps"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~ia64 ~mips ~ppc ~ppc64 ~sparc ~x86 ~amd64-linux ~x86-linux ~x64-solaris"
+KEYWORDS="~alpha amd64 ~arm ~arm64 ~ia64 ~mips ~ppc ~ppc64 ~sparc x86 ~amd64-linux ~x86-linux ~x64-solaris"
 
 # atk used in libview
 # bundles unarr
@@ -27,7 +27,7 @@ COMMON_DEPEND="
 	>=x11-libs/gtk+-3.22.0:3[introspection?]
 	gnome-base/gsettings-desktop-schemas
 	>=x11-libs/cairo-1.10:=
-	>=app-text/poppler-0.33[cairo]
+	>=app-text/poppler-0.76.0[cairo]
 	>=app-arch/libarchive-3.2.0
 	djvu? ( >=app-text/djvu-3.5.22:= )
 	dvi? (
@@ -60,9 +60,8 @@ DEPEND="${COMMON_DEPEND}
 	dev-util/gdbus-codegen
 	dev-util/glib-utils
 	>=dev-util/gtk-doc-am-1.13
-	>=dev-util/intltool-0.35
 	dev-util/itstool
-	sys-devel/gettext
+	>=sys-devel/gettext-0.19.8
 	virtual/pkgconfig
 	app-text/yelp-tools
 "

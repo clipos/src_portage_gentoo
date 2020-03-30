@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -67,8 +67,7 @@ pkg_pretend() {
 	fi
 
 	if use amd64;then
-		CONFIG_CHECK="${CONFIG_CHECK} ~CRYPTO_AES_X86_64 ~CRYPTO_DES3_EDE_X86_64"
-		WARNING_CRYPTO_AES_X86_64="CRYPTO_AES_X86_64: enable for increased performance"
+		CONFIG_CHECK="${CONFIG_CHECK} ~CRYPTO_DES3_EDE_X86_64"
 		WARNING_CRYPTO_DES3_EDE_X86_64="CRYPTO_DES3_EDE_X86_64: enable for increased performance"
 	fi
 
@@ -141,7 +140,7 @@ src_install() {
 	default
 	keepdir /var/lib/${PN}
 
-	newinitd "${FILESDIR}/iwd.initd" iwd
+	newinitd "${FILESDIR}/iwd.initd-r1" iwd
 
 	if use wired;then
 		newinitd "${FILESDIR}/ead.initd" ead

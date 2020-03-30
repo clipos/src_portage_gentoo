@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 
-PYTHON_COMPAT=( python2_7 python{3_5,3_6} pypy{,3} )
+PYTHON_COMPAT=( python2_7 python3_6 pypy3 )
 inherit distutils-r1
 
 DESCRIPTION="Container class boilerplate killer"
@@ -18,6 +18,8 @@ IUSE="test"
 DEPEND="test? ( dev-python/pytest[${PYTHON_USEDEP}]
 	dev-python/attrs[${PYTHON_USEDEP}]
 	dev-python/characteristic[${PYTHON_USEDEP}] )"
+
+RESTRICT="!test? ( test )"
 
 python_prepare_all() {
 	sed -i -e "/--benchmark-disable/d" setup.cfg || die

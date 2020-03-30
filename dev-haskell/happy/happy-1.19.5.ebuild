@@ -14,7 +14,7 @@ SRC_URI="https://hackage.haskell.org/package/${P}/${P}.tar.gz"
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="~alpha amd64 ~ia64 ~ppc ~ppc64 ~sparc x86"
+KEYWORDS="amd64 ~ia64 ~ppc ~ppc64 ~sparc x86"
 IUSE="doc"
 
 RDEPEND=""
@@ -60,7 +60,7 @@ src_compile() {
 
 src_test() {
 	# workaround https://github.com/haskell/cabal/issues/2398
-	emake -k -C tests all || die
+	emake -k -C tests all
 }
 
 src_install() {

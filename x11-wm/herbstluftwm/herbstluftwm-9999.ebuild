@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -6,7 +6,7 @@ inherit toolchain-funcs bash-completion-r1
 
 if [[ ${PV} == 9999* ]] ; then
 	inherit git-r3
-	EGIT_REPO_URI="https://github.com/herbstluftwm/herbstluftwm.git"
+	EGIT_REPO_URI="https://github.com/herbstluftwm/herbstluftwm"
 	BDEPEND="app-text/asciidoc"
 else
 	SRC_URI="https://herbstluftwm.org/tarballs/${P}.tar.gz"
@@ -21,17 +21,23 @@ LICENSE="BSD-2"
 SLOT="0"
 IUSE="examples xinerama zsh-completion"
 
-DEPEND=">=dev-libs/glib-2.24:2
+DEPEND="
+	>=dev-libs/glib-2.24:2
 	x11-libs/libX11
 	x11-libs/libXext
-	xinerama? ( x11-libs/libXinerama )"
-RDEPEND="${DEPEND}
+	xinerama? ( x11-libs/libXinerama )
+"
+RDEPEND="
+	${DEPEND}
 	app-shells/bash
-	zsh-completion? ( app-shells/zsh )"
-BDEPEND+=" virtual/pkgconfig"
+	zsh-completion? ( app-shells/zsh )
+"
+BDEPEND+="
+	virtual/pkgconfig
+"
 
 src_compile() {
-	tc-export CC LD CXX
+	tc-export CC CXX LD PKG_CONFIG
 
 	emake LDXX="$(tc-getCXX)" COLOR=0 VERBOSE= \
 		$(use xinerama || echo XINERAMAFLAGS= XINERAMALIBS= )

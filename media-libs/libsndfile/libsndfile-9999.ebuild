@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-PYTHON_COMPAT=( python{2_7,3_5,3_6,3_7} pypy{,3} )
+PYTHON_COMPAT=( python{3_6,3_7} pypy3 )
 
 if [[ ${PV} == *9999 ]]; then
 	inherit autotools git-r3
@@ -20,6 +20,7 @@ HOMEPAGE="http://www.mega-nerd.com/libsndfile"
 LICENSE="LGPL-2.1"
 SLOT="0"
 IUSE="alsa minimal sqlite static-libs test"
+RESTRICT="!test? ( test )"
 
 RDEPEND="
 	!minimal? (

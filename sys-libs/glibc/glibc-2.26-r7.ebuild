@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 
-inherit prefix toolchain-glibc usr-ldscript
+inherit prefix toolchain-funcs toolchain-glibc
 
 DESCRIPTION="GNU libc C library"
 HOMEPAGE="https://www.gnu.org/software/libc/"
@@ -14,10 +14,10 @@ EMULTILIB_PKG="true"
 # Configuration variables
 
 if [[ ${PV} == 9999* ]]; then
-	EGIT_REPO_URI="git://sourceware.org/git/glibc.git"
+	EGIT_REPO_URI="https://sourceware.org/git/glibc.git"
 	inherit git-r3
 else
-	KEYWORDS="alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86"
+	KEYWORDS="~alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86"
 	SRC_URI="mirror://gnu/glibc/${P}.tar.xz"
 fi
 
@@ -577,7 +577,7 @@ src_configure() {
 }
 
 do_src_compile() {
-	emake -C "$(builddir nptl)" || die "make nptl for ${ABI} failed"
+	emake -C "$(builddir nptl)"
 }
 
 src_compile() {
@@ -616,7 +616,7 @@ glibc_do_src_install() {
 	local builddir=$(builddir nptl)
 	cd "${builddir}"
 
-	emake install_root="${D}$(alt_prefix)" install || die
+	emake install_root="${D}$(alt_prefix)" install
 
 	# This version (2.26) provides some compatibility libraries for the NIS/NIS+ support
 	# which come without headers etc. Only needed for binary packages since the
@@ -831,10 +831,6 @@ pkg_postinst() {
 	fi
 
 	if ! is_crosscompile && [[ ${ROOT} == "/" ]] ; then
-		# Reload init ... if in a chroot or a diff init package, ignore
-		# errors from this step #253697
-		/sbin/telinit U 2>/dev/null
-
 		# if the host locales.gen contains no entries, we'll install everything
 		local locale_list="${EROOT}etc/locale.gen"
 		if [[ -z $(locale-gen --list --config "${locale_list}") ]] ; then

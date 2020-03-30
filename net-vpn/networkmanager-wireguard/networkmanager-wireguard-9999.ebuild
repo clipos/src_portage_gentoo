@@ -17,11 +17,11 @@ REQUIRED_USE="glib? ( gtk )"
 
 RDEPEND="
 	net-misc/networkmanager
-	net-vpn/wireguard
+	net-vpn/wireguard-tools[wg-quick]
 	glib? ( dev-libs/glib )
 	gtk? (
 		app-crypt/libsecret
-		gnome-extra/nm-applet
+		gnome-extra/nm-applet[gtk]
 		x11-libs/gtk+:3
 	)
 "

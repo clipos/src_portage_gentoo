@@ -1,11 +1,11 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 
-PYTHON_COMPAT=( python2_7 pypy )
+PYTHON_COMPAT=( python2_7 )
 
-inherit autotools distutils-r1 multilib virtualx
+inherit autotools distutils-r1 multilib toolchain-funcs virtualx
 
 DESCRIPTION="The Snack Sound Toolkit (Tcl)"
 HOMEPAGE="http://www.speech.kth.se/snack/"
@@ -42,7 +42,7 @@ src_prepare() {
 
 	sed \
 		-e "s:ar cr:$(tc-getAR) cr:g" \
-		-e "s:-O:${CFLAGS}:g" \
+		-e "s|-O|${CFLAGS}|g" \
 		-i Makefile.in || die
 
 	cd ..

@@ -1,10 +1,10 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
 DESCRIPTION="Meta package containing deps on all xorg drivers"
-HOMEPAGE="https://www.gentoo.org/"
+HOMEPAGE="https://wiki.gentoo.org/wiki/No_homepage"
 SRC_URI=""
 
 LICENSE="metapackage"
@@ -94,6 +94,4 @@ PDEPEND="
 	video_cards_via?           ( x11-drivers/xf86-video-openchrome )
 	video_cards_virtualbox?    ( x11-drivers/xf86-video-vboxvideo )
 	video_cards_vmware?        ( >=x11-drivers/xf86-video-vmware-13.3.0 )
-
-	!<x11-drivers/xf86-input-evdev-2.10.4
 "

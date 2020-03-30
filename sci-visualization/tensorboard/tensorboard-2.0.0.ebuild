@@ -1,10 +1,10 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-PYTHON_COMPAT=( python2_7 python3_{5,6,7} )
-inherit python-r1 python-utils-r1
+PYTHON_COMPAT=( python3_{6,7} )
+inherit python-r1
 
 DESCRIPTION="TensorFlow's Visualization Toolkit"
 HOMEPAGE="https://www.tensorflow.org/"
@@ -27,8 +27,7 @@ RDEPEND="
 	dev-python/six[${PYTHON_USEDEP}]
 	>=dev-python/setuptools-41[${PYTHON_USEDEP}]
 	dev-python/werkzeug[${PYTHON_USEDEP}]
-	dev-python/wheel[${PYTHON_USEDEP}]
-	virtual/python-futures[${PYTHON_USEDEP}]"
+	dev-python/wheel[${PYTHON_USEDEP}]"
 BDEPEND="app-arch/unzip
 	${PYTHON_DEPS}"
 PDEPEND="sci-libs/tensorflow[python,${PYTHON_USEDEP}]"

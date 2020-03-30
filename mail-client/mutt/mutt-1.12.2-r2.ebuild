@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="6"
@@ -205,11 +205,11 @@ src_configure() {
 		myconf+=( "--with-homespool=Maildir" )
 	fi
 
-	econf "${myconf[@]}" || die "configure failed"
+	econf "${myconf[@]}"
 }
 
 src_install() {
-	emake DESTDIR="${D}" install || die "install failed"
+	emake DESTDIR="${D}" install
 	if use mbox; then
 		insinto /etc/mutt
 		newins "${FILESDIR}"/Muttrc.mbox Muttrc
@@ -220,11 +220,11 @@ src_install() {
 
 	# A newer file is provided by app-misc/mime-types. So we link it.
 	rm "${ED}"/etc/${PN}/mime.types
-	dosym "${EPREFIX}"/etc/mime.types /etc/${PN}/mime.types
+	dosym ../mime.types /etc/${PN}/mime.types
 
 	# A man-page is always handy, so fake one
 	if use !doc; then
-		emake -C doc DESTDIR="${D}" muttrc.man || die
+		emake -C doc DESTDIR="${D}" muttrc.man
 		# make the fake slightly better, bug #413405
 		sed -e 's#@docdir@/manual.txt#http://www.mutt.org/doc/devel/manual.html#' \
 			-e 's#in @docdir@,#at http://www.mutt.org/,#' \

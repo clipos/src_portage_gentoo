@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="7"
@@ -27,7 +27,7 @@ SRC_URI="mirror://openssl/source/${MY_P}.tar.gz
 LICENSE="openssl"
 SLOT="0/1.1" # .so version of libssl/libcrypto
 [[ "${PV}" = *_pre* ]] || \
-KEYWORDS="alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 ~riscv s390 sh sparc x86 ~x86-linux"
+KEYWORDS="~alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 ~riscv s390 sh sparc x86 ~x86-linux"
 IUSE="+asm bindist elibc_musl rfc3779 sctp cpu_flags_x86_sse2 sslv3 static-libs test tls-heartbeat vanilla zlib"
 RESTRICT="!bindist? ( bindist )
 	!test? ( test )"
@@ -41,6 +41,7 @@ BDEPEND="
 	test? (
 		sys-apps/diffutils
 		sys-devel/bc
+		sys-process/procps
 	)"
 PDEPEND="app-misc/ca-certificates"
 
@@ -49,6 +50,7 @@ PATCHES=(
 	"${FILESDIR}"/${P}-fix-zlib.patch
 	"${FILESDIR}"/${P}-fix-potential-memleaks-w-BN_to_ASN1_INTEGER.patch
 	"${FILESDIR}"/${P}-reenable-the-stitched-AES-CBC-HMAC-SHA-implementations.patch
+	"${FILESDIR}"/${P}-config-Drop-linux-alpha-gcc-bwx.patch
 )
 
 S="${WORKDIR}/${MY_P}"
@@ -64,14 +66,12 @@ pkg_setup() {
 	[[ ${MERGE_TYPE} == binary ]] && return
 
 	# must check in pkg_setup; sysctl don't work with userpriv!
-	if has test ${FEATURES}; then
-		if use sctp; then
-			# test_ssl_new will fail with "Ensure SCTP AUTH chunks are enabled in kernel"
-			# if sctp.auth_enable is not enabled.
-			local sctp_auth_status=$(sysctl -n net.sctp.auth_enable 2>/dev/null)
-			if [[ -z "${sctp_auth_status}" || ${sctp_auth_status} != 1 ]]; then
-				die "FEATURES=test with USE=sctp requires net.sctp.auth_enable=1!"
-			fi
+	if has test ${FEATURES} && use sctp; then
+		# test_ssl_new will fail with "Ensure SCTP AUTH chunks are enabled in kernel"
+		# if sctp.auth_enable is not enabled.
+		local sctp_auth_status=$(sysctl -n net.sctp.auth_enable 2>/dev/null)
+		if [[ -z "${sctp_auth_status}" ]] || [[ ${sctp_auth_status} != 1 ]]; then
+			die "FEATURES=test with USE=sctp requires net.sctp.auth_enable=1!"
 		fi
 	fi
 }
@@ -120,14 +120,10 @@ src_prepare() {
 
 	eapply_user #332661
 
-	if has test ${FEATURES}; then
-		if use sctp; then
-			if has network-sandbox ${FEATURES}; then
-				ebegin "Disabling test '80-test_ssl_new.t' which is known to fail with FEATURES=network-sandbox"
-				rm test/recipes/80-test_ssl_new.t || die
-				eend $?
-			fi
-		fi
+	if has test ${FEATURES} && use sctp && has network-sandbox ${FEATURES}; then
+		ebegin "Disabling test '80-test_ssl_new.t' which is known to fail with FEATURES=network-sandbox"
+		rm test/recipes/80-test_ssl_new.t || die
+		eend $?
 	fi
 
 	# make sure the man pages are suffixed #302165

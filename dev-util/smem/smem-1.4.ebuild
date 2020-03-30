@@ -5,7 +5,7 @@ EAPI=7
 
 PYTHON_COMPAT=( python2_7 )
 
-inherit python-single-r1 toolchain-funcs
+inherit eutils python-single-r1 toolchain-funcs
 
 DESCRIPTION="A tool that can give numerous reports on memory usage on Linux systems"
 HOMEPAGE="https://www.selenic.com/smem/"
@@ -13,12 +13,11 @@ SRC_URI="https://www.selenic.com/${PN}/download/${P}.tar.gz"
 
 LICENSE="GPL-2+"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="amd64 x86"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 RDEPEND="${PYTHON_DEPS}"
-
-BDEPEND="dev-lang/python:2.7"
+BDEPEND="${RDEPEND}"
 
 src_prepare() {
 	default

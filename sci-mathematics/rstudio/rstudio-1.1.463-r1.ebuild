@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-inherit eutils user cmake-utils gnome2-utils pam xdg-utils java-pkg-2 pax-utils qmake-utils
+inherit eutils user cmake-utils gnome2-utils pam xdg-utils java-pkg-2 pax-utils qmake-utils vcs-clean
 
 # TODO
 # * package gin and gwt
@@ -225,7 +225,7 @@ src_install() {
 	dodir /etc/rstudio
 	insinto /etc/rstudio
 	doins "${FILESDIR}"/rsession.conf
-	dosym "${EROOT}/etc/conf.d/rstudio-server.conf" "/etc/rstudio/rserver.conf"
+	dosym ../conf.d/rstudio-server.conf /etc/rstudio/rserver.conf
 	if use dedicated || use server; then
 		dopamd src/cpp/server/extras/pam/rstudio
 		newinitd "${FILESDIR}"/rstudio-server.initd rstudio-server

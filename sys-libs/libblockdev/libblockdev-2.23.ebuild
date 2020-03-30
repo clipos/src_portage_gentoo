@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-PYTHON_COMPAT=( python{2_7,3_{5,6,7}} )
+PYTHON_COMPAT=( python3_{6,7} )
 inherit python-single-r1 xdg-utils
 
 DESCRIPTION="A library for manipulating block devices"
@@ -25,6 +25,7 @@ fi
 LICENSE="LGPL-2+"
 SLOT="0"
 IUSE="bcache +cryptsetup device-mapper dmraid escrow gtk-doc introspection lvm kbd test +tools vdo"
+RESTRICT="!test? ( test )"
 
 RDEPEND="
 	>=dev-libs/glib-2.42.2

@@ -1,10 +1,10 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
-PYTHON_COMPAT=( python{2_7,3_{5,6,7}} )
+PYTHON_COMPAT=( python3_{6,7} )
 PYTHON_REQ_USE="threads(+)"
-inherit bash-completion-r1 flag-o-matic git-r3 pax-utils python-any-r1 toolchain-funcs xdg-utils
+inherit bash-completion-r1 eutils flag-o-matic git-r3 pax-utils python-any-r1 toolchain-funcs xdg-utils
 
 DESCRIPTION="A JavaScript runtime built on Chrome's V8 JavaScript engine"
 HOMEPAGE="https://nodejs.org/"
@@ -13,19 +13,21 @@ EGIT_REPO_URI="https://github.com/nodejs/node"
 LICENSE="Apache-1.1 Apache-2.0 BSD BSD-2 MIT"
 SLOT="0"
 KEYWORDS=""
-IUSE="cpu_flags_x86_sse2 debug doc icu inspector +npm pax_kernel +snapshot +ssl systemtap test"
+IUSE="cpu_flags_x86_sse2 debug doc icu inspector +npm pax_kernel +snapshot +ssl +system-ssl systemtap test"
+RESTRICT="!test? ( test )"
 REQUIRED_USE="
 	inspector? ( icu ssl )
 	npm? ( ssl )
+	system-ssl? ( ssl )
 "
 
 RDEPEND="
-	>=dev-libs/libuv-1.33.1:=
+	>=dev-libs/libuv-1.34.1:=
 	>=net-dns/c-ares-1.15.0
 	>=net-libs/nghttp2-1.39.2
 	sys-libs/zlib
 	icu? ( >=dev-libs/icu-64.2:= )
-	ssl? ( >=dev-libs/openssl-1.1.1:0= )
+	system-ssl? ( >=dev-libs/openssl-1.1.1:0= )
 "
 BDEPEND="
 	${PYTHON_DEPS}
@@ -99,8 +101,12 @@ src_configure() {
 	use icu && myconf+=( --with-intl=system-icu ) || myconf+=( --with-intl=none )
 	use inspector || myconf+=( --without-inspector )
 	use npm || myconf+=( --without-npm )
-	use snapshot && myconf+=( --with-snapshot )
-	use ssl && myconf+=( --shared-openssl --openssl-use-def-ca-store ) || myconf+=( --without-ssl )
+	use snapshot || myconf+=( --without-node-snapshot )
+	if use ssl; then
+		use system-ssl && myconf+=( --shared-openssl --openssl-use-def-ca-store )
+	else
+		myconf+=( --without-ssl )
+	fi
 
 	local myarch=""
 	case ${ABI} in

@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 
-PYTHON_COMPAT=( python2_7 python3_{5,6,7,8} pypy pypy3 )
+PYTHON_COMPAT=( python2_7 python3_{6,7,8} pypy3 )
 
 inherit distutils-r1
 
@@ -16,7 +16,9 @@ SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-linux ~x86-linux ~x64-macos"
 
 RDEPEND="
-	>=virtual/python-funcsigs-1[${PYTHON_USEDEP}]
+	$(python_gen_cond_dep '
+		dev-python/funcsigs[${PYTHON_USEDEP}]
+	' -2)
 	>=dev-python/six-1.9[${PYTHON_USEDEP}]"
 DEPEND="${RDEPEND}
 	>=dev-python/setuptools-17.1[${PYTHON_USEDEP}]"

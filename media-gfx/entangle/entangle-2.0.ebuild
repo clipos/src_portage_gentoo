@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{5,6,7} )
+PYTHON_COMPAT=( python3_{6,7,8} )
 inherit gnome2-utils meson python-single-r1 xdg-utils
 
 DESCRIPTION="Tethered Camera Control & Capture"
@@ -21,7 +21,7 @@ DEPEND="
 	>=dev-libs/glib-2.36:2
 	>=dev-libs/gobject-introspection-1.54.0
 	dev-libs/libgudev:=
-	>=dev-libs/libpeas-1.2.0[gtk,${PYTHON_USEDEP}]
+	>=dev-libs/libpeas-1.2.0[gtk,${PYTHON_SINGLE_USEDEP}]
 	>=media-libs/gexiv2-0.10[introspection]
 	>=media-libs/libgphoto2-2.5.0:=
 	media-libs/gstreamer:1.0
@@ -48,6 +48,11 @@ src_compile() {
 	# prevent gst from loading system plugins which causes
 	# sandbox violations on device access
 	local -x GST_PLUGIN_SYSTEM_PATH_1_0=
+	# pre-generate enums to resolve race conditions
+	# https://bugs.gentoo.org/709740
+	meson_src_compile \
+		src/backend/entangle-{camera,colour-profile}-enums.h \
+		src/frontend/entangle-image-display-enums.h
 	meson_src_compile
 }
 

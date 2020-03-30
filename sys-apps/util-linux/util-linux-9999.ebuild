@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-PYTHON_COMPAT=( python2_7 python3_{5,6,7} )
+PYTHON_COMPAT=( python3_{6,7,8} )
 
 inherit toolchain-funcs libtool flag-o-matic bash-completion-r1 usr-ldscript \
 	pam python-r1 multilib-minimal multiprocessing systemd
@@ -23,16 +23,17 @@ fi
 DESCRIPTION="Various useful Linux utilities"
 HOMEPAGE="https://www.kernel.org/pub/linux/utils/util-linux/ https://github.com/karelzak/util-linux"
 
-LICENSE="GPL-2 LGPL-2.1 BSD-4 MIT public-domain"
+LICENSE="GPL-2 GPL-3 LGPL-2.1 BSD-4 MIT public-domain"
 SLOT="0"
-IUSE="build caps +cramfs fdformat hardlink kill +logger ncurses nls pam python +readline selinux slang static-libs su +suid systemd test tty-helpers udev unicode userland_GNU"
+IUSE="build caps +cramfs cryptsetup fdformat hardlink kill +logger ncurses nls pam python +readline selinux slang static-libs su +suid systemd test tty-helpers udev unicode userland_GNU"
 
 # Most lib deps here are related to programs rather than our libs,
 # so we rarely need to specify ${MULTILIB_USEDEP}.
-DEPEND="
-	virtual/os-headers
+RDEPEND="
+	virtual/libcrypt:=
 	caps? ( sys-libs/libcap-ng )
 	cramfs? ( sys-libs/zlib:= )
+	cryptsetup? ( sys-fs/cryptsetup )
 	ncurses? ( >=sys-libs/ncurses-5.2-r2:0=[unicode?] )
 	nls? ( virtual/libintl[${MULTILIB_USEDEP}] )
 	pam? ( sys-libs/pam )
@@ -47,7 +48,11 @@ BDEPEND="
 	nls? ( sys-devel/gettext )
 	test? ( sys-devel/bc )
 "
-RDEPEND="${DEPEND}
+DEPEND="
+	${RDEPEND}
+	virtual/os-headers
+"
+RDEPEND+="
 	hardlink? ( !app-arch/hardlink )
 	logger? ( !>=app-admin/sysklogd-2.0[logger] )
 	kill? (
@@ -90,12 +95,6 @@ src_prepare() {
 		po/update-potfiles
 		eautoreconf
 	fi
-
-	# Undo bad ncurses handling by upstream. #601530
-	sed -i -E \
-		-e '/NCURSES_/s:(ncursesw?)[56]-config:$PKG_CONFIG \1:' \
-		-e 's:(ncursesw?)[56]-config --version:$PKG_CONFIG --exists --print-errors \1:' \
-		configure || die
 
 	elibtoolize
 }
@@ -142,6 +141,10 @@ multilib_src_configure() {
 	tc-is-cross-compiler && export scanf_cv_alloc_modifier=ms
 	export ac_cv_header_security_pam_misc_h=$(multilib_native_usex pam) #485486
 	export ac_cv_header_security_pam_appl_h=$(multilib_native_usex pam) #545042
+
+	# Undo bad ncurses handling by upstream. Fall back to pkg-config. #601530
+	export NCURSES6_CONFIG=false NCURSES5_CONFIG=false
+	export NCURSESW6_CONFIG=false NCURSESW5_CONFIG=false
 
 	# configure args shared by python and non-python builds
 	local commonargs=(
@@ -193,6 +196,7 @@ multilib_src_configure() {
 			$(use_enable tty-helpers mesg)
 			$(use_enable tty-helpers wall)
 			$(use_enable tty-helpers write)
+			$(use_with cryptsetup)
 		)
 	else
 		myeconfargs+=(

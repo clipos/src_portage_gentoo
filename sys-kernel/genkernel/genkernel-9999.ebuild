@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # genkernel-9999        -> latest Git branch "master"
@@ -6,18 +6,19 @@
 
 EAPI="7"
 
-inherit bash-completion-r1 mount-boot
+inherit bash-completion-r1
 
 # Whenever you bump a GKPKG, check if you have to move
 # or add new patches!
-VERSION_BOOST="1.71.0"
-VERSION_BTRFS_PROGS="5.3.1"
+VERSION_BOOST="1.72.0"
+VERSION_BTRFS_PROGS="5.4.1"
 VERSION_BUSYBOX="1.31.1"
-VERSION_CRYPTSETUP="2.2.2"
+VERSION_COREUTILS="8.32"
+VERSION_CRYPTSETUP="2.3.0"
 VERSION_DMRAID="1.0.0.rc16-3"
 VERSION_DROPBEAR="2019.78"
-VERSION_EXPAT="2.2.8"
-VERSION_E2FSPROGS="1.45.4"
+VERSION_EXPAT="2.2.9"
+VERSION_E2FSPROGS="1.45.5"
 VERSION_FUSE="2.9.9"
 VERSION_GPG="1.4.23"
 VERSION_ISCSI="2.0.878"
@@ -30,11 +31,11 @@ VERSION_LVM="2.02.186"
 VERSION_LZO="2.10"
 VERSION_MDADM="4.1"
 VERSION_POPT="1.16"
-VERSION_STRACE="5.3"
+VERSION_STRACE="5.4"
 VERSION_THIN_PROVISIONING_TOOLS="0.8.5"
 VERSION_UNIONFS_FUSE="2.0"
-VERSION_UTIL_LINUX="2.34"
-VERSION_XFSPROGS="5.3.0"
+VERSION_UTIL_LINUX="2.35.1"
+VERSION_XFSPROGS="5.4.0"
 VERSION_ZLIB="1.2.11"
 VERSION_ZSTD="1.4.4"
 
@@ -42,6 +43,7 @@ COMMON_URI="
 	https://dl.bintray.com/boostorg/release/${VERSION_BOOST}/source/boost_${VERSION_BOOST//./_}.tar.bz2
 	https://www.kernel.org/pub/linux/kernel/people/kdave/btrfs-progs/btrfs-progs-v${VERSION_BTRFS_PROGS}.tar.xz
 	https://www.busybox.net/downloads/busybox-${VERSION_BUSYBOX}.tar.bz2
+	mirror://gnu/coreutils/coreutils-${VERSION_COREUTILS}.tar.xz
 	https://www.kernel.org/pub/linux/utils/cryptsetup/v$(ver_cut 1-2 ${VERSION_CRYPTSETUP})/cryptsetup-${VERSION_CRYPTSETUP}.tar.xz
 	https://people.redhat.com/~heinzm/sw/dmraid/src/dmraid-${VERSION_DMRAID}.tar.bz2
 	https://matt.ucc.asn.au/dropbear/releases/dropbear-${VERSION_DROPBEAR}.tar.bz2
@@ -80,7 +82,7 @@ else
 fi
 
 DESCRIPTION="Gentoo automatic kernel building scripts"
-HOMEPAGE="https://www.gentoo.org"
+HOMEPAGE="https://wiki.gentoo.org/wiki/Genkernel https://gitweb.gentoo.org/proj/genkernel.git/"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -140,6 +142,7 @@ src_prepare() {
 		-e "s:VERSION_BOOST:${VERSION_BOOST}:"\
 		-e "s:VERSION_BTRFS_PROGS:${VERSION_BTRFS_PROGS}:"\
 		-e "s:VERSION_BUSYBOX:${VERSION_BUSYBOX}:"\
+		-e "s:VERSION_COREUTILS:${VERSION_COREUTILS}:"\
 		-e "s:VERSION_CRYPTSETUP:${VERSION_CRYPTSETUP}:"\
 		-e "s:VERSION_DMRAID:${VERSION_DMRAID}:"\
 		-e "s:VERSION_DROPBEAR:${VERSION_DROPBEAR}:"\
@@ -232,7 +235,6 @@ pkg_postinst() {
 		fi
 	done
 
-	mount-boot_mount_boot_partition
 	if [[ $(find /boot -name 'kernel-genkernel-*' 2>/dev/null | wc -l) -gt 0 ]] ; then
 		ewarn ''
 		ewarn 'Default kernel filename was changed from "kernel-genkernel-<ARCH>-<KV>"'
@@ -241,7 +243,6 @@ pkg_postinst() {
 		ewarn 'built with genkernel before that name change, resulting in booting old'
 		ewarn 'kernel when not paying attention on boot.'
 	fi
-	mount-boot_pkg_postinst
 
 	# Show special warning for users depending on remote unlock capabilities
 	local gk_config="${EROOT}/etc/genkernel.conf"

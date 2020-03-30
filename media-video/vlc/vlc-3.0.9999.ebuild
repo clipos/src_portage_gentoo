@@ -1,4 +1,4 @@
-# Copyright 2000-2019 Gentoo Authors
+# Copyright 2000-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -29,15 +29,16 @@ HOMEPAGE="https://www.videolan.org/vlc/"
 LICENSE="LGPL-2.1 GPL-2"
 SLOT="0/5-9" # vlc - vlccore
 
-IUSE="a52 alsa altivec aom archive aribsub bidi bluray cddb chromaprint chromecast
+IUSE="a52 alsa aom archive aribsub bidi bluray cddb chromaprint chromecast
 	dav1d dbus dc1394 debug directx dts +dvbpsi dvd +encode faad fdk +ffmpeg flac
 	fluidsynth fontconfig +gcrypt gme gnome-keyring gstreamer ieee1394 jack jpeg kate
 	libass libav libcaca libnotify +libsamplerate libtar libtiger linsys lirc
 	live lua macosx-notifications mad matroska modplug mp3 mpeg mtp musepack ncurses
-	nfs ogg omxil opencv optimisememory opus png postproc projectm pulseaudio +qt5 rdp
+	nfs ogg omxil optimisememory opus png postproc projectm pulseaudio +qt5 rdp
 	run-as-root samba sdl-image sftp shout sid skins soxr speex srt ssl svg taglib
 	theora tremor truetype twolame udev upnp vaapi v4l vdpau vnc vorbis vpx wayland +X
-	x264 x265 xml zeroconf zvbi cpu_flags_arm_neon cpu_flags_x86_mmx cpu_flags_x86_sse
+	x264 x265 xml zeroconf zvbi cpu_flags_arm_neon cpu_flags_ppc_altivec cpu_flags_x86_mmx
+	cpu_flags_x86_sse
 "
 REQUIRED_USE="
 	chromecast? ( encode )
@@ -150,7 +151,6 @@ RDEPEND="
 	ncurses? ( sys-libs/ncurses:0=[unicode] )
 	nfs? ( >=net-fs/libnfs-0.10.0:= )
 	ogg? ( media-libs/libogg )
-	opencv? ( media-libs/opencv:= )
 	opus? ( >=media-libs/opus-1.0.3 )
 	png? ( media-libs/libpng:0= )
 	postproc? ( libav? ( media-libs/libpostproc ) )
@@ -273,7 +273,6 @@ src_prepare() {
 src_configure() {
 	local myeconfargs=(
 		--disable-aa
-		--disable-dependency-tracking
 		--disable-optimizations
 		--disable-rpath
 		--disable-update-check
@@ -283,7 +282,6 @@ src_configure() {
 		--enable-vlc
 		$(use_enable a52)
 		$(use_enable alsa)
-		$(use_enable altivec)
 		$(use_enable aom)
 		$(use_enable archive)
 		$(use_enable aribsub)
@@ -295,6 +293,7 @@ src_configure() {
 		$(use_enable chromecast)
 		$(use_enable chromecast microdns)
 		$(use_enable cpu_flags_arm_neon neon)
+		$(use_enable cpu_flags_ppc_altivec altivec)
 		$(use_enable cpu_flags_x86_mmx mmx)
 		$(use_enable cpu_flags_x86_sse sse)
 		$(use_enable dav1d)
@@ -349,7 +348,6 @@ src_configure() {
 		$(use_enable ogg)
 		$(use_enable omxil)
 		$(use_enable omxil omxil-vout)
-		$(use_enable opencv)
 		$(use_enable optimisememory optimize-memory)
 		$(use_enable opus)
 		$(use_enable png)
@@ -410,6 +408,7 @@ src_configure() {
 		--disable-merge-ffmpeg
 		--disable-mfx
 		--disable-mmal
+		--disable-opencv
 		--disable-opensles
 		--disable-oss
 		--disable-rpi-omxil

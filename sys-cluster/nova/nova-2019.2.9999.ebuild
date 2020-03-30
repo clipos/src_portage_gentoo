@@ -1,12 +1,12 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
-PYTHON_COMPAT=( python2_7 python3_{5,6,7} )
 
-inherit distutils-r1 eutils linux-info multilib user
+PYTHON_COMPAT=( python3_{6,7} )
+inherit distutils-r1 eutils linux-info multilib
 
-DESCRIPTION="Cloud computing fabric controller (main part of an IaaS system) in Python"
+DESCRIPTION="Cloud computing fabric controller"
 HOMEPAGE="https://launchpad.net/nova"
 
 if [[ ${PV} == *9999 ]];then
@@ -73,7 +73,6 @@ RDEPEND="
 	>=dev-python/paramiko-2.0.0[${PYTHON_USEDEP}]
 	>=dev-python/Babel-2.3.4[${PYTHON_USEDEP}]
 	!~dev-python/Babel-2.4.0[${PYTHON_USEDEP}]
-	virtual/python-enum34[${PYTHON_USEDEP}]
 	>=dev-python/iso8601-0.1.11[${PYTHON_USEDEP}]
 	>=dev-python/jsonschema-2.6.0[${PYTHON_USEDEP}]
 	>=dev-python/python-cinderclient-3.3.0[${PYTHON_USEDEP}]
@@ -122,7 +121,6 @@ RDEPEND="
 	>=dev-python/taskflow-2.16.0[${PYTHON_USEDEP}]
 	>=dev-python/python-dateutil-2.5.3[${PYTHON_USEDEP}]
 	>=dev-python/zVMCloudConnector-1.3.0[${PYTHON_USEDEP}]
-	>=dev-python/futurist-1.8.0[$(python_gen_usedep 'python2_7')]
 	>=dev-python/openstacksdk-0.35.0[${PYTHON_USEDEP}]
 	dev-python/libvirt-python[${PYTHON_USEDEP}]
 	app-emulation/libvirt[iscsi?]
@@ -146,7 +144,9 @@ RDEPEND="
 	iscsi? (
 		sys-fs/lsscsi
 		>=sys-block/open-iscsi-2.0.873-r1
-	)"
+	)
+	acct-user/nova
+	acct-group/nova"
 
 #PATCHES=(
 #)
@@ -162,8 +162,6 @@ pkg_setup() {
 			linux_chkconfig_present ${module} || ewarn "${module} needs to be enabled in kernel"
 		done
 	fi
-	enewgroup nova
-	enewuser nova -1 -1 /var/lib/nova nova
 }
 
 python_prepare_all() {

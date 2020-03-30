@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -6,7 +6,7 @@ EAPI=7
 GENTOO_DEPEND_ON_PERL=no
 
 # bug #329479: git-remote-testgit is not multiple-version aware
-PYTHON_COMPAT=( python{2_7,3_{5,6,7}} )
+PYTHON_COMPAT=( python{2_7,3_{6,7}} )
 
 inherit toolchain-funcs elisp-common l10n perl-module bash-completion-r1 python-single-r1 systemd
 
@@ -51,7 +51,7 @@ fi
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="+blksha1 +curl cgi doc emacs gnome-keyring +gpg highlight +iconv libressl mediawiki mediawiki-experimental +nls +pcre +pcre-jit perforce +perl ppcsha1 tk +threads +webdav xinetd cvs subversion test"
+IUSE="+blksha1 +curl cgi doc emacs gnome-keyring +gpg highlight +iconv libressl mediawiki mediawiki-experimental +nls +pcre +pcre-jit perforce +perl +ppcsha1 tk +threads +webdav xinetd cvs subversion test"
 
 # Common to both DEPEND and RDEPEND
 DEPEND="
@@ -69,7 +69,7 @@ DEPEND="
 		net-misc/curl
 		webdav? ( dev-libs/expat )
 	)
-	emacs? ( virtual/emacs )
+	emacs? ( >=app-editors/emacs-23.1:* )
 	iconv? ( virtual/libiconv )
 "
 

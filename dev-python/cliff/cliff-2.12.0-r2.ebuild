@@ -1,20 +1,21 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
-PYTHON_COMPAT=( python{2_7,3_5,3_6,3_7} )
+PYTHON_COMPAT=( python{2_7,3_6,3_7} )
 VIRTUALX_REQUIRED="test"
 
 inherit distutils-r1 virtualx
 
 DESCRIPTION="Command Line Interface Formulation Framework"
-HOMEPAGE="https://github.com/dreamhost/cliff"
+HOMEPAGE="https://github.com/openstack/cliff"
 SRC_URI="mirror://pypi/${PN:0:1}/${PN}/${P}.tar.gz"
 
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64 ~hppa ~mips ~s390 ~x86 ~amd64-linux ~x86-linux"
+KEYWORDS="~amd64 ~arm64 ~hppa ~mips ~ppc64 ~s390 ~x86 ~amd64-linux ~x86-linux"
 IUSE="test"
+RESTRICT="!test? ( test )"
 
 CDEPEND=">=dev-python/pbr-2.0.0[${PYTHON_USEDEP}]
 	!~dev-python/pbr-2.1.0"
@@ -49,5 +50,5 @@ RDEPEND="
 python_test() {
 	stestr init || die "stestr init failed under ${EPYTHON}"
 	# needs outside access, so blacklist the test
-	virtx stestr run --black-regex cliff.tests.test_app.TestIO.test_writer_encoding || die "stestr run failed under ${EPYTHON}"
+	virtx stestr run --black-regex cliff.tests.test_app.TestIO.test_writer_encoding
 }

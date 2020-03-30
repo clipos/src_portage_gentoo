@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -12,7 +12,7 @@ SRC_URI="mirror://sourceforge/qsynth/${P}.tar.gz"
 LICENSE="GPL-2"
 SLOT="0"
 IUSE="+alsa debug jack pulseaudio"
-KEYWORDS="~amd64 ~ppc ~x86"
+KEYWORDS="amd64 ppc x86"
 
 BDEPEND="
 	dev-qt/linguist-tools:5
@@ -39,7 +39,7 @@ src_configure() {
 	eqmake5 ${PN}.pro -o ${PN}.mak
 }
 
-src_install () {
+src_install() {
 	emake DESTDIR="${D}" INSTALL_ROOT="${D}" install
 	einstalldocs
 

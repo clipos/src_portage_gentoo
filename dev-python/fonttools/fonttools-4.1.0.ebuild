@@ -14,7 +14,7 @@ SRC_URI="https://github.com/fonttools/fonttools/archive/${PV}.tar.gz -> ${P}.tar
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~ia64 ~ppc ~ppc64 ~sparc ~x86"
+KEYWORDS="~alpha ~amd64 ~arm arm64 ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86"
 RESTRICT="!test? ( test )"
 IUSE="test"
 
@@ -29,7 +29,23 @@ DEPEND="${RDEPEND}
 		app-arch/zopfli
 	)"
 
+python_prepare_all() {
+	# When dev-python/pytest-shutil is installed, we get weird import errors.
+	# This is due to incomplete nesting in the Tests/ tree:
+	#
+	#   Tests/feaLib/__init__.py
+	#   Tests/ufoLib/__init__.py
+	#   Tests/svgLib/path/__init__.py
+	#   Tests/otlLib/__init__.py
+	#   Tests/varLib/__init__.py
+	#
+	# This tree requires an __init__.py in Tests/svgLib/ too, bug #701148.
+	touch Tests/svgLib/__init__.py || die
+
+	distutils-r1_python_prepare_all
+}
+
 python_test() {
 	# virtualx used when matplotlib is installed causing plot module tests to run
-	virtx pytest -vv Tests fontTools || die "pytest failed"
+	virtx pytest -vv Tests fontTools
 }

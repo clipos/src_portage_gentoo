@@ -3,7 +3,7 @@
 
 EAPI=7
 
-inherit cmake-utils xdg-utils
+inherit cmake xdg-utils
 
 DESCRIPTION="LXQt system configuration control center"
 HOMEPAGE="https://lxqt.org/"
@@ -19,6 +19,8 @@ fi
 LICENSE="GPL-2 GPL-2+ GPL-3 LGPL-2 LGPL-2+ LGPL-2.1+ WTFPL-2"
 SLOT="0"
 IUSE="+monitor +touchpad"
+
+PATCHES=( "${FILESDIR}/${P}-qt-5.14-build.patch" )
 
 BDEPEND="
 	dev-qt/linguist-tools:5
@@ -57,11 +59,11 @@ src_configure() {
 		-DWITH_MONITOR="$(usex monitor)"
 		-DWITH_TOUCHPAD="$(usex touchpad)"
 	)
-	cmake-utils_src_configure
+	cmake_src_configure
 }
 
 src_install() {
-	cmake-utils_src_install
+	cmake_src_install
 	doman man/*.1 liblxqt-config-cursor/man/*.1 lxqt-config-appearance/man/*.1
 }
 

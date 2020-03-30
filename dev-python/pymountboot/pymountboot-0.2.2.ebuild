@@ -1,8 +1,10 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
-PYTHON_COMPAT=( python{2_7,3_5,3_6,3_7} pypy )
+
+DISTUTILS_USE_SETUPTOOLS=no
+PYTHON_COMPAT=( python{3_6,3_7,3_8} )
 
 inherit distutils-r1
 
@@ -17,8 +19,3 @@ IUSE=""
 
 RDEPEND=">=sys-apps/util-linux-2.20"
 DEPEND="${RDEPEND}"
-
-python_compile() {
-	python_is_python3 || local -x CFLAGS="${CFLAGS} -fno-strict-aliasing"
-	distutils-r1_python_compile
-}

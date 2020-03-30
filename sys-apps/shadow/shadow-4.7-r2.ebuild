@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -16,7 +16,11 @@ IUSE="acl audit +cracklib nls pam selinux skey split-usr +su xattr"
 # Taken from the man/Makefile.am file.
 LANGS=( cs da de es fi fr hu id it ja ko pl pt_BR ru sv tr zh_CN zh_TW )
 
-DEPEND="
+BDEPEND="
+	app-arch/xz-utils
+	sys-devel/gettext
+"
+COMMON_DEPEND="
 	acl? ( sys-apps/acl:0= )
 	audit? ( >=sys-process/audit-2.6:0= )
 	cracklib? ( >=sys-libs/cracklib-2.7-r3:0= )
@@ -27,16 +31,14 @@ DEPEND="
 		>=sys-libs/libselinux-1.28:0=
 		sys-libs/libsemanage:0=
 	)
-	su? ( !sys-apps/util-linux[su] )
 	xattr? ( sys-apps/attr:0= )
 "
-BDEPEND="
-	app-arch/xz-utils
-	sys-devel/gettext
+DEPEND="${COMMON_DEPEND}
+	>=sys-kernel/linux-headers-4.14
 "
-RDEPEND="
-	${DEPEND}
+RDEPEND="${COMMON_DEPEND}
 	pam? ( >=sys-auth/pambase-20150213 )
+	su? ( !sys-apps/util-linux[su(-)] )
 "
 
 PATCHES=(

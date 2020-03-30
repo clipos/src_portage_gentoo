@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # @ECLASS: kde.org.eclass
@@ -40,6 +40,12 @@ EXPORT_FUNCTIONS pkg_nofetch src_unpack
 # Name of the package as hosted on kde.org mirrors.
 : ${KDE_ORG_NAME:=$PN}
 
+# @ECLASS-VARIABLE: KDE_RELEASE_SERVICE
+# @DESCRIPTION:
+# If set to "false", do nothing.
+# If set to "true", set SRC_URI accordingly and apply KDE_UNRELEASED.
+: ${KDE_RELEASE_SERVICE:=false}
+
 # @ECLASS-VARIABLE: KDE_SELINUX_MODULE
 # @DESCRIPTION:
 # If set to "none", do nothing.
@@ -66,6 +72,9 @@ KDE_UNRELEASED=( )
 HOMEPAGE="https://kde.org/"
 
 case ${CATEGORY} in
+	kde-apps)
+		KDE_RELEASE_SERVICE=true
+		;;
 	kde-plasma)
 		HOMEPAGE="https://kde.org/plasma-desktop"
 		;;
@@ -77,11 +86,15 @@ case ${CATEGORY} in
 	*) ;;
 esac
 
-_kde_is_unreleased() {
+_kde.org_is_unreleased() {
 	local pair
 	for pair in "${KDE_UNRELEASED[@]}" ; do
 		if [[ "${pair}" = "${CATEGORY}-${PV}" ]]; then
 			return 0
+		elif [[ ${KDE_RELEASE_SERVICE} = true ]]; then
+			if [[ "${pair/kde-apps/${CATEGORY}}" = "${CATEGORY}-${PV}" ]]; then
+				return 0
+			fi
 		fi
 	done
 
@@ -89,25 +102,27 @@ _kde_is_unreleased() {
 }
 
 # Determine fetch location for released tarballs
-_calculate_src_uri() {
+_kde.org_calculate_src_uri() {
 	debug-print-function ${FUNCNAME} "$@"
 
 	local _src_uri="mirror://kde/"
 
+	if [[ ${KDE_RELEASE_SERVICE} = true ]]; then
+		case ${PV} in
+			??.??.[6-9]? )
+				_src_uri+="unstable/release-service/${PV}/src/"
+				RESTRICT+=" mirror"
+				;;
+			*) _src_uri+="stable/release-service/${PV}/src/" ;;
+		esac
+	fi
+
 	case ${CATEGORY} in
-		kde-apps)
-			case ${PV} in
-				??.??.[6-9]? )
-					_src_uri+="unstable/applications/${PV}/src/"
-					RESTRICT+=" mirror"
-					;;
-				*) _src_uri+="stable/applications/${PV}/src/" ;;
-			esac
-			;;
 		kde-frameworks)
 			_src_uri+="stable/frameworks/$(ver_cut 1-2)/"
 			case ${PN} in
 				kdelibs4support | \
+				kdesignerplugin | \
 				kdewebkit | \
 				khtml | \
 				kjs | \
@@ -116,14 +131,11 @@ _calculate_src_uri() {
 				kross)
 					_src_uri+="portingAids/"
 					;;
-				kdesignerplugin)
-					[[ ${PV} = 5.60.* ]] || _src_uri+="portingAids/"
-					;;
 			esac
 			;;
 		kde-plasma)
 			case ${PV} in
-				5.??.[6-9]? )
+				5.??.[6-9]?* )
 					_src_uri+="unstable/plasma/$(ver_cut 1-3)/"
 					RESTRICT+=" mirror"
 					;;
@@ -144,13 +156,13 @@ _calculate_src_uri() {
 
 	SRC_URI="${_src_uri}${KDE_ORG_NAME}-${PV}.tar.xz"
 
-	if _kde_is_unreleased ; then
+	if _kde.org_is_unreleased ; then
 		RESTRICT+=" fetch"
 	fi
 }
 
 # Determine fetch location for live sources
-_calculate_live_repo() {
+_kde.org_calculate_live_repo() {
 	debug-print-function ${FUNCNAME} "$@"
 
 	SRC_URI=""
@@ -161,7 +173,7 @@ _calculate_live_repo() {
 	# (anongit) with anything else you might want to use.
 	EGIT_MIRROR=${EGIT_MIRROR:=https://anongit.kde.org}
 
-	if [[ ${PV} == ??.??.49.9999 && ${CATEGORY} = kde-apps ]]; then
+	if [[ ${PV} == ??.??.49.9999 && ${KDE_RELEASE_SERVICE} = true ]]; then
 		EGIT_BRANCH="release/$(ver_cut 1-2)"
 	fi
 
@@ -181,9 +193,9 @@ _calculate_live_repo() {
 }
 
 case ${KDE_BUILD_TYPE} in
-	live) _calculate_live_repo ;;
+	live) _kde.org_calculate_live_repo ;;
 	*)
-		_calculate_src_uri
+		_kde.org_calculate_src_uri
 		debug-print "${LINENO} ${ECLASS} ${FUNCNAME}: SRC_URI is ${SRC_URI}"
 		;;
 esac
@@ -199,7 +211,7 @@ fi
 # KDE_UNRELEASED, display a giant warning that the package has not yet been
 # released upstream and should not be used.
 kde.org_pkg_nofetch() {
-	if ! _kde_is_unreleased ; then
+	if ! _kde.org_is_unreleased ; then
 		return
 	fi
 

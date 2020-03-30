@@ -1,11 +1,11 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="7"
 
-PYTHON_COMPAT=( python{2_7,3_5,3_6} )
+PYTHON_COMPAT=( python3_6 )
 
-inherit eutils systemd udev python-any-r1
+inherit eutils systemd toolchain-funcs udev python-any-r1
 
 MY_PN="qemu"
 MY_P="${MY_PN}-${PV}"

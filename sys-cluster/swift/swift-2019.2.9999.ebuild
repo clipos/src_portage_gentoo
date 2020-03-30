@@ -1,10 +1,10 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
-PYTHON_COMPAT=( python2_7 python3_6 python3_7 )
+EAPI=7
+PYTHON_COMPAT=( python3_6 python3_7 )
 
-inherit distutils-r1 eutils linux-info user
+inherit distutils-r1 eutils linux-info
 
 DESCRIPTION="A highly available, distributed, and eventually consistent object/blob store"
 HOMEPAGE="https://launchpad.net/swift"
@@ -19,7 +19,7 @@ fi
 
 LICENSE="Apache-2.0"
 SLOT="0"
-IUSE="account container doc +memcached object proxy"
+IUSE="account container doc +memcached +object proxy"
 REQUIRED_USE="|| ( proxy account container object )"
 
 CDEPEND=">=dev-python/pbr-1.8.0[${PYTHON_USEDEP}]"
@@ -29,7 +29,6 @@ DEPEND="
 
 RDEPEND="
 	${CDEPEND}
-	>=dev-python/dnspython-1.15.0:0[$(python_gen_usedep 'python2_7')]
 	>=dev-python/eventlet-0.25.0[${PYTHON_USEDEP}]
 	>=dev-python/greenlet-0.3.2[${PYTHON_USEDEP}]
 	>=dev-python/netifaces-0.8[${PYTHON_USEDEP}]
@@ -40,9 +39,10 @@ RDEPEND="
 	dev-python/pyxattr[${PYTHON_USEDEP}]
 	>=dev-python/PyECLib-1.3.1[${PYTHON_USEDEP}]
 	>=dev-python/cryptography-2.0.2[${PYTHON_USEDEP}]
-	>=dev-python/ipaddress-1.0.16[${PYTHON_USEDEP}]
 	memcached? ( net-misc/memcached )
-	net-misc/rsync[xattr]"
+	net-misc/rsync[xattr]
+	acct-user/swift
+	acct-group/swift"
 
 pkg_pretend() {
 	linux-info_pkg_setup
@@ -56,18 +56,13 @@ pkg_pretend() {
 	fi
 }
 
-pkg_setup() {
-	enewuser swift
-	enewgroup swift
-}
-
 src_prepare() {
 	sed -i 's/xattr/pyxattr/g' requirements.txt || die
 	sed -i '/^hacking/d' test-requirements.txt || die
 	distutils-r1_python_prepare_all
 }
 
-src_test () {
+src_test() {
 	# https://bugs.launchpad.net/swift/+bug/1249727
 	find . \( -name test_wsgi.py -o -name test_locale.py -o -name test_utils.py \) -delete || die
 	SKIP_PIP_INSTALL=1 PBR_VERSION=0.6.0 sh .unittests || die
@@ -89,8 +84,7 @@ python_install_all() {
 		newinitd "${FILESDIR}/swift-proxy.initd" "swift-proxy"
 		newins "etc/proxy-server.conf-sample" "proxy-server.conf"
 		if use memcached; then
-			sed -i '/depend/a\
-    need memcached' "${D}/etc/init.d/swift-proxy"
+			sed -i '/depend/a\    need memcached' "${D}/etc/init.d/swift-proxy"
 		fi
 	fi
 	if use account; then
@@ -112,7 +106,7 @@ python_install_all() {
 		dodoc -r doc/{s3api,saio,source}
 	fi
 
-	fowners root:swift "/etc/swift" || die "fowners failed"
+	fowners root:swift "/etc/swift"
 	fperms 0750 /etc/swift
 }
 

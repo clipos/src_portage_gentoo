@@ -3,6 +3,7 @@
 
 EAPI=7
 
+CMAKE_ECLASS=cmake
 inherit cmake-multilib
 
 DESCRIPTION="Access a working SSH implementation by means of a library"
@@ -21,7 +22,7 @@ SLOT="0/4" # subslot = soname major version
 IUSE="debug doc examples gcrypt gssapi libressl mbedtls pcap server +sftp static-libs test zlib"
 # Maintainer: check IUSE-defaults at DefineOptions.cmake
 
-REQUIRED_USE="?? ( gcrypt mbedtls ) test? ( static-libs )"
+REQUIRED_USE="?? ( gcrypt mbedtls )"
 
 BDEPEND="
 	doc? ( app-doc/doxygen[dot] )
@@ -49,7 +50,7 @@ PATCHES=( "${FILESDIR}/${PN}-0.8.0-tests.patch" )
 RESTRICT+=" !test? ( test )"
 
 src_prepare() {
-	cmake-utils_src_prepare
+	cmake_src_prepare
 
 	# just install the examples, do not compile them
 	cmake_comment_add_subdirectory examples
@@ -81,24 +82,26 @@ multilib_src_configure() {
 		-DWITH_PCAP="$(usex pcap)"
 		-DWITH_SERVER="$(usex server)"
 		-DWITH_SFTP="$(usex sftp)"
-		-DBUILD_SHARED_LIBS="$(usex !static-libs)"
+		-DBUILD_STATIC_LIB="$(usex static-libs)"
 		-DUNIT_TESTING="$(usex test)"
 		-DWITH_ZLIB="$(usex zlib)"
 	)
 
 	multilib_is_native_abi || mycmakeargs+=( -DCMAKE_DISABLE_FIND_PACKAGE_Doxygen=ON )
 
-	cmake-utils_src_configure
+	cmake_src_configure
 }
 
 multilib_src_compile() {
-	cmake-utils_src_compile
-	multilib_is_native_abi && use doc && cmake-utils_src_compile docs
+	cmake_src_compile
+	multilib_is_native_abi && use doc && cmake_src_compile docs
 }
 
 multilib_src_install() {
-	cmake-utils_src_install
+	cmake_src_install
 	multilib_is_native_abi && use doc && HTML_DOCS=( "${BUILD_DIR}"/doc/html/. )
+
+	use static-libs && dolib.a src/libssh.a
 
 	# compatibility symlink until all consumers have been updated
 	# to no longer use libssh_threads.so

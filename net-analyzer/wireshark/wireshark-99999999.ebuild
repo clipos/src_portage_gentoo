@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
-PYTHON_COMPAT=( python3_{5,6,7} )
-inherit fcaps flag-o-matic git-r3 multilib python-any-r1 qmake-utils user xdg-utils cmake-utils
+PYTHON_COMPAT=( python3_{6,7} )
+inherit fcaps flag-o-matic git-r3 multilib python-any-r1 qmake-utils user xdg-utils cmake
 
 DESCRIPTION="A network protocol analyzer formerly known as ethereal"
 HOMEPAGE="https://www.wireshark.org/"
@@ -13,18 +13,18 @@ LICENSE="GPL-2"
 SLOT="0/${PV}"
 KEYWORDS=""
 IUSE="
-	adns androiddump bcg729 brotli +capinfos +captype ciscodump +dftest doc
-	dpauxmon +dumpcap +editcap http2 kerberos libxml2 lua lz4 maxminddb
-	+mergecap +minizip +netlink +plugins plugin-ifdemo +pcap +qt5 +randpkt
-	+randpktdump +reordercap sbc selinux +sharkd smi snappy spandsp sshdump ssl
-	sdjournal +text2pcap tfshark +tshark +udpdump zlib
+	androiddump bcg729 brotli +capinfos +captype ciscodump +dftest doc dpauxmon
+	+dumpcap +editcap http2 kerberos libxml2 lua lz4 maxminddb +mergecap
+	+minizip +netlink +plugins plugin-ifdemo +pcap +qt5 +randpkt +randpktdump
+	+reordercap sbc selinux +sharkd smi snappy spandsp sshdump ssl sdjournal
+	+text2pcap tfshark +tshark +udpdump zlib
 "
 S=${WORKDIR}/${P/_/}
 
 CDEPEND="
 	>=dev-libs/glib-2.32:2
+	>=net-dns/c-ares-1.5
 	dev-libs/libgcrypt:0
-	adns? ( >=net-dns/c-ares-1.5 )
 	bcg729? ( media-libs/bcg729 )
 	brotli? ( app-arch/brotli )
 	ciscodump? ( >=net-libs/libssh-0.6 )
@@ -62,8 +62,6 @@ DEPEND="
 	${PYTHON_DEPS}
 "
 BDEPEND="
-	!<perl-core/Pod-Simple-3.170
-	!<virtual/perl-Pod-Simple-3.170
 	dev-lang/perl
 	sys-devel/bison
 	sys-devel/flex
@@ -85,11 +83,7 @@ REQUIRED_USE="
 	plugin-ifdemo? ( plugins )
 "
 PATCHES=(
-	"${FILESDIR}"/${PN}-2.4-androiddump.patch
 	"${FILESDIR}"/${PN}-2.6.0-redhat.patch
-	"${FILESDIR}"/${PN}-2.9.0-tfshark-libm.patch
-	"${FILESDIR}"/${PN}-99999999-androiddump-wsutil.patch
-	"${FILESDIR}"/${PN}-99999999-qtsvg.patch
 	"${FILESDIR}"/${PN}-99999999-ui-needs-wiretap.patch
 )
 
@@ -152,7 +146,6 @@ src_configure() {
 		-DENABLE_BCG729=$(usex bcg729)
 		-DENABLE_BROTLI=$(usex brotli)
 		-DENABLE_CAP=$(usex filecaps caps)
-		-DENABLE_CARES=$(usex adns)
 		-DENABLE_GNUTLS=$(usex ssl)
 		-DENABLE_KERBEROS=$(usex kerberos)
 		-DENABLE_LIBXML2=$(usex libxml2)
@@ -171,15 +164,15 @@ src_configure() {
 		-DENABLE_ZLIB=$(usex zlib)
 	)
 
-	cmake-utils_src_configure
+	cmake_src_configure
 }
 
 src_test() {
-	cmake-utils_src_test
+	cmake_src_test
 }
 
 src_install() {
-	cmake-utils_src_install
+	cmake_src_install
 
 	# FAQ is not required as is installed from help/faq.txt
 	dodoc AUTHORS ChangeLog NEWS README* doc/randpkt.txt doc/README*

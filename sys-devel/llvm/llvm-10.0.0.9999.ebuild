@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-PYTHON_COMPAT=( python{2_7,3_{5,6,7}} )
+PYTHON_COMPAT=( python3_{6,7,8} )
 inherit cmake-utils llvm.org multilib-minimal multiprocessing \
 	pax-utils python-any-r1 toolchain-funcs
 
@@ -13,7 +13,7 @@ LLVM_COMPONENTS=( llvm )
 llvm.org_set_globals
 
 # Those are in lib/Targets, without explicit CMakeLists.txt mention
-ALL_LLVM_EXPERIMENTAL_TARGETS=( ARC AVR )
+ALL_LLVM_EXPERIMENTAL_TARGETS=( ARC AVR VE )
 # Keep in sync with CMakeLists.txt
 ALL_LLVM_TARGETS=( AArch64 AMDGPU ARM BPF Hexagon Lanai Mips MSP430
 	NVPTX PowerPC RISCV Sparc SystemZ WebAssembly X86 XCore
@@ -44,20 +44,16 @@ RDEPEND="
 		)
 	)
 	libedit? ( dev-libs/libedit:0=[${MULTILIB_USEDEP}] )
-	libffi? ( >=virtual/libffi-3.0.13-r1:0=[${MULTILIB_USEDEP}] )
+	libffi? ( >=dev-libs/libffi-3.0.13-r1:0=[${MULTILIB_USEDEP}] )
 	ncurses? ( >=sys-libs/ncurses-5.9-r3:0=[${MULTILIB_USEDEP}] )
 	xar? ( app-arch/xar )
 	xml? ( dev-libs/libxml2:2=[${MULTILIB_USEDEP}] )
 	z3? ( >=sci-mathematics/z3-4.7.1:0=[${MULTILIB_USEDEP}] )"
-# configparser-3.2 breaks the build (3.3 or none at all are fine)
 DEPEND="${RDEPEND}
 	gold? ( sys-libs/binutils-libs )"
 BDEPEND="
 	dev-lang/perl
 	sys-devel/gnuconfig
-	|| ( >=sys-devel/gcc-3.0 >=sys-devel/llvm-3.5
-		( >=sys-freebsd/freebsd-lib-9.1-r10 sys-libs/libcxx )
-	)
 	kernel_Darwin? (
 		<sys-libs/libcxx-$(ver_cut 1-3).9999
 		>=sys-devel/binutils-apple-5.1
@@ -67,7 +63,6 @@ BDEPEND="
 		dev-python/sphinx[${PYTHON_USEDEP}]
 	') )
 	libffi? ( virtual/pkgconfig )
-	!!<dev-python/configparser-3.3.0.2
 	${PYTHON_DEPS}"
 # There are no file collisions between these versions but having :0
 # installed means llvm-config there will take precedence.
@@ -264,6 +259,7 @@ get_distribution_components() {
 			llvm-exegesis
 			llvm-extract
 			llvm-ifs
+			llvm-install-name-tool
 			llvm-jitlink
 			llvm-lib
 			llvm-link
@@ -355,8 +351,6 @@ multilib_src_configure() {
 		-DLLVM_ENABLE_EH=ON
 		-DLLVM_ENABLE_RTTI=ON
 		-DLLVM_ENABLE_Z3_SOLVER=$(usex z3)
-
-		-DWITH_POLLY=OFF # TODO
 
 		-DLLVM_HOST_TRIPLE="${CHOST}"
 
@@ -483,7 +477,7 @@ multilib_src_install() {
 
 multilib_src_install_all() {
 	local revord=$(( 9999 - ${SLOT} ))
-	newenvd - "10llvm-${revord}" <<-_EOF_
+	newenvd - "60llvm-${revord}" <<-_EOF_
 		PATH="${EPREFIX}/usr/lib/llvm/${SLOT}/bin"
 		# we need to duplicate it in ROOTPATH for Portage to respect...
 		ROOTPATH="${EPREFIX}/usr/lib/llvm/${SLOT}/bin"

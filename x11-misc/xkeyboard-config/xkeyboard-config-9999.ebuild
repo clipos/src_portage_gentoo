@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -25,13 +25,8 @@ BDEPEND="
 	sys-devel/gettext
 	virtual/pkgconfig
 "
-RDEPEND="
-	!<x11-apps/xkbcomp-1.2.3
-	!<x11-libs/libX11-1.4.3
-"
-DEPEND="
-	${LIVE_DEPEND}
-"
+RDEPEND=""
+DEPEND="${LIVE_DEPEND}"
 
 src_prepare() {
 	default
@@ -48,4 +43,8 @@ src_configure() {
 	)
 
 	econf "${econfargs[@]}"
+}
+
+src_test() {
+	:;
 }

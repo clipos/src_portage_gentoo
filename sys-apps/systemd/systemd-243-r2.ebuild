@@ -1,4 +1,4 @@
-# Copyright 2011-2019 Gentoo Authors
+# Copyright 2011-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -11,10 +11,10 @@ else
 	MY_P=${PN}-${MY_PV}
 	S=${WORKDIR}/${MY_P}
 	SRC_URI="https://github.com/systemd/systemd/archive/v${MY_PV}/${MY_P}.tar.gz"
-	KEYWORDS="alpha amd64 arm arm64 ~hppa ~ia64 ~mips ppc ppc64 sparc x86"
+	KEYWORDS="~alpha amd64 arm arm64 ~hppa ia64 ~mips ppc ppc64 sparc x86"
 fi
 
-PYTHON_COMPAT=( python{3_5,3_6,3_7} )
+PYTHON_COMPAT=( python{3_6,3_7} )
 
 inherit bash-completion-r1 linux-info meson multilib-minimal ninja-utils pam python-any-r1 systemd toolchain-funcs udev usr-ldscript
 
@@ -32,7 +32,6 @@ MINKV="3.11"
 
 COMMON_DEPEND=">=sys-apps/util-linux-2.30:0=[${MULTILIB_USEDEP}]
 	sys-libs/libcap:0=[${MULTILIB_USEDEP}]
-	!<sys-libs/glibc-2.16
 	acl? ( sys-apps/acl:0= )
 	apparmor? ( sys-libs/libapparmor:0= )
 	audit? ( >=sys-process/audit-2:0= )
@@ -100,7 +99,6 @@ RDEPEND="${COMMON_DEPEND}
 		sys-apps/coreutils[kill(-)]
 	) )
 	!sys-auth/nss-myhostname
-	!<sys-kernel/dracut-044
 	!sys-fs/eudev
 	!sys-fs/udev
 "
@@ -127,6 +125,10 @@ BDEPEND="
 	dev-libs/libxslt:0
 	$(python_gen_any_dep 'dev-python/lxml[${PYTHON_USEDEP}]')
 "
+
+python_check_deps() {
+	has_version -b "dev-python/lxml[${PYTHON_USEDEP}]"
+}
 
 pkg_pretend() {
 	if [[ ${MERGE_TYPE} != buildonly ]]; then
@@ -186,6 +188,7 @@ src_prepare() {
 	# Add local patches here
 	PATCHES+=(
 		"${FILESDIR}/243-seccomp.patch"
+		"${FILESDIR}/245-clang-gnu11.patch"
 	)
 
 	if ! use vanilla; then
@@ -237,6 +240,7 @@ multilib_src_configure() {
 		-Dbashcompletiondir="$(get_bashcompdir)"
 		# make sure we get /bin:/sbin in PATH
 		-Dsplit-usr=$(usex split-usr true false)
+		-Dsplit-bin=true
 		-Drootprefix="$(usex split-usr "${EPREFIX:-/}" "${EPREFIX}/usr")"
 		-Drootlibdir="${EPREFIX}/usr/$(get_libdir)"
 		-Dsysvinit-path=

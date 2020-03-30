@@ -41,6 +41,7 @@ RDEPEND=">=dev-haskell/cabal-helper-0.7.3.0:=[profile?] <dev-haskell/cabal-helpe
 	>=dev-haskell/text-1.2.1.3:=[profile?] <dev-haskell/text-1.3:=[profile?]
 	>=dev-haskell/transformers-base-0.4.4:=[profile?] <dev-haskell/transformers-base-0.5:=[profile?]
 	>=dev-lang/ghc-7.8.2:=
+	emacs? ( >=app-editors/emacs-23.1:* )
 "
 DEPEND="${RDEPEND}
 	>=dev-haskell/cabal-1.18.1.3 <dev-haskell/cabal-1.25
@@ -55,7 +56,7 @@ src_compile() {
 	haskell-cabal_src_compile
 	if use emacs ; then
 		pushd elisp
-		elisp-compile *.el || die
+		elisp-compile *.el
 		popd
 	fi
 }

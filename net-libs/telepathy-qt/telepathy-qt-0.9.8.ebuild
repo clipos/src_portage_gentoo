@@ -1,10 +1,10 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{5,6,7} )
-inherit python-any-r1 cmake-utils virtualx
+PYTHON_COMPAT=( python3_{6,7} )
+inherit python-any-r1 cmake virtualx
 
 DESCRIPTION="Qt bindings for the Telepathy D-Bus protocol"
 HOMEPAGE="https://telepathy.freedesktop.org/"
@@ -12,8 +12,10 @@ SRC_URI="https://telepathy.freedesktop.org/releases/${PN}/${P}.tar.gz"
 
 LICENSE="LGPL-2.1"
 SLOT="0"
-KEYWORDS="~amd64 ~arm ~arm64 ~x86"
+KEYWORDS="amd64 ~arm arm64 x86"
 IUSE="debug farstream test"
+
+REQUIRED_USE="test? ( farstream )"
 
 RDEPEND="
 	dev-qt/qtcore:5
@@ -44,11 +46,12 @@ BDEPEND="${PYTHON_DEPS}
 RESTRICT="!test? ( test )"
 
 python_check_deps() {
+	use test || return 0
 	has_version "dev-python/dbus-python[${PYTHON_USEDEP}]"
 }
 
 pkg_setup() {
-	use test && python-any-r1_pkg_setup
+	python-any-r1_pkg_setup
 }
 
 src_configure() {
@@ -58,7 +61,7 @@ src_configure() {
 		-DENABLE_TESTS=$(usex test)
 		-DENABLE_EXAMPLES=OFF
 	)
-	cmake-utils_src_configure
+	cmake_src_configure
 }
 
 src_test() {
@@ -67,6 +70,6 @@ src_test() {
 		-E "(BaseConnectionManager|BaseProtocol)"
 	)
 	pushd "${BUILD_DIR}" > /dev/null || die
-	virtx cmake-utils_src_test
+	virtx cmake_src_test
 	popd > /dev/null || die
 }

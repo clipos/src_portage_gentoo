@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -7,15 +7,14 @@ PYTHON_REQ_USE="libressl?,sqlite,ssl"
 LIBDVDCSS_VERSION="1.4.2-Leia-Beta-5"
 LIBDVDREAD_VERSION="6.0.0-Leia-Alpha-3"
 LIBDVDNAV_VERSION="6.0.0-Leia-Alpha-3"
-FFMPEG_VERSION="4.0.4"
-CODENAME="Leia"
-FFMPEG_KODI_VERSION="18.4"
-PYTHON_COMPAT=( python3_{5,6,7} )
+FFMPEG_VERSION="4.2.2"
+CODENAME="Matrix"
+FFMPEG_KODI_VERSION="Alpha1"
+PYTHON_COMPAT=( python3_{6,7,8} )
 SRC_URI="https://github.com/xbmc/libdvdcss/archive/${LIBDVDCSS_VERSION}.tar.gz -> libdvdcss-${LIBDVDCSS_VERSION}.tar.gz
 	https://github.com/xbmc/libdvdread/archive/${LIBDVDREAD_VERSION}.tar.gz -> libdvdread-${LIBDVDREAD_VERSION}.tar.gz
 	https://github.com/xbmc/libdvdnav/archive/${LIBDVDNAV_VERSION}.tar.gz -> libdvdnav-${LIBDVDNAV_VERSION}.tar.gz
 	!system-ffmpeg? ( https://github.com/xbmc/FFmpeg/archive/${FFMPEG_VERSION}-${CODENAME}-${FFMPEG_KODI_VERSION}.tar.gz -> ffmpeg-${PN}-${FFMPEG_VERSION}-${CODENAME}-${FFMPEG_KODI_VERSION}.tar.gz )"
-
 if [[ ${PV} == *9999 ]] ; then
 	EGIT_REPO_URI="https://github.com/xbmc/xbmc.git"
 	inherit git-r3
@@ -30,7 +29,7 @@ else
 	S=${WORKDIR}/xbmc-${MY_PV}-${CODENAME}
 fi
 
-inherit autotools cmake-utils desktop linux-info pax-utils python-single-r1 xdg
+inherit autotools cmake desktop linux-info pax-utils python-single-r1 xdg
 
 DESCRIPTION="A free and open source media-player and entertainment hub"
 HOMEPAGE="https://kodi.tv/ https://kodi.wiki/"
@@ -72,10 +71,12 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	>=dev-libs/libxml2-2.9.4
 	>=dev-libs/lzo-2.04
 	dev-libs/tinyxml[stl]
-	dev-python/pillow[${PYTHON_USEDEP}]
-	dev-python/pycryptodome[${PYTHON_USEDEP}]
-	>=dev-libs/libcdio-0.94
-	>=dev-libs/libfmt-3.0.1
+	$(python_gen_cond_dep '
+		dev-python/pillow[${PYTHON_MULTI_USEDEP}]
+		dev-python/pycryptodome[${PYTHON_MULTI_USEDEP}]
+	')
+	>=dev-libs/libcdio-2.1.0
+	>=dev-libs/libfmt-6.1.2
 	dev-libs/libfstrcmp
 	gbm? (	media-libs/mesa[gbm] )
 	gles? (
@@ -85,25 +86,26 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	libusb? ( virtual/libusb:1 )
 	virtual/ttf-fonts
 	media-fonts/roboto
+	media-libs/dav1d
 	>=media-libs/fontconfig-2.13.1
 	>=media-libs/freetype-2.10.1
 	>=media-libs/libass-0.13.4
 	!raspberry-pi? ( media-libs/mesa[egl,X(+)] )
 	>=media-libs/taglib-1.11.1
 	system-ffmpeg? (
-		>=media-video/ffmpeg-${FFMPEG_VERSION}:=[encode,postproc]
+		>=media-video/ffmpeg-${FFMPEG_VERSION}:=[dav1d,encode,postproc]
 		libressl? ( media-video/ffmpeg[libressl,-openssl] )
 		!libressl? ( media-video/ffmpeg[-libressl,openssl] )
 	)
 	mysql? ( dev-db/mysql-connector-c:= )
 	mariadb? ( dev-db/mariadb-connector-c:= )
-	>=net-misc/curl-7.56.1[http2]
+	>=net-misc/curl-7.68.0[http2]
 	nfs? ( >=net-fs/libnfs-2.0.0:= )
 	opengl? ( media-libs/glu )
 	!libressl? ( >=dev-libs/openssl-1.0.2l:0= )
 	libressl? ( dev-libs/libressl:0= )
 	raspberry-pi? (
-		|| ( media-libs/raspberrypi-userland media-libs/raspberrypi-userland-bin media-libs/mesa[egl,gles2,vc4] )
+		|| ( media-libs/raspberrypi-userland media-libs/raspberrypi-userland-bin media-libs/mesa[egl,gles2,video_cards_vc4] )
 	)
 	pulseaudio? ( media-sound/pulseaudio )
 	samba? ( >=net-fs/samba-3.4.6[smbclient(+)] )
@@ -141,7 +143,6 @@ COMMON_DEPEND="${PYTHON_DEPS}
 "
 RDEPEND="${COMMON_DEPEND}
 	lirc? ( app-misc/lirc )
-	!media-tv/xbmc
 	udisks? ( sys-fs/udisks:2 )
 	upower? ( sys-power/upower )
 "
@@ -154,7 +155,7 @@ DEPEND="${COMMON_DEPEND}
 	dev-util/cmake
 	dev-util/gperf
 	media-libs/giflib
-	>=media-libs/libjpeg-turbo-1.5.1:=
+	>=media-libs/libjpeg-turbo-2.0.4:=
 	>=media-libs/libpng-1.6.26:0=
 	test? ( dev-cpp/gtest )
 	virtual/pkgconfig
@@ -182,7 +183,7 @@ src_unpack() {
 }
 
 src_prepare() {
-	cmake-utils_src_prepare
+	cmake_src_prepare
 
 	# avoid long delays when powerkit isn't running #348580
 	sed -i \
@@ -230,7 +231,6 @@ src_configure() {
 		-DENABLE_LCMS2=$(usex lcms)
 		-DENABLE_LIRCCLIENT=$(usex lirc)
 		-DENABLE_MARIADBCLIENT=$(usex mariadb)
-		-DENABLE_MYSQLCLIENT=$(usex mysql)
 		-DENABLE_MICROHTTPD=$(usex webserver)
 		-DENABLE_MYSQLCLIENT=$(usex mysql)
 		-DENABLE_NFS=$(usex nfs)
@@ -283,19 +283,19 @@ src_configure() {
 		)
 	fi
 
-	cmake-utils_src_configure
+	cmake_src_configure
 }
 
 src_compile() {
-	cmake-utils_src_compile all
+	cmake_src_compile all
 }
 
 src_test() {
-	cmake-utils_src_make check
+	cmake_build check
 }
 
 src_install() {
-	cmake-utils_src_install
+	cmake_src_install
 
 	pax-mark Em "${ED}"/usr/$(get_libdir)/${PN}/${PN}.bin
 

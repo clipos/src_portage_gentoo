@@ -1,10 +1,10 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 WANT_AUTOCONF="2.1"
 
-PYTHON_COMPAT=( python3_{5,6,7} )
+PYTHON_COMPAT=( python3_{6,7} )
 PYTHON_REQ_USE='ncurses,sqlite,ssl,threads(+)'
 
 # This list can be updated with scripts/get_langs.sh from the mozilla overlay
@@ -53,6 +53,7 @@ KEYWORDS="amd64 ~ppc64 x86"
 SLOT="0"
 LICENSE="MPL-2.0 GPL-2 LGPL-2.1"
 IUSE="+calendar +chatzilla +crypt +gmp-autoupdate +ipc jack minimal pulseaudio +roaming selinux test"
+RESTRICT="!test? ( test )"
 
 SRC_URI+="
 	https://dev.gentoo.org/~axs/mozilla/patchsets/${PATCH}.tar.xz
@@ -250,7 +251,7 @@ src_configure() {
 	fi
 
 	# workaround for funky/broken upstream configure...
-	SHELL="${SHELL:-${EPREFIX%/}/bin/bash}" \
+	SHELL="${SHELL:-${EPREFIX}/bin/bash}" \
 	emake V=1 -f client.mk configure
 }
 
@@ -294,7 +295,7 @@ src_install() {
 		done
 	fi
 
-	MOZ_MAKE_FLAGS="${MAKEOPTS}" SHELL="${SHELL:-${EPREFIX%/}/bin/bash}" \
+	MOZ_MAKE_FLAGS="${MAKEOPTS}" SHELL="${SHELL:-${EPREFIX}/bin/bash}" \
 	emake DESTDIR="${D}" install
 	MOZ_P="${P/_*}" mozlinguas_src_install
 	cp "${FILESDIR}"/${PN}.desktop "${T}" || die

@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -20,7 +20,7 @@ KEYWORDS="~amd64 ~arm"
 IUSE="igbinary +json +session"
 
 DEPEND="
-	igbinary? ( dev-php/igbinary[php_targets_php7-1?,php_targets_php7-2?,php_targets_php7-3?,php_targets_php7-4?] )
+	igbinary? ( >=dev-php/igbinary-3.0.1-r1[php_targets_php7-1?,php_targets_php7-2?,php_targets_php7-3?,php_targets_php7-4?] )
 "
 RDEPEND="${DEPEND} !dev-php/pecl-redis:7"
 
@@ -39,7 +39,7 @@ src_configure() {
 	php-ext-source-r3_src_configure
 }
 
-src_test(){
+src_test() {
 	local slot
 	for slot in $(php_get_slots); do
 		php_init_slot_env "${slot}"

@@ -1,8 +1,8 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
-PYTHON_COMPAT=( python3_{5,6,7} )
+PYTHON_COMPAT=( python3_{6,7} )
 
 inherit systemd autotools eutils gnome2-utils python-r1
 
@@ -12,7 +12,7 @@ SRC_URI="https://github.com/jonls/redshift/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64 ~x86"
+KEYWORDS="amd64 arm64 x86"
 IUSE="ayatana geoclue gtk nls"
 
 COMMON_DEPEND=">=x11-libs/libX11-1.4
@@ -41,7 +41,6 @@ src_configure() {
 	use gtk && python_setup
 
 	econf \
-		--disable-silent-rules \
 		$(use_enable nls) \
 		--enable-drm \
 		--enable-randr \
@@ -70,9 +69,9 @@ src_install() {
 		python_foreach_impl _impl_specific_src_install
 		python_replicate_script "${D}"/usr/bin/redshift-gtk
 		dosym redshift-gtk /usr/bin/gtk-redshift
-	fi
 
-	python_foreach_impl python_optimize
+		python_foreach_impl python_optimize
+	fi
 }
 
 pkg_preinst() {

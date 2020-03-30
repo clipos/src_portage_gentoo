@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=5
@@ -50,7 +50,6 @@ REQUIRED_USE="openmpi_rm_slurm? ( !openmpi_rm_pbs )
 RDEPEND="
 	!sys-cluster/mpich
 	!sys-cluster/mpich2
-	!sys-cluster/mpiexec
 	!sys-cluster/pmix
 	<sys-apps/hwloc-2
 	dev-libs/libltdl:0
@@ -154,14 +153,14 @@ src_configure() {
 		$(use_with openmpi_rm_slurm slurm)
 }
 
-src_install () {
-	emake DESTDIR="${D}" install || die "make install failed"
+src_install() {
+	emake DESTDIR="${D}" install
 	# From USE=vt see #359917
 	rm "${ED}"/usr/share/libtool &> /dev/null
-	dodoc README AUTHORS NEWS VERSION || die
+	dodoc README AUTHORS NEWS VERSION
 }
 
 src_test() {
 	# Doesn't work with the default src_test as the dry run (-n) fails.
-	emake -j1 check || die "emake check failed"
+	emake -j1 check
 }

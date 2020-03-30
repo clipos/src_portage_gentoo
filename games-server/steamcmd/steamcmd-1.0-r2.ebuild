@@ -3,7 +3,7 @@
 
 EAPI=7
 
-inherit readme.gentoo-r1 user
+inherit readme.gentoo-r1
 
 DESCRIPTION="This is the command-line version of the Steam client for dedicated servers"
 HOMEPAGE="https://developer.valvesoftware.com/wiki/SteamCMD"
@@ -11,7 +11,7 @@ SRC_URI="https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz 
 
 LICENSE="LGPL-2.1+ Steam"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~x86"
+KEYWORDS="-* amd64 x86"
 
 RDEPEND="
 	acct-group/steamcmd

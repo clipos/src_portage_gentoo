@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="7"
@@ -84,18 +84,18 @@ src_install() {
 	doins -r etc include lib* share
 	insinto ${PREFIX}/share/gps/plug-ins
 	doins share/examples/gnat/gnat-examples.xml
-	fperms 755 ${PREFIX}/libexec/gcc/${machine}/${basever}/cc1 || die
-	fperms 755 ${PREFIX}/libexec/gcc/${machine}/${basever}/cc1plus || die
-	fperms 755 ${PREFIX}/libexec/gcc/${machine}/${basever}/collect2 || die
-	fperms 755 ${PREFIX}/libexec/gcc/${machine}/${basever}/gnat1 || die
-	fperms 755 ${PREFIX}/libexec/gcc/${machine}/${basever}/liblto_plugin.so.0.0.0 || die
-	fperms 755 ${PREFIX}/libexec/gcc/${machine}/${basever}/lto1 || die
-	fperms 755 ${PREFIX}/libexec/gcc/${machine}/${basever}/lto-wrapper || die
-	fperms 755 ${PREFIX}/libexec/gprbuild/gprbind || die
-	fperms 755 ${PREFIX}/libexec/gprbuild/gprlib || die
+	fperms 755 ${PREFIX}/libexec/gcc/${machine}/${basever}/cc1
+	fperms 755 ${PREFIX}/libexec/gcc/${machine}/${basever}/cc1plus
+	fperms 755 ${PREFIX}/libexec/gcc/${machine}/${basever}/collect2
+	fperms 755 ${PREFIX}/libexec/gcc/${machine}/${basever}/gnat1
+	fperms 755 ${PREFIX}/libexec/gcc/${machine}/${basever}/liblto_plugin.so.0.0.0
+	fperms 755 ${PREFIX}/libexec/gcc/${machine}/${basever}/lto1
+	fperms 755 ${PREFIX}/libexec/gcc/${machine}/${basever}/lto-wrapper
+	fperms 755 ${PREFIX}/libexec/gprbuild/gprbind
+	fperms 755 ${PREFIX}/libexec/gprbuild/gprlib
 }
 
-pkg_postinst () {
+pkg_postinst() {
 	einfo "GNAT GPL is now installed. To launch it, you must put"
 	einfo "      ${PREFIX}/bin"
 	einfo "in front of your PATH environment variable. The following"

@@ -18,7 +18,7 @@ DESCRIPTION="dav1d is an AV1 Decoder :)"
 HOMEPAGE="https://code.videolan.org/videolan/dav1d"
 
 LICENSE="BSD-2"
-SLOT="0/3"
+SLOT="0/4"
 IUSE="+8bit +10bit +asm"
 
 ASM_DEPEND=">=dev-lang/nasm-2.13.02"
@@ -34,15 +34,16 @@ multilib_src_configure() {
 	use 8bit  && bits+=( 8 )
 	use 10bit && bits+=( 16 )
 
+	local enable_asm
 	if [[ ${MULTILIB_ABI_FLAG} == abi_x86_x32 ]]; then
-		build_asm=false
+		enable_asm=false
 	else
-		build_asm=$(usex asm true false)
+		enable_asm=$(usex asm true false)
 	fi
 
 	local emesonargs=(
 		-D bitdepths=$(IFS=,; echo "${bits[*]}")
-		-D build_asm=$build_asm
+		-D enable_asm=${enable_asm}
 	)
 	meson_src_configure
 }

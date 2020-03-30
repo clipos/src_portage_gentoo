@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 
-PYTHON_COMPAT=( python3_{5,6} )
+PYTHON_COMPAT=( python3_6 )
 
 inherit cmake-utils gnome2-utils python-single-r1 xdg-utils
 
@@ -18,6 +18,7 @@ KEYWORDS="~amd64 ~ppc ~ppc64 ~x86"
 IUSE="aqbanking debug doc examples gnome-keyring +gui mysql nls ofx postgres
 	  python quotes -register2 smartcard sqlite test"
 
+RESTRICT="!test? ( test )"
 REQUIRED_USE="
 	python? ( ${PYTHON_REQUIRED_USE} )
 	smartcard? ( aqbanking )"

@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-USE_RUBY="ruby24 ruby25 ruby26"
+USE_RUBY="ruby24 ruby25 ruby26 ruby27"
 
 RUBY_FAKEGEM_RECIPE_DOC="none"
 RUBY_FAKEGEM_EXTRADOC="CHANGELOG.md README.md docs/TEMPLATES.md"
@@ -28,9 +28,7 @@ ruby_add_bdepend "test? (
 	dev-ruby/coffee-script
 	dev-ruby/erubis
 	dev-ruby/nokogiri
-	!!<dev-ruby/maruku-0.7.2 )"
-
-ruby_add_rdepend "!!<dev-ruby/tilt-1.4.1-r2:0"
+)"
 
 all_ruby_prepare() {
 	rm Gemfile || die

@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="7"
@@ -318,7 +318,7 @@ src_prepare() {
 	java-pkg-opt-2_src_prepare
 }
 
-src_configure(){
+src_configure() {
 	# bug 508724 mariadb cannot use ld.gold
 	tc-ld-disable-gold
 	# Bug #114895, bug #110149
@@ -335,7 +335,6 @@ src_configure(){
 	mycmakeargs=(
 		-DCMAKE_C_FLAGS_RELWITHDEBINFO="$(usex debug '' '-DNDEBUG')"
 		-DCMAKE_CXX_FLAGS_RELWITHDEBINFO="$(usex debug '' '-DNDEBUG')"
-		-DCMAKE_INSTALL_PREFIX="${EPREFIX}/usr"
 		-DMYSQL_DATADIR="${EPREFIX}/var/lib/mysql"
 		-DSYSCONFDIR="${EPREFIX}/etc/mysql"
 		-DINSTALL_BINDIR=bin

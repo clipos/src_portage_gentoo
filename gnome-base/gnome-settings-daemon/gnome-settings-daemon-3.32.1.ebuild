@@ -1,8 +1,8 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
-PYTHON_COMPAT=( python{3_5,3_6,3_7} )
+PYTHON_COMPAT=( python{3_6,3_7} )
 
 inherit gnome.org gnome2-utils python-any-r1 meson udev virtualx xdg
 
@@ -18,7 +18,7 @@ REQUIRED_USE="
 	input_devices_wacom? ( udev )
 	wayland? ( udev )
 "
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 ~sparc ~x86 ~amd64-linux ~x86-linux ~x86-solaris"
+KEYWORDS="~alpha amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 ~sparc x86 ~amd64-linux ~x86-linux ~x86-solaris"
 
 # >=polkit-0.114 for ITS translation rules of .policy files
 COMMON_DEPEND="

@@ -1,8 +1,29 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # This file requires eapi 5 or later. New entries go on top.
 # Please use the same syntax as in package.use.mask
+
+# Brian Evans <grknight@gentoo.org> (2020-02-27)
+# Two packages are delayed during stable of PHP 7.4
+# arm, arm64 and hppa necessary to not disruput consistency
+# but this will allow all other packages to be used
+# Bug 706180, 710942
+dev-php/pecl-apcu php_targets_php7-4
+dev-php/pecl-yaz php_targets_php7-4
+
+# Georgy Yakovlev <gyakovlev@gentoo.org> (2019-12-21)
+# For bleeding edge features and testing, not generally suitable
+# for stable systems
+dev-lang/rust miri nightly parallel-compiler system-bootstrap
+
+# Andreas Sturmlechner <asturm@gentoo.org> (2019-12-18)
+# Neither sys-apps/bolt nor kde-plasma/plasma-thunderbolt are stable
+kde-plasma/plasma-meta thunderbolt
+
+# Andreas Sturmlechner <asturm@gentoo.org> (2019-12-09)
+# Declared experimental, and dev-cpp/websocketpp not stable yet
+sci-libs/indilib websocket
 
 # Andreas Sturmlechner <asturm@gentoo.org> (2019-11-28)
 # sci-libs/vtk is not stable anymore
@@ -33,7 +54,6 @@ dev-perl/Business-ISBN barcode
 dev-perl/Template-Toolkit gd
 media-fonts/unifont utils fontforge
 media-video/vdrsync dvdr
-net-analyzer/openvas-manager extras
 www-apps/bugzilla extras
 www-apps/otrs gd
 
@@ -80,10 +100,6 @@ sys-devel/clang-runtime crt
 # Needs dev-ruby/asciidoctor which has a lot of unstable deps
 net-analyzer/wireshark doc
 
-# Andreas Sturmlechner <asturm@gentoo.org> (2018-05-29)
-# Depends on unstable media-libs/libaom
-media-video/vlc aom
-
 # Andreas Sturmlechner <asturm@gentoo.org> (2018-05-21)
 # Depends on lots of unstable dependencies
 dev-python/s3fs test
@@ -119,6 +135,10 @@ app-backup/backup-manager s3
 # Brian Evans <grknight@gentoo.org (2017-11-06)
 # Requires stable phpunit
 dev-php/PEAR-Text_Password test
+
+# Andreas K. Hüttel <dilfridge@gentoo.org> (2017-11-04)
+# Requires audacious, which is masked. Bug 632513
+media-libs/freeverb3 audacious jack
 
 # Andreas Sturmlechner <asturm@gentoo.org> (2017-10-22)
 # Requires unmaintained unstable dependency net-libs/gloox.

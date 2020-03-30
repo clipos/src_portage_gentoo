@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{5,6,7} )
+PYTHON_COMPAT=( python3_{6,7,8} )
 
 inherit bash-completion-r1 cmake-utils python-single-r1 xdg-utils
 
@@ -19,7 +19,9 @@ IUSE="+cdemu-daemon"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 RDEPEND="${PYTHON_DEPS}
-	dev-python/pygobject:3[${PYTHON_USEDEP}]
+	$(python_gen_cond_dep '
+		dev-python/pygobject:3[${PYTHON_MULTI_USEDEP}]
+	')
 	cdemu-daemon? ( app-cdr/cdemu-daemon:0/7 )"
 DEPEND="
 	dev-util/desktop-file-utils

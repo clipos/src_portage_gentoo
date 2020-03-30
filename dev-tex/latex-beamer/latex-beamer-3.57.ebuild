@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -21,7 +21,7 @@ RDEPEND=">=dev-tex/pgf-1.10
 
 S=${WORKDIR}/beamer-${PV}
 
-src_prepare(){
+src_prepare() {
 	default
 	rm -rf doc/licenses || die
 }
@@ -34,7 +34,7 @@ src_install() {
 
 	if use doc ; then
 		docinto doc
-		dodoc -r doc
-		dosym "${ED}/usr/share/doc/${P}/doc/" "${TEXMF}/doc/latex/beamer"
+		dodoc -r  doc
+		dosym "../../../../../usr/share/doc/${PF}/doc/" "${TEXMF}/doc/latex/beamer"
 	fi
 }

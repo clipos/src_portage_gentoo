@@ -63,10 +63,10 @@ RDEPEND=">=dev-haskell/boxes-0.1.3:=[profile?] <dev-haskell/boxes-0.2:=[profile?
 		>=dev-haskell/uulib-0.9.20:=[profile?] )
 "
 RDEPEND+="
-		emacs? ( app-emacs/haskell-mode
-			virtual/emacs )
+		emacs? ( >=app-editors/emacs-23.1:*
+			app-emacs/haskell-mode )
 "
-PDEPEND="stdlib? ( =sci-mathematics/agda-stdlib-${MY_GENTOO_AGDA_STDLIB_V} )"
+PDEPEND="stdlib? ( ~sci-mathematics/agda-stdlib-${MY_GENTOO_AGDA_STDLIB_V} )"
 DEPEND="${RDEPEND}
 	dev-haskell/alex
 	>=dev-haskell/cabal-1.22.2.0

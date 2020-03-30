@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=5
@@ -55,7 +55,6 @@ MPI_UNCLASSED_DEP_STR="
 CDEPEND="
 	!sys-cluster/mpich
 	!sys-cluster/mpich2
-	!sys-cluster/mpiexec
 	!sys-cluster/pmix
 	dev-libs/libevent
 	dev-libs/libltdl:0
@@ -150,7 +149,7 @@ src_configure() {
 		$(use_enable java mpi-java)
 }
 
-src_install () {
+src_install() {
 	emake DESTDIR="${D}" install
 
 	# From USE=vt see #359917
@@ -170,7 +169,7 @@ src_install () {
 		rm "${mpi_jar}" || die
 	fi
 
-	dodoc README AUTHORS NEWS VERSION || die
+	dodoc README AUTHORS NEWS VERSION
 }
 
 src_test() {

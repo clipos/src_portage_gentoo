@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 
-PYTHON_COMPAT=( python2_7 python3_{5,6} )
+PYTHON_COMPAT=( python2_7 python3_{6,7} )
 
 inherit autotools python-single-r1
 
@@ -82,8 +82,8 @@ src_install() {
 	einstalldocs
 
 	insinto /usr/$(get_libdir)/pkgconfig
-	doins hamlib.pc || die "doins failed"
+	doins hamlib.pc
 
 	echo "LDPATH=/usr/$(get_libdir)/hamlib" > "${T}"/73hamlib
-	doenvd "${T}"/73hamlib || die "doenvd failed"
+	doenvd "${T}"/73hamlib
 }

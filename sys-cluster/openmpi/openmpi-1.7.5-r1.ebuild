@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=5
@@ -53,7 +53,6 @@ MPI_UNCLASSED_DEP_STR="
 RDEPEND="
 	!sys-cluster/mpich
 	!sys-cluster/mpich2
-	!sys-cluster/mpiexec
 	!sys-cluster/pmix
 	dev-libs/libevent
 	dev-libs/libltdl:0
@@ -146,13 +145,13 @@ src_configure() {
 		$(use_with openmpi_rm_slurm slurm)
 }
 
-src_install () {
+src_install() {
 	emake DESTDIR="${D}" install
 	# From USE=vt see #359917
 	rm "${ED}"/usr/share/libtool &> /dev/null
 	# Avoid collisions with libevent
 	rm -rf "${ED}"/usr/include/event2 &> /dev/null
-	dodoc README AUTHORS NEWS VERSION || die
+	dodoc README AUTHORS NEWS VERSION
 }
 
 src_test() {

@@ -43,6 +43,7 @@ RDEPEND="dev-haskell/async:=[profile?]
 	dev-haskell/transformers:=[profile?]
 	dev-haskell/transformers-base:=[profile?]
 	>=dev-lang/ghc-7.4.1:=
+	emacs? ( >=app-editors/emacs-23.1:* )
 "
 DEPEND="${RDEPEND}
 	>=dev-haskell/cabal-1.14
@@ -60,7 +61,7 @@ src_compile() {
 	haskell-cabal_src_compile
 	if use emacs ; then
 		pushd elisp
-		elisp-compile *.el || die
+		elisp-compile *.el
 		popd
 	fi
 }

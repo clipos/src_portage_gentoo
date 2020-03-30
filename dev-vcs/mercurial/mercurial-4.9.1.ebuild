@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -23,7 +23,7 @@ RDEPEND="app-misc/ca-certificates
 	gpg? ( app-crypt/gnupg )
 	tk? ( dev-lang/tk )"
 
-DEPEND="emacs? ( virtual/emacs )
+DEPEND="emacs? ( >=app-editors/emacs-23.1:* )
 	test? ( app-arch/unzip
 		dev-python/pygments[${PYTHON_USEDEP}] )"
 
@@ -49,7 +49,7 @@ python_prepare_all() {
 }
 
 python_configure_all() {
-	strip-flags -ftracer -ftree-vectorize
+	filter-flags -ftracer -ftree-vectorize
 	# Note: make it impl-conditional if py3 is supported
 	append-flags -fno-strict-aliasing
 

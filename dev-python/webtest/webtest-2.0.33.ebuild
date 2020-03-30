@@ -1,9 +1,10 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-PYTHON_COMPAT=( python{2_7,3_{5,6,7,8}} pypy{,3} )
+DISTUTILS_USE_SETUPTOOLS=rdepend
+PYTHON_COMPAT=( python{2_7,3_{6,7,8}} pypy3 )
 
 inherit distutils-r1
 
@@ -17,7 +18,7 @@ S="${WORKDIR}/${MY_P}"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64 ~hppa ~ppc64 ~s390 ~sh ~sparc ~x86"
+KEYWORDS="~alpha amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc64 ~s390 ~sh ~sparc ~x86"
 IUSE="test"
 RESTRICT="!test? ( test )"
 
@@ -30,7 +31,6 @@ RDEPEND="
 	dev-python/beautifulsoup:4[${PYTHON_USEDEP}]"
 BDEPEND="${RDEPEND}
 	app-arch/unzip
-	dev-python/setuptools[${PYTHON_USEDEP}]
 	test? ( dev-python/nose[${PYTHON_USEDEP}]
 		dev-python/pyquery[${PYTHON_USEDEP}]
 		dev-python/pastedeploy[${PYTHON_USEDEP}]

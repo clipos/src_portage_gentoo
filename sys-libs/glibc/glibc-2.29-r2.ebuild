@@ -1,11 +1,11 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 
-PYTHON_COMPAT=( python3_{5,6,7} )
+PYTHON_COMPAT=( python3_{6,7} )
 
-inherit python-any-r1 prefix eutils eapi7-ver toolchain-funcs flag-o-matic gnuconfig usr-ldscript \
+inherit python-any-r1 prefix eutils eapi7-ver toolchain-funcs flag-o-matic gnuconfig \
 	multilib systemd multiprocessing
 
 DESCRIPTION="GNU libc C library"
@@ -19,7 +19,7 @@ if [[ ${PV} == 9999* ]]; then
 	EGIT_REPO_URI="https://sourceware.org/git/glibc.git"
 	inherit git-r3
 else
-	KEYWORDS="alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 ~riscv s390 sh sparc x86"
+	KEYWORDS="~alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 ~riscv s390 sh sparc x86"
 	SRC_URI="mirror://gnu/glibc/${P}.tar.xz"
 fi
 
@@ -99,7 +99,6 @@ DEPEND="${COMMON_DEPEND}
 	>=app-misc/pax-utils-0.1.10
 	sys-devel/bison
 	!<sys-devel/bison-2.7
-	!<sys-devel/make-4
 	doc? ( sys-apps/texinfo )
 	test? ( >=net-dns/libidn2-2.0.5 )
 "
@@ -1112,7 +1111,7 @@ src_configure() {
 }
 
 do_src_compile() {
-	emake -C "$(builddir nptl)" || die "make nptl for ${ABI} failed"
+	emake -C "$(builddir nptl)"
 }
 
 src_compile() {
@@ -1165,7 +1164,7 @@ glibc_do_src_install() {
 	local builddir=$(builddir nptl)
 	cd "${builddir}"
 
-	emake install_root="${D}$(build_eprefix)$(alt_prefix)" install || die
+	emake install_root="${D}$(build_eprefix)$(alt_prefix)" install
 
 	# This version (2.26) provides some compatibility libraries for the NIS/NIS+ support
 	# which come without headers etc. Only needed for binary packages since the
@@ -1435,10 +1434,6 @@ pkg_postinst() {
 	fi
 
 	if ! is_crosscompile && [[ ${ROOT} == "/" ]] ; then
-		# Reload init ... if in a chroot or a diff init package, ignore
-		# errors from this step #253697
-		/sbin/telinit U 2>/dev/null
-
 		use compile-locales || run_locale_gen "${EROOT}"
 	fi
 

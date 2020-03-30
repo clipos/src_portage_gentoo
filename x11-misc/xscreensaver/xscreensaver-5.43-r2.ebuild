@@ -1,8 +1,8 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
-inherit autotools desktop flag-o-matic multilib pam
+inherit autotools desktop eutils flag-o-matic multilib pam
 
 DESCRIPTION="A modular screen saver and locker for the X Window System"
 HOMEPAGE="https://www.jwz.org/xscreensaver/"
@@ -12,8 +12,8 @@ SRC_URI="
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~sh ~sparc ~x86 ~amd64-linux ~x86-linux ~x64-solaris ~x86-solaris"
-IUSE="gdm jpeg new-login offensive opengl pam +perl selinux suid xinerama"
+KEYWORDS="~alpha amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~sh ~sparc x86 ~amd64-linux ~x86-linux ~x64-solaris ~x86-solaris"
+IUSE="caps gdm jpeg new-login offensive opengl pam +perl selinux suid xinerama"
 
 COMMON_DEPEND="
 	>=gnome-base/libglade-2
@@ -32,6 +32,7 @@ COMMON_DEPEND="
 	x11-libs/libXt
 	x11-libs/libXxf86misc
 	x11-libs/libXxf86vm
+	caps? ( sys-libs/libcap )
 	jpeg? ( virtual/jpeg:0 )
 	new-login? (
 		gdm? ( gnome-base/gdm )
@@ -102,6 +103,7 @@ src_configure() {
 	export RPM_PACKAGE_VERSION=no #368025
 
 	econf \
+		$(use_with caps setcap-hacks) \
 		$(use_with jpeg) \
 		$(use_with new-login login-manager) \
 		$(use_with opengl gl) \

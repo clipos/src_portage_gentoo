@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-inherit cmake-utils kodi-addon
+inherit cmake kodi-addon
 
 DESCRIPTION="SFTP VFS addon for Kodi"
 HOMEPAGE="https://github.com/xbmc/vfs.sftp"
@@ -34,7 +34,7 @@ DEPEND="
 	=media-tv/kodi-18*
 	"
 
-src_prepare(){
+src_prepare() {
 	[ -d depends ] && rm -rf depends || die
-	cmake-utils_src_prepare
+	cmake_src_prepare
 }

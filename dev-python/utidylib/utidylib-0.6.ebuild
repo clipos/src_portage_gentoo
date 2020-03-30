@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -14,7 +14,7 @@ SRC_URI="mirror://pypi/${P:0:1}/${PN}/${MY_P}.tar.gz"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64 ~ppc ~ppc64 ~x86"
+KEYWORDS="amd64 arm64 ppc ppc64 x86"
 IUSE="doc test"
 
 REQUIRED_USE="${PYTHON_REQUIRED_USE}
@@ -24,14 +24,7 @@ REQUIRED_USE="${PYTHON_REQUIRED_USE}
 BDEPEND="
 	dev-python/setuptools[${PYTHON_USEDEP}]
 	doc? ( dev-python/sphinx )
-	test? ( $(python_gen_cond_dep '
-		dev-python/flake8[${PYTHON_USEDEP}]
-		dev-python/pycodestyle[${PYTHON_USEDEP}]
-		dev-python/pyflakes[${PYTHON_USEDEP}]
-		dev-python/pytest[${PYTHON_USEDEP}]
-		dev-python/pytest-cov[${PYTHON_USEDEP}]
-		' 'python2*' python3_6 python3_7
-	) )
+	test? ( dev-python/pytest[${PYTHON_USEDEP}] )
 "
 DEPEND="
 	dev-python/six[${PYTHON_USEDEP}]
