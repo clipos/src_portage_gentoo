@@ -37,7 +37,8 @@ SLOT="0"
 KEYWORDS="~alpha amd64 arm arm64 hppa ~ia64 ~m68k ~mips ppc ppc64 ~riscv s390 sparc x86 ~ppc-aix ~x64-cygwin ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~m68k-mint ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
 # Probably want to drop ssl defaulting to on in a future version.
 IUSE="abi_mips_n32 audit bindist debug hpn kerberos kernel_linux ldns libedit libressl livecd pam +pie sctp selinux +ssl static test X X509 xmss"
-
+# CLIP OS: enable ssh root login if clipos_instrumentations features are set
+IUSE+=" clipos_instrumentations_allow-ssh-root-login"
 RESTRICT="!test? ( test )"
 
 REQUIRED_USE="
@@ -141,9 +142,10 @@ src_prepare() {
 	local PATCHSET_VERSION_MACROS=()
 
 	if use X509 ; then
-		pushd "${WORKDIR}" &>/dev/null || die
-		eapply "${FILESDIR}/${P}-X509-glue-"${X509_VER}".patch"
-		popd &>/dev/null || die
+		# X509 12.3-gentoo patch contains the changes from below
+		#pushd "${WORKDIR}" &>/dev/null || die
+		#eapply "${FILESDIR}/${P}-X509-glue-"${X509_VER}".patch"
+		#popd &>/dev/null || die
 
 		eapply "${WORKDIR}"/${X509_PATCH%.*}
 		eapply "${FILESDIR}"/${P}-X509-$(ver_cut 1-2 ${X509_VER})-tests.patch
@@ -185,9 +187,9 @@ src_prepare() {
 		pushd "${hpn_patchdir}" &>/dev/null || die
 		eapply "${FILESDIR}"/${PN}-8.1_p1-hpn-${HPN_VER}-glue.patch
 		if use X509; then
-		#	einfo "Will disable MT AES cipher due to incompatbility caused by X509 patch set"
-		#	# X509 and AES-CTR-MT don't get along, let's just drop it
-		#	rm openssh-${HPN_PV//./_}-hpn-AES-CTR-${HPN_VER}.diff || die
+			einfo "Will disable MT AES cipher due to incompatbility caused by X509 patch set"
+			# X509 and AES-CTR-MT don't get along, let's just drop it
+			rm openssh-${HPN_PV//./_}-hpn-AES-CTR-${HPN_VER}.diff || die
 			eapply "${FILESDIR}"/${PN}-8.0_p1-hpn-${HPN_VER}-X509-glue.patch
 		fi
 		use sctp && eapply "${FILESDIR}"/${PN}-8.1_p1-hpn-${HPN_VER}-sctp-glue.patch
@@ -287,7 +289,9 @@ src_configure() {
 		--sysconfdir="${EPREFIX}"/etc/ssh
 		--libexecdir="${EPREFIX}"/usr/$(get_libdir)/misc
 		--datadir="${EPREFIX}"/usr/share/openssh
-		--with-privsep-path="${EPREFIX}"/var/empty
+		# CLIP OS: Use a truly read only empty path
+		#--with-privsep-path="${EPREFIX}"/var/empty
+		--with-privsep-path="${EPREFIX}/usr/lib/openssh/empty"
 		--with-privsep-user=sshd
 		$(use_with audit audit linux)
 		$(use_with kerberos kerberos5 "${EPREFIX}"/usr)
@@ -394,13 +398,32 @@ tweak_ssh_configs() {
 src_install() {
 	emake install-nokeys DESTDIR="${D}"
 	fperms 600 /etc/ssh/sshd_config
-	dobin contrib/ssh-copy-id
-	newinitd "${FILESDIR}"/sshd-r1.initd sshd
-	newconfd "${FILESDIR}"/sshd-r1.confd sshd
+
+	# CLIP OS: Not needed
+	# dobin contrib/ssh-copy-id
+
+	# CLIP OS: no need for init scripts
+	# newinitd "${FILESDIR}"/sshd-r1.initd sshd
+	# newconfd "${FILESDIR}"/sshd-r1.confd sshd
 
 	newpamd "${FILESDIR}"/sshd.pam_include.2 sshd
 
-	tweak_ssh_configs
+	# CLIP OS: directly use our vendored configuration
+	# tweak_ssh_configs
+
+	# CLIP OS: Install our own minimal config
+	insinto /etc/ssh
+	doins "${FILESDIR}"/clipos/sshd_config
+	fperms 600 /etc/ssh/sshd_config
+
+	# Setup AllowUsers & PermitRootLogin depending on instrumentation level
+	if use clipos_instrumentations_allow-ssh-root-login; then
+		cat "${FILESDIR}"/clipos/sshd_config.clipos-core.instrumented \
+			>> "${ED%/}"/etc/ssh/sshd_config
+	else
+		cat "${FILESDIR}"/clipos/sshd_config.clipos-core \
+			>> "${ED%/}"/etc/ssh/sshd_config
+	fi
 
 	doman contrib/ssh-copy-id.1
 	dodoc CREDITS OVERVIEW README* TODO sshd_config
@@ -410,10 +433,24 @@ src_install() {
 	diropts -m 0700
 	dodir /etc/skel/.ssh
 
-	keepdir /var/empty
+	# CLIP OS: Use a truly read only empty path
+	keepdir /usr/lib/openssh/empty
 
 	systemd_dounit "${FILESDIR}"/sshd.{service,socket}
 	systemd_newunit "${FILESDIR}"/sshd_at.service 'sshd@.service'
+
+	# CLIP OS: Install sysusers configuration for sshd unprivileged user
+	insinto /usr/lib/sysusers.d
+	doins "${FILESDIR}/clipos/openssh.conf"
+
+	# CLIP OS: Remove unneeded ssh-keysign
+	rm -v "${D}/usr/lib64/misc/ssh-keysign"
+}
+
+pkg_preinst() {
+	if ! use ssl && has_version "${CATEGORY}/${PN}[ssl]"; then
+		show_ssl_warning=1
+	fi
 }
 
 pkg_postinst() {

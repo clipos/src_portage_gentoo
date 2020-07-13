@@ -1,0 +1,214 @@
+diff --git a/main.c b/main.c
+index 6ccf32e..ed81ffb 100644
+--- a/main.c
++++ b/main.c
+@@ -408,6 +408,7 @@ int main
+   int scfilter_level = 0, lock_memory = 0, sched_priority = 0;
+   int clock_control = 1, system_log = 1;
+   int config_args = 0;
++  int systemd = 0;
+ 
+   do_platform_checks();
+ 
+@@ -427,7 +428,7 @@ int main
+   optind = 1;
+ 
+   /* Parse short command-line options */
+-  while ((opt = getopt(argc, argv, "46df:F:hl:mnP:qQrRst:u:vx")) != -1) {
++  while ((opt = getopt(argc, argv, "46df:F:hl:mnP:qQrRsSt:u:vx")) != -1) {
+     switch (opt) {
+       case '4':
+       case '6':
+@@ -478,6 +479,10 @@ int main
+       case 's':
+         do_init_rtc = 1;
+         break;
++      case 'S':
++        systemd = 1;
++        nofork = 1;
++        break ;
+       case 't':
+         timeout = parse_int_arg(optarg);
+         break;
+@@ -496,7 +501,7 @@ int main
+     }
+   }
+ 
+-  if (getuid() && !client_only)
++  if (getuid() && !client_only && !systemd)
+     LOG_FATAL("Not superuser");
+ 
+   /* Turn into a daemon */
+@@ -516,7 +521,7 @@ int main
+ 
+   DNS_SetAddressFamily(address_family);
+ 
+-  CNF_Initialise(restarted, client_only);
++  CNF_Initialise(restarted, client_only, systemd);
+ 
+   /* Parse the config file or the remaining command line arguments */
+   config_args = argc - optind;
+@@ -528,7 +533,8 @@ int main
+   }
+ 
+   /* Check whether another chronyd may already be running */
+-  check_pidfile();
++  if (!systemd)
++    check_pidfile();
+ 
+   if (!user)
+     user = CNF_GetUser();
+@@ -541,7 +547,8 @@ int main
+   CNF_CreateDirs(pw->pw_uid, pw->pw_gid);
+ 
+   /* Write our pidfile to prevent other instances from running */
+-  write_pidfile();
++  if (!systemd)
++    write_pidfile();
+ 
+   PRV_Initialise();
+   LCL_Initialise();
+@@ -571,7 +578,7 @@ int main
+   }
+ 
+   /* Drop root privileges if the specified user has a non-zero UID */
+-  if (!geteuid() && (pw->pw_uid || pw->pw_gid))
++  if ((!geteuid() && (pw->pw_uid || pw->pw_gid)) && !systemd)
+     SYS_DropRoot(pw->pw_uid, pw->pw_gid);
+ 
+   REF_Initialise();
+
+diff --git a/conf.c b/conf.c
+index 85a7f2e..f6b2cd9 100644
+--- a/conf.c
++++ b/conf.c
+@@ -323,7 +323,7 @@ check_number_of_args(char *line, int num)
+ /* ================================================== */
+ 
+ void
+-CNF_Initialise(int r, int client_only)
++CNF_Initialise(int r, int client_only, int systemd)
+ {
+   restarted = r;
+ 
+@@ -341,12 +341,26 @@ CNF_Initialise(int r, int client_only)
+   logdir = Strdup("");
+   rtc_device = Strdup(DEFAULT_RTC_DEVICE);
+   hwclock_file = Strdup(DEFAULT_HWCLOCK_FILE);
+-  user = Strdup(DEFAULT_USER);
+-
++  if (!systemd) {
++    user = Strdup(DEFAULT_USER);
++  }
+   if (client_only) {
+     cmd_port = ntp_port = 0;
+     bind_cmd_path = Strdup("");
+     pidfile = Strdup("");
++  } else if (systemd) {
++      struct passwd *pw;
++      uid_t uid;
++
++      uid = geteuid();
++      pw = getpwuid(uid);
++      if (pw) {
++        user = Strdup(pw->pw_name);
++      } else {
++        LOG_FATAL("Could not get username for UID %u", uid);
++      }
++      bind_cmd_path = Strdup(DEFAULT_COMMAND_SOCKET);
++      pidfile = Strdup("");
+   } else {
+     bind_cmd_path = Strdup(DEFAULT_COMMAND_SOCKET);
+     pidfile = Strdup(DEFAULT_PID_FILE);
+
+diff --git a/conf.h b/conf.h
+index 43217fc..2a37421 100644
+--- a/conf.h
++++ b/conf.h
+@@ -31,7 +31,7 @@
+ #include "addressing.h"
+ #include "reference.h"
+ 
+-extern void CNF_Initialise(int restarted, int client_only);
++extern void CNF_Initialise(int restarted, int client_only, int systemd);
+ extern void CNF_Finalise(void);
+ 
+ extern char *CNF_GetRtcDevice(void);
+ diff --git a/test/unit/clientlog.c b/test/unit/clientlog.c
+index a412b69..870de36 100644
+--- a/test/unit/clientlog.c
++++ b/test/unit/clientlog.c
+@@ -33,7 +33,7 @@ test_unit(void)
+     "cmdratelimit interval 3 burst 4 leak 3",
+   };
+ 
+-  CNF_Initialise(0, 0);
++  CNF_Initialise(0, 0, 0);
+   for (i = 0; i < sizeof conf / sizeof conf[0]; i++)
+     CNF_ParseLine(NULL, i + 1, conf[i]);
+ 
+diff --git a/test/unit/keys.c b/test/unit/keys.c
+index ac995fa..c3dfcc5 100644
+--- a/test/unit/keys.c
++++ b/test/unit/keys.c
+@@ -90,7 +90,7 @@ test_unit(void)
+     "keyfile "KEYFILE
+   };
+ 
+-  CNF_Initialise(0, 0);
++  CNF_Initialise(0, 0, 0);
+   for (i = 0; i < sizeof conf / sizeof conf[0]; i++)
+     CNF_ParseLine(NULL, i + 1, conf[i]);
+ 
+diff --git a/test/unit/ntp_core.c b/test/unit/ntp_core.c
+index ac01205..70025f1 100644
+--- a/test/unit/ntp_core.c
++++ b/test/unit/ntp_core.c
+@@ -313,7 +313,7 @@ test_unit(void)
+   NCR_Instance inst1, inst2;
+   NTP_Receive_Buffer packet_queue[PACKET_QUEUE_LENGTH];
+ 
+-  CNF_Initialise(0, 0);
++  CNF_Initialise(0, 0, 0);
+   for (i = 0; i < sizeof conf / sizeof conf[0]; i++)
+     CNF_ParseLine(NULL, i + 1, conf[i]);
+ 
+diff --git a/test/unit/ntp_sources.c b/test/unit/ntp_sources.c
+index f13852e..b38daec 100644
+--- a/test/unit/ntp_sources.c
++++ b/test/unit/ntp_sources.c
+@@ -38,7 +38,7 @@ test_unit(void)
+ 
+   memset(&params, 0, sizeof (params));
+ 
+-  CNF_Initialise(0, 0);
++  CNF_Initialise(0, 0, 0);
+   CNF_ParseLine(NULL, 1, conf);
+ 
+   LCL_Initialise();
+diff --git a/test/unit/smooth.c b/test/unit/smooth.c
+index 998a4d1..3aa88d2 100644
+--- a/test/unit/smooth.c
++++ b/test/unit/smooth.c
+@@ -29,7 +29,7 @@ test_unit(void)
+   double offset, freq, wander;
+   char conf[] = "smoothtime 300 0.01";
+ 
+-  CNF_Initialise(0, 0);
++  CNF_Initialise(0, 0, 0);
+   CNF_ParseLine(NULL, 1, conf);
+ 
+   LCL_Initialise();
+diff --git a/test/unit/sources.c b/test/unit/sources.c
+index 83f7060..773dd61 100644
+--- a/test/unit/sources.c
++++ b/test/unit/sources.c
+@@ -30,7 +30,7 @@ test_unit(void)
+   IPAddr addr;
+   int i, j, k, l, samples, sel_options;
+ 
+-  CNF_Initialise(0, 0);
++  CNF_Initialise(0, 0, 0);
+   LCL_Initialise();
+   TST_RegisterDummyDrivers();
+   SCH_Initialise();

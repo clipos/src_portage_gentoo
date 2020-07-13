@@ -1,0 +1,4 @@
+
+# CLIP OS Core specific configuration
+AllowUsers admin audit
+PermitRootLogin no

@@ -3,23 +3,33 @@
 
 EAPI=7
 
-if [[ ${PV} == 9999 ]]; then
-	EGIT_REPO_URI="https://github.com/systemd/systemd.git"
-	inherit git-r3
-else
-	if [[ ${PV} == *.* ]]; then
-		MY_PN=systemd-stable
-	else
-		MY_PN=systemd
-	fi
-	MY_PV=${PV/_/-}
-	MY_P=${MY_PN}-${MY_PV}
-	S=${WORKDIR}/${MY_P}
-	SRC_URI="https://github.com/systemd/${MY_PN}/archive/v${MY_PV}/${MY_P}.tar.gz"
-	KEYWORDS="~alpha amd64 arm arm64 ~hppa ~ia64 ~mips ppc ppc64 sparc x86"
-fi
+# CLIP OS: We use cros-workon instead
+#if [[ ${PV} == 9999 ]]; then
+#	EGIT_REPO_URI="https://github.com/systemd/systemd.git"
+#	inherit git-r3
+#else
+#	if [[ ${PV} == *.* ]]; then
+#		MY_PN=systemd-stable
+#	else
+#		MY_PN=systemd
+#	fi
+#	MY_PV=${PV/_/-}
+#	MY_P=${MY_PN}-${MY_PV}
+#	S=${WORKDIR}/${MY_P}
+#	SRC_URI="https://github.com/systemd/${MY_PN}/archive/v${MY_PV}/${MY_P}.tar.gz"
+#	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~sparc ~x86"
+#fi
 
-PYTHON_COMPAT=( python3_{6,7,8} )
+CROS_WORKON_PROJECT='external/systemd'
+CROS_WORKON_COMMIT="e0e7964d4cdcadea67ffb6990c98dc5bf28b6bcb" # v243.4
+KEYWORDS="amd64"
+
+PYTHON_COMPAT=( python{3_6,3_7} )
+
+# cros-workon must be imported first, in cases where cros-workon and
+# another eclass exports the same function (say src_compile) we want
+# the later eclass's version to win. Only need src_unpack from workon.
+inherit cros-workon
 
 inherit bash-completion-r1 linux-info meson multilib-minimal ninja-utils pam python-any-r1 systemd toolchain-funcs udev usr-ldscript
 
@@ -29,6 +39,9 @@ HOMEPAGE="https://www.freedesktop.org/wiki/Software/systemd"
 LICENSE="GPL-2 LGPL-2.1 MIT public-domain"
 SLOT="0/2"
 IUSE="acl apparmor audit build cgroup-hybrid cryptsetup curl dns-over-tls elfutils +gcrypt gnuefi http idn importd +kmod +lz4 lzma nat pam pcre policykit qrcode +resolvconf +seccomp selinux split-usr static-libs +sysv-utils test vanilla xkb"
+# CLIP OS specific use flags
+IUSE+=" clipos_use_sysusers clipos_use_networkd"
+IUSE+=" clipos_instrumentations_coredump-handler clipos_instrumentations_early-root-shell"
 
 REQUIRED_USE="importd? ( curl gcrypt lzma )"
 RESTRICT="!test? ( test )"
@@ -37,10 +50,11 @@ MINKV="3.11"
 
 COMMON_DEPEND=">=sys-apps/util-linux-2.30:0=[${MULTILIB_USEDEP}]
 	sys-libs/libcap:0=[${MULTILIB_USEDEP}]
+	!<sys-libs/glibc-2.16
 	acl? ( sys-apps/acl:0= )
 	apparmor? ( sys-libs/libapparmor:0= )
 	audit? ( >=sys-process/audit-2:0= )
-	cryptsetup? ( >=sys-fs/cryptsetup-2.0.1:0= )
+	cryptsetup? ( >=sys-fs/cryptsetup-1.6:0= )
 	curl? ( net-misc/curl:0= )
 	dns-over-tls? ( >=net-libs/gnutls-3.5.3:0= )
 	elfutils? ( >=dev-libs/elfutils-0.158:0= )
@@ -104,6 +118,7 @@ RDEPEND="${COMMON_DEPEND}
 		sys-apps/coreutils[kill(-)]
 	) )
 	!sys-auth/nss-myhostname
+	!<sys-kernel/dracut-044
 	!sys-fs/eudev
 	!sys-fs/udev
 "
@@ -122,7 +137,7 @@ BDEPEND="
 	>=dev-util/intltool-0.50
 	>=sys-apps/coreutils-8.16
 	sys-devel/m4
-	virtual/pkgconfig
+	virtual/pkgconfig[${MULTILIB_USEDEP}]
 	test? ( sys-apps/dbus )
 	app-text/docbook-xml-dtd:4.2
 	app-text/docbook-xml-dtd:4.5
@@ -130,10 +145,6 @@ BDEPEND="
 	dev-libs/libxslt:0
 	$(python_gen_any_dep 'dev-python/lxml[${PYTHON_USEDEP}]')
 "
-
-python_check_deps() {
-	has_version -b "dev-python/lxml[${PYTHON_USEDEP}]"
-}
 
 pkg_pretend() {
 	if [[ ${MERGE_TYPE} != buildonly ]]; then
@@ -147,7 +158,7 @@ pkg_pretend() {
 			~INOTIFY_USER ~IPV6 ~NET ~NET_NS ~PROC_FS ~SIGNALFD ~SYSFS
 			~TIMERFD ~TMPFS_XATTR ~UNIX
 			~CRYPTO_HMAC ~CRYPTO_SHA256 ~CRYPTO_USER_API_HASH
-			~!GRKERNSEC_PROC ~!IDE ~!SYSFS_DEPRECATED
+			~!FW_LOADER_USER_HELPER_FALLBACK ~!GRKERNSEC_PROC ~!IDE ~!SYSFS_DEPRECATED
 			~!SYSFS_DEPRECATED_V2"
 
 		use acl && CONFIG_CHECK+=" ~TMPFS_POSIX_ACL"
@@ -181,10 +192,16 @@ pkg_setup() {
 
 src_unpack() {
 	default
-	[[ ${PV} != 9999 ]] || git-r3_src_unpack
+	# CLIP OS: We use cros-workon instead
+	#[[ ${PV} != 9999 ]] || git-r3_src_unpack
+	cros-workon_src_unpack
 }
 
 src_prepare() {
+	# CLIP OS: Do not use Gentoo patches as we track systemd-stable
+	default
+	return 0
+
 	# Do NOT add patches here
 	local PATCHES=()
 
@@ -192,7 +209,7 @@ src_prepare() {
 
 	# Add local patches here
 	PATCHES+=(
-		"${FILESDIR}/245-clang-gnu11.patch"
+		"${FILESDIR}/243-seccomp.patch"
 	)
 
 	if ! use vanilla; then
@@ -238,22 +255,29 @@ meson_multilib_native_use() {
 multilib_src_configure() {
 	local myconf=(
 		--localstatedir="${EPREFIX}/var"
-		-Dsupport-url="https://gentoo.org/support/"
+		# CLIP OS: Update support URL
+		#-Dsupport-url="https://gentoo.org/support/"
+		-Dsupport-url="https://clip-os.org/contact/"
 		-Dpamlibdir="$(getpam_mod_dir)"
 		# avoid bash-completion dep
 		-Dbashcompletiondir="$(get_bashcompdir)"
 		# make sure we get /bin:/sbin in PATH
 		-Dsplit-usr=$(usex split-usr true false)
-		-Dsplit-bin=true
 		-Drootprefix="$(usex split-usr "${EPREFIX:-/}" "${EPREFIX}/usr")"
 		-Drootlibdir="${EPREFIX}/usr/$(get_libdir)"
 		-Dsysvinit-path=
 		-Dsysvrcnd-path=
 		# Avoid infinite exec recursion, bug 642724
 		-Dtelinit-path="${EPREFIX}/lib/sysvinit/telinit"
+		# CLIP OS: Enabled only for efiboot
+		-Defi=$(meson_multilib_native_use gnuefi)
+		# CLIP OS: Unused
 		# no deps
-		-Dima=true
-		-Ddefault-hierarchy=$(usex cgroup-hybrid hybrid unified)
+		#-Dima=true
+		-Dima=false
+		# CLIP OS: Only use cgroups v2 with a unified hierarchy
+		# -Ddefault-hierarchy=$(usex cgroup-hybrid hybrid unified)
+		-Ddefault-hierarchy=unified
 		# Optional components/dependencies
 		-Dacl=$(meson_multilib_native_use acl)
 		-Dapparmor=$(meson_multilib_native_use apparmor)
@@ -280,38 +304,89 @@ multilib_src_configure() {
 		-Dqrencode=$(meson_multilib_native_use qrcode)
 		-Dseccomp=$(meson_multilib_native_use seccomp)
 		-Dselinux=$(meson_multilib_native_use selinux)
+		# CLIP OS: Unused
+		-Dsmack=false
 		-Ddbus=$(meson_multilib_native_use test)
 		-Dxkbcommon=$(meson_multilib_native_use xkb)
 		-Dntp-servers="0.gentoo.pool.ntp.org 1.gentoo.pool.ntp.org 2.gentoo.pool.ntp.org 3.gentoo.pool.ntp.org"
 		# Breaks screen, tmux, etc.
-		-Ddefault-kill-user-processes=false
+		# CLIP OS: Intended behaviour (no persistence beyond session lifetime)
+		#-Ddefault-kill-user-processes=false
+		-Ddefault-kill-user-processes=true
 		-Dcreate-log-dirs=false
 
 		# multilib options
 		-Dbacklight=$(meson_multilib)
-		-Dbinfmt=$(meson_multilib)
-		-Dcoredump=$(meson_multilib)
+		# CLIP OS: Disabled binfmt support
+		#-Dbinfmt=$(meson_multilib)
+		-Dbinfmt=false
+		# CLIP OS: Install systemd-coredump handler only for debug
+		#-Dcoredump=$(meson_multilib)
+		-Dcoredump=$(meson_multilib_native_use clipos_instrumentations_coredump-handler)
 		-Denvironment-d=$(meson_multilib)
 		-Dfirstboot=$(meson_multilib)
-		-Dhibernate=$(meson_multilib)
-		-Dhostnamed=$(meson_multilib)
+		# CLIP OS: Hibernation not supported for now (ephemeral swap)
+		#-Dhibernate=$(meson_multilib)
+		-Dhibernate=false
+		# CLIP OS: Disable hostnamed support
+		#-Dhostnamed=$(meson_multilib)
+		-Dhostnamed=false
 		-Dhwdb=$(meson_multilib)
 		-Dldconfig=$(meson_multilib)
-		-Dlocaled=$(meson_multilib)
+		# CLIP OS: Disable localed support
+		#-Dlocaled=$(meson_multilib)
+		-Dlocaled=false
 		-Dman=$(meson_multilib)
-		-Dnetworkd=$(meson_multilib)
-		-Dquotacheck=$(meson_multilib)
+		# CLIP OS: Temporarily enabled as system network manager
+		#-Dnetworkd=$(meson_multilib)
+		-Dnetworkd=$(meson_multilib_native_use clipos_use_networkd)
+		# CLIP OS: Disabled
+		#-Dquotacheck=$(meson_multilib)
+		-Dquotacheck=false
 		-Drandomseed=$(meson_multilib)
 		-Drfkill=$(meson_multilib)
-		-Dsysusers=$(meson_multilib)
-		-Dtimedated=$(meson_multilib)
-		-Dtimesyncd=$(meson_multilib)
+		# CLIP OS: Enabled only for the SDK
+		#-Dsysusers=$(meson_multilib)
+		-Dsysusers=$(meson_multilib_native_use clipos_use_sysusers)
+		# CLIP OS: Disable timedated support
+		#-Dtimedated=$(meson_multilib)
+		-Dtimedated=false
+		# CLIP OS: Disable timesync support
+		#-Dtimesyncd=$(meson_multilib)
+		-Dtimesyncd=false
 		-Dtmpfiles=$(meson_multilib)
 		-Dvconsole=$(meson_multilib)
 
 		# static-libs
 		-Dstatic-libsystemd=$(usex static-libs true false)
 		-Dstatic-libudev=$(usex static-libs true false)
+
+		# CLIP OS: Always disabled
+		-Dresolve=false
+		-Dmachined=false
+		-Dremote=false
+		-Dnss-myhostname=false
+		-Dhtml=false
+
+		# CLIP OS: Specify this, or meson breaks due to no /etc/login.defs
+		-Dsystem-gid-max=999
+		-Dsystem-uid-max=999
+
+		# CLIP OS: dbus paths
+		-Ddbussessionservicedir="${EPREFIX}/usr/share/dbus-1/services"
+		-Ddbussystemservicedir="${EPREFIX}/usr/share/dbus-1/system-services"
+
+		# The CLIP OS epoch, Mon January 1 00:00:00 UTC 2018. Used by timesyncd
+		# as a sanity check for the minimum acceptable time. Explicitly set
+		# to avoid using the current build time.
+		-Dtime-epoch=1514764800
+
+		# CLIP OS: Set hostname fallback to original product shortname
+		-Dfallback-hostname="clipos"
+
+		# CLIP OS: Set the shell to spawn when the "early-root-shell"
+		# instrumentation feature is enabled
+		-Ddebug-shell=$(usex clipos_instrumentations_early-root-shell /bin/bash /sbin/nologin)
 	)
 
 	meson_src_configure "${myconf[@]}"
@@ -376,6 +451,50 @@ multilib_src_install_all() {
 	fi
 
 	gen_usr_ldscript -a systemd udev
+
+	# CLIP OS: Don't set any extra environment variables by default
+	# rm "${ED%/}/usr/lib/environment.d/99-environment.conf" || die
+
+	# CLIP OS: Remove all default configuration from /etc
+	for d in \
+		/etc/systemd/system \
+		/etc/sysctl.d \
+		/etc/sysctl.conf \
+		/etc/tmpfiles.d; do
+		rm -rf "${ED%/}"/${d}
+	done
+
+	# CLIP OS: Remove nspawn binary, tmpfiles & unit
+	rm "${ED}"/usr/bin/systemd-nspawn
+	rm "${ED}"/usr/lib64/tmpfiles.d/systemd-nspawn.conf
+	rm "${ED}"/lib64/systemd/system/systemd-nspawn@.service
+
+	# CLIP OS: Remove /sys/kernel/config & /sys/kernel/debug mounts
+	rm "${ED}"/lib64/systemd/system/sys-kernel-config.mount
+	rm "${ED}"/lib64/systemd/system/sys-kernel-debug.mount
+
+	# CLIP OS: Remove /tmp mount
+	rm "${ED}"/lib64/systemd/system/tmp.mount
+
+	# CLIP OS: Do not enable random services if /etc was detected as empty!!!
+	# rm "${ED%/}$(usex split-usr /usr '')/lib/systemd/system-preset/90-systemd.preset" || die
+	insinto $(usex split-usr /usr '')/lib/systemd/system-preset
+	doins "${FILESDIR}"/clipos/99-default.preset
+
+	# CLIP OS: Do not ship distro-specific files (nsswitch.conf pam.d)
+	rm -rf "${ED%/}"/usr/share/factory
+	sed -i "${ED%/}"/usr/lib/tmpfiles.d/etc.conf \
+		-e '/^C \/etc\/nsswitch\.conf/d' \
+		-e '/^C \/etc\/pam\.d/d'
+
+	# CLIP OS: Replace default sysusers configs with fixed UID:GID versions
+	insinto /usr/lib/sysusers.d
+	doins "${FILESDIR}"/clipos/basic.conf
+	doins "${FILESDIR}"/clipos/systemd.conf
+
+	# CLIP OS: Install systemd-journald config override
+	insinto /etc/systemd/journald.conf.d/
+	doins "${FILESDIR}"/clipos/journald/default.conf
 }
 
 migrate_locale() {
@@ -467,7 +586,8 @@ pkg_postinst() {
 	# between OpenRC & systemd
 	migrate_locale
 
-	systemd_reenable systemd-networkd.service systemd-resolved.service
+	# CLIP OS: Required services are re-enabled in the configure step
+	# systemd_reenable systemd-networkd.service systemd-resolved.service
 
 	if [[ ${ENABLED_UNITS[@]} ]]; then
 		systemctl --root="${ROOT:-/}" enable "${ENABLED_UNITS[@]}"
@@ -505,3 +625,5 @@ pkg_prerm() {
 		rm -f -v "${EROOT}"/var/lib/systemd/catalog/database
 	fi
 }
+
+# vim: set ts=8 sts=8 sw=8 ai noet:

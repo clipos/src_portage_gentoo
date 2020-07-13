@@ -15,6 +15,8 @@ IUSE="
 	+adns caps +cmdmon html ipv6 libedit +ntp +phc pps readline +refclock +rtc
 	seccomp selinux
 "
+# CLIP OS: add nettle USE flag
+IUSE+=" nettle"
 REQUIRED_USE="
 	?? ( libedit readline )
 "
@@ -24,6 +26,10 @@ CDEPEND="
 	libedit? ( dev-libs/libedit )
 	readline? ( >=sys-libs/readline-4.1-r4:= )
 	seccomp? ( sys-libs/libseccomp )
+"
+# CLIP OS
+CDEPEND+="
+	nettle? ( dev-libs/nettle )
 "
 DEPEND="
 	${CDEPEND}
@@ -40,8 +46,12 @@ RESTRICT=test
 S="${WORKDIR}/${P/_/-}"
 
 PATCHES=(
-	"${FILESDIR}"/${PN}-3.5-pool-vendor-gentoo.patch
-	"${FILESDIR}"/${PN}-3.5-systemd-gentoo.patch
+	# CLIP OS: Ignore configuration patches as we use our own config
+	# "${FILESDIR}"/${PN}-3.5-pool-vendor-gentoo.patch
+	# "${FILESDIR}"/${PN}-3.5-systemd-gentoo.patch
+
+	# CLIP OS: Support running as an unprivileged user, via systemd
+	"${FILESDIR}"/clipos/${PN}-3.5-systemd.patch
 )
 
 src_prepare() {
@@ -78,10 +88,11 @@ src_configure() {
 		$(usex pps '' --disable-pps)
 		$(usex refclock '' --disable-refclock)
 		$(usex rtc '' --disable-rtc)
+		# CLIP OS: Enable support for other hashes that MD5
+		$(!usex nettle '' --disable-sechash)
 		${CHRONY_EDITLINE}
 		${EXTRA_ECONF}
 		--chronysockdir="${EPREFIX}/run/chrony"
-		--disable-sechash
 		--docdir="${EPREFIX}/usr/share/doc/${PF}"
 		--mandir="${EPREFIX}/usr/share/man"
 		--prefix="${EPREFIX}/usr"
@@ -103,11 +114,22 @@ src_compile() {
 src_install() {
 	default
 
-	newinitd "${FILESDIR}"/chronyd.init-r2 chronyd
-	newconfd "${FILESDIR}"/chronyd.conf chronyd
+	# CLIP OS: Not Needed
+	# newinitd "${FILESDIR}"/chronyd.init-r2 chronyd
+	# newconfd "${FILESDIR}"/chronyd.conf chronyd
 
-	insinto /etc/${PN}
-	newins examples/chrony.conf.example1 chrony.conf
+	# CLIP OS: Not needed
+	# insinto /etc/${PN}
+	# newins examples/chrony.conf.example1 chrony.conf
+
+	# CLIP OS: Install our own minimal config
+	insinto /etc/chrony
+	doins "${FILESDIR}"/clipos/chronyd_config
+	fperms 644 /etc/chrony/chronyd_config
+
+	# CLIP OS: Install sysusers configuration for chrony unprivileged user
+	insinto /usr/lib/sysusers.d
+	doins "${FILESDIR}"/clipos/chronyd.conf
 
 	docinto examples
 	dodoc examples/*.example*
@@ -119,9 +141,12 @@ src_install() {
 
 	keepdir /var/{lib,log}/chrony
 
-	insinto /etc/logrotate.d
-	newins "${FILESDIR}"/chrony-2.4-r1.logrotate chrony
+	# CLIP OS: No log files
+	# insinto /etc/logrotate.d
+	# newins "${FILESDIR}"/chrony-2.4-r1.logrotate chrony
 
-	systemd_dounit examples/{chronyd,chrony-wait}.service
-	systemd_enable_ntpunit 50-chrony chronyd.service
+	# CLIP OS: Install unit file
+	systemd_dounit "${FILESDIR}"/clipos/chronyd.service
+	# systemd_dounit examples/{chronyd,chrony-wait}.service
+	# systemd_enable_ntpunit 50-chrony chronyd.service
 }

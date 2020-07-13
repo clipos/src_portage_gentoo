@@ -23,6 +23,9 @@ for mod in $STRONGSWAN_PLUGINS_OPT; do
 	IUSE="${IUSE} strongswan_plugins_${mod}"
 done
 
+# CLIP OS: Additionnal useflags to disable legacy features by default
+IUSE="${IUSE} clipos_use_ikev1 clipos_use_legacy-ipsec-script"
+
 COMMON_DEPEND="!net-misc/openswan
 	gmp? ( >=dev-libs/gmp-4.1.5:= )
 	gcrypt? ( dev-libs/libgcrypt:0 )
@@ -132,9 +135,23 @@ src_configure() {
 		fi
 	done
 
+	# CLIP OS: Disable unused plugins and unwanted options
+	myconf+=" --disable-cmac"
+	myconf+=" --disable-curve25519"
+	myconf+=" --disable-des"
+	myconf+=" --disable-dnskey"
+	myconf+=" --disable-fips-prf"
+	myconf+=" --disable-md5"
+	myconf+=" --disable-pgp"
+	myconf+=" --disable-pki"
+	myconf+=" --disable-rc2"
+	myconf+=" --disable-sha1"
+	myconf+=" --disable-sshkey"
+	myconf+=" --disable-xcbc"
+
 	econf \
 		--disable-static \
-		--enable-ikev1 \
+		$(use_enable clipos_use_ikev1 ikev1) \
 		--enable-ikev2 \
 		--enable-swanctl \
 		--enable-socket-dynamic \
@@ -169,6 +186,9 @@ src_configure() {
 		$(use_enable pkcs11) \
 		$(use_enable sqlite) \
 		$(use_enable systemd) \
+		$(use_enable clipos_use_legacy-ipsec-script charon) \
+		$(use_enable clipos_use_legacy-ipsec-script stroke) \
+		$(use_enable clipos_use_legacy-ipsec-script scepclient) \
 		$(use_with caps capabilities libcap) \
 		--with-piddir=/run \
 		--with-systemdsystemunitdir="$(systemd_get_systemunitdir)" \
@@ -182,7 +202,8 @@ src_install() {
 		rm -rf "${ED}"/lib/systemd || die
 	fi
 
-	doinitd "${FILESDIR}"/ipsec
+	# CLIP OS: Do not install init scripts
+	# doinitd "${FILESDIR}"/ipsec
 
 	local dir_ugid
 	if use non-root; then
@@ -196,21 +217,38 @@ src_install() {
 	fi
 
 	diropts -m 0750 -o ${dir_ugid} -g ${dir_ugid}
-	dodir /etc/ipsec.d \
-		/etc/ipsec.d/aacerts \
-		/etc/ipsec.d/acerts \
-		/etc/ipsec.d/cacerts \
-		/etc/ipsec.d/certs \
-		/etc/ipsec.d/crls \
-		/etc/ipsec.d/ocspcerts \
-		/etc/ipsec.d/private \
-		/etc/ipsec.d/reqs
+	if use clipos_use_legacy-ipsec-script; then
+		dodir /etc/ipsec.d \
+			/etc/ipsec.d/aacerts \
+			/etc/ipsec.d/acerts \
+			/etc/ipsec.d/cacerts \
+			/etc/ipsec.d/certs \
+			/etc/ipsec.d/crls \
+			/etc/ipsec.d/ocspcerts \
+			/etc/ipsec.d/private \
+			/etc/ipsec.d/reqs
+	fi
 
-	dodoc NEWS README TODO
+	dodoc NEWS README TODO || die
 
 	# shared libs are used only internally and there are no static libs,
 	# so it's safe to get rid of the .la files
 	find "${D}" -name '*.la' -delete || die "Failed to remove .la files."
+
+	# CLIP OS: Install systemd unit hardening & configuration
+	insinto /lib/systemd/system/strongswan.service.d
+	doins "${FILESDIR}/clipos/security.conf"
+	doins "${FILESDIR}/clipos/unit-deps.conf"
+
+	# CLIP OS: Install sysusers configuration for ipsec unprivileged user
+	insinto /usr/lib/sysusers.d
+	doins "${FILESDIR}/clipos/strongswan.conf"
+
+	# CLIP OS: Fix vici socket path for charon & swanctl
+	sed -i \
+		's|# socket = unix://${piddir}/|socket = unix:///run/ipsec/|g' \
+		"${D}/etc/strongswan.d/swanctl.conf" \
+		"${D}/etc/strongswan.d/charon/vici.conf"
 }
 
 pkg_preinst() {

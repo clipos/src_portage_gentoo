@@ -1,0 +1,18 @@
+# $OpenBSD: sshd_config,v 1.102 2018/02/16 02:32:40 djm Exp $
+# CLIP OS default /etc/ssh/sshd_config
+
+PasswordAuthentication no
+PermitEmptyPasswords no
+
+UsePAM yes
+
+AllowAgentForwarding no
+AllowTcpForwarding no
+PrintMotd no
+PrintLastLog no
+
+# Use only ecdsa-sha2-nistp256 host keys
+HostKeyAlgorithms ecdsa-sha2-nistp256
+
+# Use a distinct RW folder for host keys
+HostKey /etc/ssh/host_keys/ecdsa_key

@@ -1,0 +1,40 @@
+[Unit]
+Description=chrony, an NTP client/server
+Documentation=man:chronyd(8) man:chronyc(1) man:chrony.conf(5)
+Wants=time-sync.target
+Before=time-sync.target
+After=network.target
+
+[Service]
+User=chrony
+
+NoNewPrivileges=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+
+PrivateTmp=yes
+PrivateDevices=yes
+
+ProtectSystem=full
+ProtectHome=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+
+StateDirectory=chrony
+StateDirectoryMode=0750
+
+SystemCallArchitectures=native
+SystemCallFilter=@system-service @clock
+SystemCallErrorNumber=EPERM
+
+AmbientCapabilities=CAP_SYS_TIME
+CapabilityBoundingSet=CAP_SYS_TIME
+
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_INET AF_INET6
+
+ExecStart=/usr/sbin/chronyd -f /etc/chrony/chronyd_config -S
+
+[Install]
+WantedBy=multi-user.target
