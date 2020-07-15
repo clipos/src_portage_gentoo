@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
-<pkgmetadata>
-<!-- maintainer-needed -->
-<longdescription lang="en">
-  Firmware image for Intel WiFi Link 1000 series network cards
-</longdescription>
-</pkgmetadata>

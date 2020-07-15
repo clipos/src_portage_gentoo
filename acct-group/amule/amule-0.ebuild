@@ -1,9 +1,1 @@
-# Copyright 2020 Gentoo Authors
-# Distributed under the terms of the GNU General Public License v2
-
-EAPI=7
-
-inherit acct-group
-
-DESCRIPTION="Group for net-p2p/amule"
-ACCT_GROUP_ID=468
+.amule.ebuild.0
