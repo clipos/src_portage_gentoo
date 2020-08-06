@@ -53,6 +53,14 @@ is_crosscompile() {
 	[[ ${CHOST} != ${CTARGET} ]]
 }
 
+BUILD_GCC_LIBS_ONLY=false
+if [[ "${PN}" == "gcc" && "${CATEGORY}" == "sys-libs" ]]; then
+	BUILD_GCC_LIBS_ONLY=true
+	# We need to use the sys-devel category to avoid modifying the GCC ebuilds
+	# (which check it to handle cross-compilation)
+	CATEGORY="sys-devel"
+fi
+
 # General purpose version check.  Without a second arg matches up to minor version (x.x.x)
 tc_version_is_at_least() {
 	ver_test "${2:-${GCC_RELEASE_VER}}" -ge "$1"
@@ -210,6 +218,8 @@ if tc_version_is_at_least 10; then
 else
 	SLOT="${GCC_CONFIG_VER}"
 fi
+
+$BUILD_GCC_LIBS_ONLY && SLOT="${SLOT}-lib"
 
 #---->> DEPEND <<----
 
@@ -842,6 +852,13 @@ toolchain_src_configure() {
 	einfo "CFLAGS=\"${CFLAGS}\""
 	einfo "CXXFLAGS=\"${CXXFLAGS}\""
 	einfo "LDFLAGS=\"${LDFLAGS}\""
+
+	if $BUILD_GCC_LIBS_ONLY; then
+		LIBPATH="${PREFIX}/$(get_libdir)"
+
+		# Don't set to gcc-library or we'll get a compat libstdc++
+		ETYPE="gcc-compiler"
+	fi
 
 	# Force internal zip based jar script to avoid random
 	# issues with 3rd party jar implementations.  #384291
@@ -1679,6 +1696,23 @@ toolchain_src_compile() {
 	# This needs to be set for compile as well, as it's used in libtool
 	# generation, which will break install otherwise (at least in 3.3.6): #664486
 	CONFIG_SHELL="${EPREFIX}/bin/bash" \
+
+	if $BUILD_GCC_LIBS_ONLY; then
+		# xgcc is needed to build libgcc / libstdc++
+		local targets="all-gcc all-target-libgcc"
+		use cxx && targets="${targets} all-target-libstdc++-v3"
+		use_if_iuse openmp && targets="${targets} all-target-libgomp"
+		use_if_iuse gcj && targets="${targets} all-target-libjava"
+		use_if_iuse objc && targets="${targets} all-target-libobjc"
+
+		local targ
+		for targ in ${targets}; do
+			gcc_do_make "${targ}" || die "Failed to make ${targ}"
+		done
+
+		return 0
+	fi
+
 	gcc_do_make ${GCC_MAKE_TARGET}
 }
 
@@ -1815,6 +1849,25 @@ toolchain_src_install() {
 		grep -q 'It has been auto-edited by fixincludes from' "${x}" \
 			&& rm -f "${x}"
 	done < <(find gcc/include*/ -name '*.h')
+
+	if $BUILD_GCC_LIBS_ONLY; then
+		local targets="install-target-libgcc"
+		use cxx && targets="${targets} install-target-libstdc++-v3"
+		use_if_iuse openmp && targets="${targets} install-target-libgomp"
+		use_if_iuse gcj && targets="${targets} install-target-libjava"
+		use_if_iuse objc && targets="${targets} install-target-objc"
+
+		S="${WORKDIR}"/build emake -j1 DESTDIR="${D}" ${targets} || die
+
+		einfo "Removing unneeded stuff"
+		find "${D}" \! -type d \! -path "$(readlink -f -- ${D}/${LIBPATH})/*" -delete
+		find "${D}" -depth -type d -delete 2>/dev/null
+		pushd "${D}${LIBPATH}" >/dev/null
+		rm -r gcc *.a *.la *.py
+		popd >/dev/null
+
+		return 0
+	fi
 
 	# Do the 'make install' from the build directory
 	S="${WORKDIR}"/build emake -j1 DESTDIR="${D}" install || die
@@ -2233,6 +2286,8 @@ toolchain_pkg_postinst() {
 		# Cleaning can be removed in June 2022.
 		rm -f "${EROOT%/}"/sbin/fix_libtool_files.sh
 		rm -f "${EROOT%/}"/usr/share/gcc-data/fixlafiles.awk
+
+		$BUILD_GCC_LIBS_ONLY && return 0
 
 		mkdir -p "${EROOT%/}"/usr/bin
 		# Since these aren't critical files and portage sucks with
