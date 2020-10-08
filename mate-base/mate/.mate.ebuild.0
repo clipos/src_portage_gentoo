@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -57,7 +57,6 @@ RDEPEND="
 		=mate-extra/mate-system-monitor-${MATE_BRANCH}*
 		=mate-extra/mate-utils-${MATE_BRANCH}*
 		=media-gfx/eom-${MATE_BRANCH}*
-		sys-apps/gnome-disk-utility
 	)
 	help? (
 		gnome-extra/yelp
@@ -81,4 +80,6 @@ pkg_postinst() {
 	elog "Some packages that are not included in this meta-package but may be of interest:"
 	elog "		mate-extra/caja-dropbox"
 	elog "		mate-extra/mate-user-share"
+	elog "		mate-extra/caja-admin"
+	elog "		mate-extra/caja-hide"
 }

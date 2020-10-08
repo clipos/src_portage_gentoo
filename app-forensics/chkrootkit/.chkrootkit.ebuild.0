@@ -1,15 +1,16 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
-inherit eutils toolchain-funcs
+inherit toolchain-funcs
+
+GENTOO_PATCH="${PN}-0.53-gentoo.diff"
 
 DESCRIPTION="Tool to locally check for signs of a rootkit"
 HOMEPAGE="http://www.chkrootkit.org/"
-# Upstream named their *uncompressed* tarball .tar.gz (*sigh*)
-SRC_URI="ftp://ftp.pangeia.com.br/pub/seg/pac/${P}.tar.gz -> ${P}.tar
-	https://dev.gentoo.org/~polynomial-c/${PN}-0.51-gentoo.diff.xz"
+SRC_URI="ftp://ftp.pangeia.com.br/pub/seg/pac/${P}.tar.gz
+	https://dev.gentoo.org/~polynomial-c/${GENTOO_PATCH}.xz"
 
 LICENSE="BSD-2"
 SLOT="0"
@@ -19,7 +20,7 @@ IUSE="+cron"
 RDEPEND="cron? ( virtual/cron )"
 
 PATCHES=(
-	"${WORKDIR}"/${PN}-0.51-gentoo.diff
+	"${WORKDIR}/${GENTOO_PATCH}"
 )
 
 src_prepare() {

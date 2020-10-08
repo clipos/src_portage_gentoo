@@ -1,1 +1,0 @@
-.python-funcsigs.ebuild.0

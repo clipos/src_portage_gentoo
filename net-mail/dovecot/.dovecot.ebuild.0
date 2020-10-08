@@ -10,7 +10,7 @@ inherit autotools ssl-cert systemd toolchain-funcs
 MY_P="${P/_/.}"
 #MY_S="${PN}-ce-${PV}"
 major_minor="$(ver_cut 1-2)"
-sieve_version="0.5.10"
+sieve_version="0.5.11"
 if [[ ${PV} == *_rc* ]] ; then
 	rc_dir="rc/"
 else
@@ -68,6 +68,8 @@ RDEPEND="${DEPEND}
 	acct-user/dovecot
 	acct-user/dovenull
 	net-mail/mailbase"
+
+PATCHES=( "${FILESDIR}"/${P}-apop-fix.patch )
 
 pkg_setup() {
 	if use managesieve && ! use sieve; then

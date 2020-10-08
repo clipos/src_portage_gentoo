@@ -1,11 +1,12 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=5
-GNOME2_LA_PUNT="yes"
-GCONF_DEBUG="no"
+EAPI=7
 
-inherit autotools eutils gnome2
+# Not all modules needed by py script are packaged in Gentoo
+#PYTHON_COMPAT=( python3_{6..9} )
+
+inherit autotools flag-o-matic gnome2-utils xdg #python-single-r1
 
 DESCRIPTION="A graphical user interface to the Apple productline"
 HOMEPAGE="http://www.gtkpod.org/"
@@ -18,6 +19,7 @@ KEYWORDS="amd64 x86"
 IUSE="aac clutter curl cdr flac gstreamer mp3 vorbis"
 REQUIRED_USE="cdr? ( gstreamer )"
 
+# ${PYTHON_DEPS}
 COMMON_DEPEND="
 	>=dev-libs/gdl-3.6:3
 	>=dev-libs/glib-2.31:2
@@ -50,7 +52,10 @@ COMMON_DEPEND="
 RDEPEND="${COMMON_DEPEND}
 	gstreamer? ( media-plugins/gst-plugins-meta:1.0 )
 "
+# media-libs/gstreamer:1.0 needed at build time as we need m4 file for
+# eautoreconf, bug #659748
 DEPEND="${COMMON_DEPEND}
+	media-libs/gstreamer:1.0
 	dev-util/intltool
 	sys-devel/flex
 	sys-devel/gettext
@@ -59,20 +64,26 @@ DEPEND="${COMMON_DEPEND}
 "
 
 src_prepare() {
-	epatch "${FILESDIR}"/${PN}-2.1.3-gold.patch
-	epatch "${FILESDIR}"/${PN}-2.1.5-m4a.patch
+	xdg_src_prepare
 
-	sed -i -e 's:python:python2:' scripts/sync-palm-jppy.py || die
+	eapply "${FILESDIR}"/${PN}-2.1.3-gold.patch
+	eapply "${FILESDIR}"/${PN}-2.1.5-m4a.patch
+
+#	python_fix_shebang scripts/
+#	2to3 --no-diffs -w scripts/sync-palm-jppy.py || die
+
+	gnome2_disable_deprecation_warning
 
 	eautoreconf
-	gnome2_src_prepare
 }
 
 src_configure() {
 	# Prevent sandbox violations, bug #420279
 	addpredict /dev
 
-	gnome2_src_configure \
+	append-flags -fcommon #722504
+
+	econf \
 		--enable-deprecations \
 		--disable-static \
 		--disable-plugin-coverweb \
@@ -86,7 +97,7 @@ src_configure() {
 }
 
 src_install() {
-	gnome2_src_install \
+	emake \
 		DESTDIR="${D}" \
 		docdir=/usr/share/doc/${PF}/html \
 		figuresdir=/usr/share/doc/${PF}/html/figures \
@@ -94,4 +105,19 @@ src_install() {
 
 	dodoc AUTHORS ChangeLog NEWS README TODO TROUBLESHOOTING
 	rm -f "${ED}"/usr/share/gtkpod/data/{AUTHORS,COPYING} || die
+
+	# Needs unpackaged python modules
+	rm -f "${ED}"/usr/share/gtkpod/scripts/sync-palm-jppy.py || die
+
+	find "${D}" -name '*.la' -type f -delete || die
+}
+
+pkg_postinst() {
+	gnome2_schemas_update
+	xdg_pkg_postinst
+}
+
+pkg_postrm() {
+	gnome2_schemas_update
+	xdg_pkg_postrm
 }

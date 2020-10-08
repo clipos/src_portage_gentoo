@@ -51,7 +51,7 @@ SRC_URI="
 IUSE="gnome java kde"
 LICENSE="LGPL-3"
 SLOT="0"
-KEYWORDS="-* amd64 x86"
+KEYWORDS="-* amd64 ~x86"
 
 BIN_COMMON_DEPEND="
 	app-text/hunspell:0/1.7
@@ -64,7 +64,7 @@ BIN_COMMON_DEPEND="
 	media-libs/harfbuzz:0/0.9.18[icu]
 	media-libs/libpng:0/16
 	>=sys-devel/gcc-9.3.0
-	>=sys-libs/glibc-2.30
+	>=sys-libs/glibc-2.31
 	virtual/jpeg-compat:62
 "
 
@@ -139,7 +139,7 @@ COMMON_DEPEND="
 	x11-libs/libXrandr
 	x11-libs/libXrender
 	net-print/cups
-	sys-apps/dbus
+	sys-apps/dbus[X]
 	gnome? (
 		dev-libs/glib:2
 		gnome-base/dconf
@@ -241,8 +241,7 @@ pkg_postinst() {
 	xdg_desktop_database_update
 	xdg_mimeinfo_database_update
 
-	use java || \
-		ewarn 'If you plan to use the Base application you should enable java or you will get crashes and missing features.'
+	ewarn 'If you plan to use the Base application you should use a source build and enable java and firebird.'
 }
 
 pkg_postrm() {

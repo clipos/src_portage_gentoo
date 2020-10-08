@@ -40,6 +40,7 @@ src_prepare() {
 		-i src/eix-functions.sh.in || die
 	sed -e "s:'\$(bindir)/eix-functions.sh':cat \\\\\"${EPREFIX}/usr/share/eix/eix-functions\\\\\":" \
 		-i src/Makefile.am || die
+
 	eautoreconf
 }
 
@@ -49,6 +50,7 @@ src_configure() {
 		$(use_enable nls)
 		$(use_with doc extra-doc)
 		$(use_with sqlite)
+		--without-protobuf
 
 		# default configuration
 		$(use_with prefix always-accept-keywords)
@@ -73,12 +75,6 @@ src_configure() {
 		--disable-strong-security
 	)
 
-	# https://github.com/vaeth/eix/issues/35
-	append-cxxflags -std=c++14
-
-	# work around https://github.com/vaeth/eix/issues/64, bug#687988
-	local -x mv_fCXXFLAGS_cache='-mindirect-branch=thunk'
-
 	econf "${myconf[@]}"
 }
 
@@ -88,11 +84,10 @@ src_install() {
 	dotmpfiles tmpfiles.d/eix.conf
 
 	rm -r "${ED}"/usr/bin/eix-functions.sh || die
-
 }
 
 pkg_postinst() {
-		tmpfiles_process eix.conf
+	tmpfiles_process eix.conf
 
 	local obs=${EROOT}/var/cache/eix.previous
 	if [[ -f ${obs} ]]; then

@@ -1,11 +1,11 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=5
+EAPI=7
 
-PYTHON_COMPAT=( python2_7 )
+PYTHON_COMPAT=( python3_{6,7,8,9} )
 
-inherit autotools eutils ltprune multilib-minimal python-single-r1
+inherit autotools eutils multilib-minimal python-single-r1
 
 DESCRIPTION="LASH Audio Session Handler"
 HOMEPAGE="http://www.nongnu.org/lash/"
@@ -13,24 +13,39 @@ SRC_URI="mirror://nongnu/${PN}/${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~alpha amd64 ~arm arm64 hppa ppc ppc64 sparc x86"
+KEYWORDS="~alpha amd64 arm arm64 hppa ppc ppc64 sparc x86"
 IUSE="alsa debug gtk python static-libs" # doc
 
-RDEPEND="dev-libs/libxml2
+BDEPEND="
+	virtual/pkgconfig
+"
+RDEPEND="
+	dev-libs/libxml2
+	sys-apps/util-linux[${MULTILIB_USEDEP}]
 	virtual/jack
-	>=sys-apps/util-linux-2.24.1-r3[${MULTILIB_USEDEP}]
 	alsa? ( media-libs/alsa-lib )
 	gtk? ( x11-libs/gtk+:2 )
 	python? ( ${PYTHON_DEPS} )
-	|| ( sys-libs/readline dev-libs/libedit )"
-DEPEND="${RDEPEND}
-	virtual/pkgconfig
-	python? ( >=dev-lang/swig-1.3.40 )"
+	|| ( sys-libs/readline dev-libs/libedit )
+"
+DEPEND="
+	${RDEPEND}
+	python? ( dev-lang/swig )
+"
 # doc? ( >=app-text/texi2html-5 )
 
-DOCS="AUTHORS ChangeLog NEWS README TODO"
+DOCS=( AUTHORS ChangeLog NEWS README TODO )
+HTML_DOCS=( docs/lash-manual-html-one-page/lash-manual.html )
 
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
+
+PATCHES=(
+	"${FILESDIR}"/${P}-glibc2.8.patch
+	"${FILESDIR}"/${P}-swig_version_comparison.patch
+	"${FILESDIR}"/${P}-gcc47.patch
+	"${FILESDIR}"/${P}-underlinking.patch
+	"${FILESDIR}"/${P}-strcmp.patch
+)
 
 pkg_setup() {
 	use python && python-single-r1_pkg_setup
@@ -41,12 +56,7 @@ src_prepare() {
 		-e '/texi2html/s:-number:&-sections:' \
 		docs/Makefile.am || die #422045
 
-	epatch \
-		"${FILESDIR}"/${P}-glibc2.8.patch \
-		"${FILESDIR}"/${P}-swig_version_comparison.patch \
-		"${FILESDIR}"/${P}-gcc47.patch \
-		"${FILESDIR}"/${P}-underlinking.patch \
-		"${FILESDIR}"/${P}-strcmp.patch
+	default
 
 	AT_M4DIR=m4 eautoreconf
 }
@@ -108,7 +118,7 @@ multilib_src_install() {
 }
 
 multilib_src_install_all() {
-	dohtml docs/lash-manual-html-*/lash-manual.html
-	prune_libtool_files --all # --all for _lash.la in python directory
+	einstalldocs
+	find "${D}" -name '*.la' -delete || die
 	use python && python_optimize
 }

@@ -38,4 +38,4 @@ RDEPEND="${DEPEND}
 	sys-apps/diffutils
 "
 
-PATCHES=( "${FILESDIR}/${P}-crash-w-o-clipboard.patch" )
+PATCHES=( "${FILESDIR}/${P}-hidpi.patch" )

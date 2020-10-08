@@ -174,7 +174,7 @@ _kde.org_calculate_live_repo() {
 	# @DESCRIPTION:
 	# This variable allows easy overriding of default kde mirror service
 	# (anongit) with anything else you might want to use.
-	EGIT_MIRROR=${EGIT_MIRROR:=https://anongit.kde.org}
+	EGIT_MIRROR=${EGIT_MIRROR:=https://invent.kde.org/kde}
 
 	if [[ ${PV} == ??.??.49.9999 && ${KDE_RELEASE_SERVICE} = true ]]; then
 		EGIT_BRANCH="release/$(ver_cut 1-2)"
@@ -192,7 +192,7 @@ _kde.org_calculate_live_repo() {
 	# @DESCRIPTION:
 	# This variable allows overriding of default repository
 	# name. Specify only if this differs from PN and KDE_ORG_NAME.
-	EGIT_REPO_URI="${EGIT_MIRROR}/${EGIT_REPONAME:=$KDE_ORG_NAME}"
+	EGIT_REPO_URI="${EGIT_MIRROR}/${EGIT_REPONAME:=$KDE_ORG_NAME}.git"
 }
 
 case ${KDE_BUILD_TYPE} in

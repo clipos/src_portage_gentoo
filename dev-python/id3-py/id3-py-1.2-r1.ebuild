@@ -1,1 +1,0 @@
-.id3-py.ebuild.0

@@ -1,11 +1,11 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 DESCRIPTION="daemon to proxy GSSAPI context establishment and channel handling"
-HOMEPAGE="https://pagure.io/gssproxy"
-SRC_URI="http://releases.pagure.org/gssproxy/${P}.tar.gz"
+HOMEPAGE="https://github.com/gssapi/gssproxy"
+SRC_URI="https://github.com/gssapi/${PN}/releases/download/v${PV}/${P}.tar.gz"
 
 LICENSE="BSD-1"
 SLOT="0"
@@ -20,10 +20,11 @@ RDEPEND="${COMMON_DEPEND}
 	selinux? ( sec-policy/selinux-gssproxy )"
 # We need xml stuff to build the man pages, and people really want/need
 # the man pages for this package :). #585200
-DEPEND="${COMMON_DEPEND}
+BDEPEND="
 	app-text/docbook-xml-dtd:4.4
 	dev-libs/libxslt
-	virtual/pkgconfig"
+	virtual/pkgconfig
+"
 
 # Many requirements to run tests, including running slapd as root, hence
 # unfeasible.
@@ -72,7 +73,7 @@ src_configure() {
 src_install() {
 	default
 	# This is a plugin module, so no need for la file.
-	find "${ED%/}"/usr -name proxymech.la -delete
+	find "${ED}"/usr -name proxymech.la -delete || die
 
 	doinitd "${FILESDIR}"/gssproxy
 	insinto /etc/gssproxy

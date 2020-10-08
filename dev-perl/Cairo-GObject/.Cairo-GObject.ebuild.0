@@ -1,10 +1,10 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 DIST_AUTHOR=XAOC
-DIST_VERSION=1.004
+DIST_VERSION=1.005
 DIST_EXAMPLES=("examples/*")
 inherit perl-module
 
@@ -19,8 +19,17 @@ RDEPEND="
 	>=dev-perl/glib-perl-1.224.0
 	>=dev-perl/Cairo-1.80.0
 "
-DEPEND="${RDEPEND}
+DEPEND="
+	x11-libs/cairo[glib]
+"
+BDEPEND="${RDEPEND}
 	virtual/perl-ExtUtils-MakeMaker
 	>=dev-perl/ExtUtils-Depends-0.200.0
 	>=dev-perl/ExtUtils-PkgConfig-1.0.0
 "
+src_compile() {
+	mymake=(
+		"OPTIMIZE=${CFLAGS}"
+	)
+	perl-module_src_compile
+}

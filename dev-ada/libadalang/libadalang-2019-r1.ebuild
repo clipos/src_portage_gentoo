@@ -1,1 +1,0 @@
-.libadalang.ebuild.0

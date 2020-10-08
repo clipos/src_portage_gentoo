@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
-inherit gnome.org readme.gentoo-r1 meson xdg
+inherit eapi7-ver gnome.org readme.gentoo-r1 meson xdg
 
 DESCRIPTION="JavaScript extensions for GNOME Shell"
 HOMEPAGE="https://wiki.gnome.org/Projects/GnomeShell/Extensions"
@@ -22,8 +22,7 @@ RDEPEND="${COMMON_DEPEND}
 	dev-libs/gobject-introspection:=
 	dev-libs/atk[introspection]
 	gnome-base/gnome-menus:3[introspection]
-	>=gnome-base/gnome-shell-3.34
-	<gnome-base/gnome-shell-3.35
+	=gnome-base/gnome-shell-$(ver_cut 1-2)*
 	media-libs/clutter:1.0[introspection]
 	net-libs/telepathy-glib[introspection]
 	x11-libs/gdk-pixbuf:2[introspection]
@@ -36,7 +35,7 @@ DEPEND="${COMMON_DEPEND}
 	dev-lang/sassc
 	>=sys-devel/gettext-0.19.8
 	virtual/pkgconfig
-	test? ( dev-lang/spidermonkey:60 )
+	test? ( dev-lang/spidermonkey:68 )
 "
 
 RESTRICT="!test? ( test )"

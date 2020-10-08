@@ -1,1 +1,0 @@
-.etc-proposals.ebuild.0

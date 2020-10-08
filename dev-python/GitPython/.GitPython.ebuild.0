@@ -8,9 +8,9 @@ PYTHON_REQ_USE="threads(+)"
 
 inherit distutils-r1
 
-TEST_P=GitPython-3.1.0
-GITDB_P=gitdb-4.0.2
-SMMAP_P=smmap-3.0.1
+TEST_P=GitPython-${PV}
+GITDB_P=gitdb-4.0.5
+SMMAP_P=smmap-3.0.4
 
 DESCRIPTION="Library used to interact with Git repositories"
 HOMEPAGE="https://github.com/gitpython-developers/GitPython https://pypi.org/project/GitPython/"
@@ -46,12 +46,13 @@ src_test() {
 		"${T}"/test/git/ext/gitdb/gitdb/ext/smmap || die
 
 	cd "${T}"/test || die
-	# remove performance tests
-	rm -r git/test/performance || die
+	rm -r test/performance || die
 	# tests requiring network access
-	sed -i -e 's:test_fetch_error:_&:' git/test/test_remote.py || die
-	# broken apparently
-	sed -i -e 's:test_rev_parse:_&:' git/test/test_repo.py || die
+	sed -i -e 's:test_fetch_error:_&:' test/test_remote.py || die
+	rm test/test_installation.py || die
+	# broken apparently (also fails in git clone)
+	sed -e 's:test_rev_parse:_&:' \
+		-i test/test_repo.py || die
 
 	distutils-r1_src_test
 }

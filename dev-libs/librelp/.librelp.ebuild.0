@@ -2,13 +2,13 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="7"
-PYTHON_COMPAT=( python3_{6,7} )
+PYTHON_COMPAT=( python3_{6,7,8} )
 
 inherit autotools python-any-r1
 
 DESCRIPTION="An easy to use library for the RELP protocol"
-HOMEPAGE="http://www.librelp.com/"
-SRC_URI="http://download.rsyslog.com/${PN}/${P}.tar.gz"
+HOMEPAGE="https://www.rsyslog.com/librelp/"
+SRC_URI="https://download.rsyslog.com/${PN}/${P}.tar.gz"
 
 LICENSE="GPL-3+ doc? ( FDL-1.3 )"
 

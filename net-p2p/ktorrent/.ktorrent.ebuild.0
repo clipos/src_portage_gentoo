@@ -1,18 +1,18 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
 ECM_HANDBOOK="optional"
 ECM_TEST="optional"
-KFMIN=5.60.0
+KFMIN=5.64.0
 QTMIN=5.12.3
 VIRTUALX_REQUIRED="test"
 inherit ecm kde.org
 
 DESCRIPTION="Powerful BitTorrent client based on KDE Frameworks"
 HOMEPAGE="https://kde.org/applications/internet/org.kde.ktorrent"
-[[ ${KDE_BUILD_TYPE} = release ]] && SRC_URI="mirror://kde/stable/${PN}/${PV/%.0}/${P}.tar.xz"
+[[ ${KDE_BUILD_TYPE} = release ]] && SRC_URI="mirror://kde/stable/${PN}/${PV}/${P}.tar.xz"
 
 LICENSE="GPL-2"
 SLOT="5"
@@ -43,7 +43,7 @@ COMMON_DEPEND="
 	>=kde-frameworks/kwindowsystem-${KFMIN}:5
 	>=kde-frameworks/kxmlgui-${KFMIN}:5
 	>=kde-frameworks/solid-${KFMIN}:5
-	>=net-libs/libktorrent-2.1.1:5
+	>=net-libs/libktorrent-2.2.0:5
 	infowidget? ( dev-libs/geoip )
 	kross? (
 		>=kde-frameworks/karchive-${KFMIN}:5
@@ -55,14 +55,11 @@ COMMON_DEPEND="
 		>=media-libs/taglib-1.5
 	)
 	rss? (
-		>=kde-frameworks/kdewebkit-${KFMIN}:5
+		>=dev-qt/qtwebengine-${QTMIN}:5
 		>=kde-frameworks/syndication-${KFMIN}:5
 	)
-	search? (
-		>=dev-qt/qtwebkit-5.212.0_pre20180120:5
-		>=kde-frameworks/kdewebkit-${KFMIN}:5
-	)
-	shutdown? ( >=kde-plasma/plasma-workspace-5.15.5 )
+	search? ( >=dev-qt/qtwebengine-${QTMIN}:5 )
+	shutdown? ( kde-plasma/libkworkspace:5 )
 	stats? ( >=kde-frameworks/kplotting-${KFMIN}:5 )
 	upnp? ( >=kde-frameworks/kcompletion-${KFMIN}:5 )
 	zeroconf? ( >=kde-frameworks/kdnssd-${KFMIN}:5 )
@@ -74,15 +71,20 @@ RDEPEND="${COMMON_DEPEND}
 	ipfilter? (
 		app-arch/bzip2
 		app-arch/unzip
-		>=kde-apps/kio-extras-19.04.3
+		kde-apps/kio-extras:5
 		>=kde-frameworks/ktextwidgets-${KFMIN}:5
 	)
 "
 
 PATCHES=(
-	"${FILESDIR}/${PN}-5.1.1-singlefile-torrent.patch" # git master
-	"${FILESDIR}/${P}-crash-on-exit.patch" # bug #632588
+	"${FILESDIR}/${P}-fix-start-in-systray.patch" # 5.2 branch
+	"${FILESDIR}/${P}-taglib-linking.patch" # 5.2 branch
 )
+
+src_prepare() {
+	ecm_src_prepare
+	ecm_punt_bogus_dep Qt Script
+}
 
 src_configure() {
 	local mycmakeargs=(

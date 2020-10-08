@@ -1,0 +1,1 @@
+.kcoreaddons.ebuild.0

@@ -147,6 +147,11 @@ kernel-build_src_install() {
 	mv include scripts "${ED}/usr/src/linux-${ver}/" || die
 	mv "arch/${kern_arch}/include" \
 		"${ED}/usr/src/linux-${ver}/arch/${kern_arch}/" || die
+	# some arches need module.lds linker script to build external modules
+	if [[ -f arch/${kern_arch}/kernel/module.lds ]]; then
+		insinto "/usr/src/linux-${ver}/arch/${kern_arch}/kernel"
+		doins "arch/${kern_arch}/kernel/module.lds"
+	fi
 
 	# remove everything but Makefile* and Kconfig*
 	find -type f '!' '(' -name 'Makefile*' -o -name 'Kconfig*' ')' \
@@ -170,6 +175,9 @@ kernel-build_src_install() {
 	doins build/{System.map,Module.symvers}
 	local image_path=$(kernel-install_get_image_path)
 	cp -p "build/${image_path}" "${ED}/usr/src/linux-${ver}/${image_path}" || die
+
+	# building modules fails with 'vmlinux has no symtab?' if stripped
+	use ppc64 && dostrip -x "/usr/src/linux-${ver}/${image_path}"
 
 	# strip empty directories
 	find "${D}" -type d -empty -exec rmdir {} + || die

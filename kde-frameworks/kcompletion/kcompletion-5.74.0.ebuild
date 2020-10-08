@@ -1,0 +1,1 @@
+.kcompletion.ebuild.0

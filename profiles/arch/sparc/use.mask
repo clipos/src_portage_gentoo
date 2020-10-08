@@ -37,10 +37,6 @@ ayatana
 # mongodb is not keyworded on sparc
 mongodb
 
-# Andreas Sturmlechner <asturm@gentoo.org> (2018-12-06)
-# dev-qt/qtdeclarative-5.11.x is broken and blocks re-keywording of Qt5.
-qml
-
 # Sergei Trofimovich <slyfox@gentoo.org> (2017-11-19)
 # There is no luajit support on sparc. Bug #554376
 luajit
@@ -100,7 +96,6 @@ mono
 d
 # LCDproc masks see bug #148072
 lcd_devices_g15
-lcd_devices_graphlcd
 lcd_devices_ula200
 # Masking hardened, it isn't really supported, see bugs #144126 #78951
 hardened
@@ -139,7 +134,6 @@ ebook
 capi
 lensfun
 jingle
-mod_wsgi
 vaapi
 librtmp
 rtmp

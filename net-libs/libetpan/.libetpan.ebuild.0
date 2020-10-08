@@ -15,7 +15,7 @@ IUSE="berkdb gnutls ipv6 liblockfile libressl lmdb sasl ssl static-libs"
 
 # BerkDB is only supported up to version 6.0
 DEPEND="sys-libs/zlib
-	!lmdb? ( berkdb? ( <sys-libs/db-6.1:= ) )
+	!lmdb? ( berkdb? ( sys-libs/db:= ) )
 	lmdb? ( dev-db/lmdb )
 	ssl? (
 		gnutls? ( net-libs/gnutls:= )
@@ -30,7 +30,9 @@ RDEPEND="${DEPEND}"
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-1.0-nonnull.patch
-	"${FILESDIR}"/${PN}-1.9.3-missing-stddev_h.patch
+	"${FILESDIR}"/${PN}-1.9.4-berkdb_lookup.patch #519846
+	"${FILESDIR}"/${PN}-1.9.4-pkgconfig_file_no_ldflags.patch
+	"${FILESDIR}"/${P}-CVE-2020-15953.patch #734130
 )
 
 pkg_pretend() {
@@ -57,12 +59,11 @@ src_configure() {
 	local myeconfargs=(
 		# --enable-debug simply injects "-O2 -g" into CFLAGS
 		--disable-debug
-		$(use_enable berkdb db)
 		$(use_enable ipv6)
 		$(use_enable liblockfile lockfile)
-		$(use_enable lmdb)
 		$(use_enable static-libs static)
 		$(use_with sasl)
+		$(usex lmdb '--enable-lmdb --disable-db' "$(use_enable berkdb db) --disable-lmdb")
 		$(usex ssl "$(use_with gnutls) $(use_with !gnutls openssl)" '--without-gnutls --without-openssl')
 	)
 	econf "${myeconfargs[@]}"

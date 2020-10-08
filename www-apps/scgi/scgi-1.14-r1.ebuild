@@ -1,1 +1,0 @@
-.scgi.ebuild.0

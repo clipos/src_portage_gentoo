@@ -1,0 +1,1 @@
+.onigmo.ebuild.0

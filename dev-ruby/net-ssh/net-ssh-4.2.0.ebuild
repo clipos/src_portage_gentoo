@@ -1,1 +1,0 @@
-.net-ssh.ebuild.1

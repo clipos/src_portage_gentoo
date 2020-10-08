@@ -1,22 +1,22 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
-DESCRIPTION="screen(1) frontend that is designed to be a session handler"
-HOMEPAGE="http://pubwww.hsz-t.ch/~mgloor/screenie.html"
-SRC_URI="http://pubwww.hsz-t.ch/~mgloor/data/${P}.tar.bz2"
+DESCRIPTION="A small and lightweight screen wrapper"
+HOMEPAGE="https://sourceforge.net/projects/screenie/"
+SRC_URI="http://downloads.sourceforge.net/project/${PN}/${P}.tar.gz"
 
-LICENSE="GPL-2"
+LICENSE="GPL-2+"
 SLOT="0"
 KEYWORDS="amd64 ~arm hppa ~ia64 sparc x86"
-IUSE=""
 
 RDEPEND="app-misc/screen"
 
-PATCHES=( "${FILESDIR}/${PN}-CVE-2008-5371.patch" )
+S="${WORKDIR}/${PN}"
 
 src_install() {
+	einstalldocs
 	dobin screenie
-	default
+	doman screenie.1
 }

@@ -1,0 +1,1 @@
+.syntax-highlighting.ebuild.0

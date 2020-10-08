@@ -5,7 +5,7 @@ EAPI=7
 
 inherit eutils flag-o-matic multilib toolchain-funcs multilib-minimal
 
-NSPR_VER="4.25"
+NSPR_VER="4.28"
 RTM_NAME="NSS_${PV//./_}_RTM"
 
 DESCRIPTION="Mozilla's Network Security Services library that implements PKI support"
@@ -36,7 +36,7 @@ MULTILIB_CHOST_TOOLS=(
 
 PATCHES=(
 	# Custom changes for gentoo
-	"${FILESDIR}/${PN}-3.47-gentoo-fixups.patch"
+	"${FILESDIR}/${PN}-3.53-gentoo-fixups.patch"
 	"${FILESDIR}/${PN}-3.21-gentoo-fixup-warnings.patch"
 	"${FILESDIR}/${PN}-3.23-hppa-byte_order.patch"
 	"${FILESDIR}/${PN}-3.53-fix-building-on-ppc.patch"
@@ -150,27 +150,25 @@ multilib_src_compile() {
 	local myCPPFLAGS="${CPPFLAGS} $($(tc-getPKG_CONFIG) nspr --cflags)"
 	unset NSPR_INCLUDE_DIR
 
-	# Do not let `uname` be used.
-	if use kernel_linux ; then
-		makeargs+=(
-			OS_TARGET=Linux
-			OS_RELEASE=2.6
-			OS_TEST="$(nssarch)"
-		)
-	fi
-
 	export NSS_ALLOW_SSLKEYLOGFILE=1
 	export NSS_ENABLE_WERROR=0 #567158
 	export BUILD_OPT=1
 	export NSS_USE_SYSTEM_SQLITE=1
 	export NSDISTMODE=copy
-	export NSS_ENABLE_ECC=1
 	export FREEBL_NO_DEPEND=1
 	export FREEBL_LOWHASH=1
 	export NSS_SEED_ONLY_DEV_URANDOM=1
-	export ASFLAGS=""
 	export USE_SYSTEM_ZLIB=1
 	export ZLIB_LIBS=-lz
+	export ASFLAGS=""
+	# Fix build failure on arm64
+	export NS_USE_GCC=1
+	# Detect compiler type and set proper environment value
+	if tc-is-gcc; then
+		export CC_IS_GCC=1
+	elif tc-is-clang; then
+		export CC_IS_CLANG=1
+	fi
 
 	local d
 
@@ -188,7 +186,7 @@ multilib_src_compile() {
 		CPPFLAGS="${myCPPFLAGS}" \
 		XCFLAGS="${CFLAGS} ${CPPFLAGS}" \
 		NSPR_LIB_DIR="${T}/fakedir" \
-		emake -j1 "${makeargs[@]}" -C ${d}
+		emake -j1 "${makeargs[@]}" -C ${d} OS_TEST="$(nssarch)"
 	done
 }
 

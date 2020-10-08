@@ -1,0 +1,1 @@
+.rspec-json_expectations.ebuild.0

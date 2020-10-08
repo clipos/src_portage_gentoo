@@ -38,12 +38,12 @@ SRC_URI="https://downloads.asterisk.org/pub/telephony/dahdi-linux/releases/${MY_
 
 LICENSE="LGPL-2.1"
 SLOT="0"
-KEYWORDS="amd64 ~ppc ~ppc64 x86"
+KEYWORDS="amd64 ~arm ~arm64 ~ppc ~ppc64 x86"
 IUSE="flash oslec"
 
 PATCHES=( "${WORKDIR}/dahdi-patchset" )
 
-CONFIG_CHECK="MODULES ~CRC_CCITT"
+CONFIG_CHECK="MODULES PCI ~CRC_CCITT"
 
 pkg_pretend() {
 	use oslec && CONFIG_CHECK+=" ECHO"

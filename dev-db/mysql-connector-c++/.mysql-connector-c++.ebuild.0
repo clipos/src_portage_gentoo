@@ -4,7 +4,7 @@
 EAPI="7"
 
 CMAKE_MAKEFILE_GENERATOR=emake
-inherit cmake-utils
+inherit cmake
 
 DESCRIPTION="MySQL database connector for C++ (mimics JDBC 4.0 API)"
 HOMEPAGE="https://dev.mysql.com/downloads/connector/cpp/"
@@ -29,7 +29,7 @@ S="${WORKDIR}/${P}-src"
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-8.0.19-fix-build.patch
-	"${FILESDIR}"/${PN}-8.0.19-fix-libressl-support.patch
+	"${FILESDIR}"/${PN}-8.0.20-fix-libressl-support.patch
 )
 
 src_configure() {
@@ -40,5 +40,5 @@ src_configure() {
 		$(usex legacy '-DMYSQLCLIENT_STATIC_LINKING=0' '')
 	)
 
-	cmake-utils_src_configure
+	cmake_src_configure
 }

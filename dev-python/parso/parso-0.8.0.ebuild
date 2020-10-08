@@ -1,0 +1,1 @@
+.parso.ebuild.0

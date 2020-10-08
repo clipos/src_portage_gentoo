@@ -1,1 +1,0 @@
-.libgnomeui.ebuild.0

@@ -1,1 +1,0 @@
-.glosung.ebuild.0

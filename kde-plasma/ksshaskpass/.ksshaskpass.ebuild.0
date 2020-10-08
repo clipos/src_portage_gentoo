@@ -3,9 +3,9 @@
 
 EAPI=7
 
-KFMIN=5.66.0
+KFMIN=5.71.0
 PVCUT=$(ver_cut 1-3)
-QTMIN=5.12.3
+QTMIN=5.14.2
 inherit ecm kde.org
 
 DESCRIPTION="KDE implementation of ssh-askpass with Kwallet integration"
@@ -75,4 +75,5 @@ pkg_postinst() {
 		rm "${EROOT}"/etc/plasma/startup/05-ksshaskpass.sh || die
 		elog "Removed obsolete ${EPREFIX}/etc/plasma/startup/05-ksshaskpass.sh"
 	fi
+	rmdir -v "${EROOT}"/etc/plasma{/startup,} 2> /dev/null
 }

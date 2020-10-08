@@ -1,1 +1,0 @@
-.protobuf-java.ebuild.1

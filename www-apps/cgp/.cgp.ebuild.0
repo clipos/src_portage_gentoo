@@ -1,12 +1,12 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 inherit webapp
 
 MY_PN="${PN^^}"
-MY_PV="72acfcbffd51da1e77a56517618da68252485ed6"
+MY_PV="fd8fa70739d18d786e88f7ffa57e250e0e41af8f"
 
 DESCRIPTION="A graphical web-based front-end for visualizing RRD collected by collectd"
 HOMEPAGE="https://github.com/pommi/CGP"
@@ -27,6 +27,8 @@ S="${WORKDIR}/${MY_PN}-${MY_PV}"
 
 DOCS=( "README.md" "doc/CHANGELOG" "doc/nginx.conf" )
 
+PATCHES=( "${FILESDIR}/${P}-double-quote.patch" )
+
 src_install() {
 	webapp_src_preinst
 
@@ -34,7 +36,7 @@ src_install() {
 
 	# Since the docs are already installed, remove them from htdocs
 	# The file doc/CHANGELOG is needed, as CGP reads from there it's version
-	rm -r .gitignore doc/LICENSE doc/nginx.conf || die
+	rm -r .gitignore LICENSE doc/nginx.conf || die
 
 	insinto "${MY_HTDOCSDIR}"
 	doins -r .

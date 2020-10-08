@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
-WX_GTK_VER="3.0"
+WX_GTK_VER="3.0-gtk3"
 
 inherit elisp-common java-pkg-opt-2 systemd wxwidgets
 

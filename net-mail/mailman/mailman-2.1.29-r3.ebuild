@@ -1,1 +1,0 @@
-.mailman.ebuild.0

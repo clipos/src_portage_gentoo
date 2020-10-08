@@ -1,1 +1,0 @@
-.moosic.ebuild.0

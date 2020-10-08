@@ -1,0 +1,1 @@
+.krunner.ebuild.0

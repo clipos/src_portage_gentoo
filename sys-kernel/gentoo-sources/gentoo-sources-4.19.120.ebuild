@@ -1,1 +1,0 @@
-.gentoo-sources.ebuild.3

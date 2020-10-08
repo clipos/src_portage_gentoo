@@ -1,7 +1,7 @@
 # Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=5
 
 USE_RUBY="ruby23 ruby24 ruby25"
 
@@ -22,28 +22,33 @@ SLOT="$(get_version_component_range 1-2)"
 KEYWORDS="amd64 ~arm ~arm64 ~hppa ~ppc ~ppc64 ~x86 ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
 IUSE=""
 
-ruby_add_rdepend "dev-ruby/concurrent-ruby:1"
+RUBY_PATCHES=( ${P}-frozen-classes.patch )
 
 ruby_add_bdepend "test? (
-	>=dev-ruby/activesupport-4.2
+	dev-ruby/activesupport
 	dev-ruby/bundler
 	>=dev-ruby/mocha-0.13
 	dev-ruby/test_declarative )"
 
 all_ruby_prepare() {
-	rm -f gemfiles/*.lock || die
+	# Remove bundler lock files since we cannot depend on specific
+	# versions in Gentoo.
+	rm gemfiles/*.lock || die
 
-	# Remove optional unpackaged oj gem
-	sed -i -e '/oj/ s:^:#:' gemfiles/* || die
+	# Also test activesupport 5.2.
+	sed -e 's/4.2.0/5.2.0/' < gemfiles/Gemfile.rails-4.2.x > gemfiles/Gemfile.rails-5.2.x || die
 }
 
 each_ruby_test() {
 	case ${RUBY} in
 		*ruby25)
-			versions="5.1"
+			versions="5.2"
 			;;
 		*ruby23|*ruby24)
-			versions="4.2 5.0 5.1"
+			versions="4.2 5.2"
+			;;
+		*)
+			die "Unexpected ruby target"
 			;;
 	esac
 

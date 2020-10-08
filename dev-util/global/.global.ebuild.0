@@ -1,9 +1,9 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI="5"
+EAPI=7
 
-inherit autotools elisp-common eutils ltprune
+inherit autotools elisp-common
 
 DESCRIPTION="tag system to find an object location in various sources"
 HOMEPAGE="https://www.gnu.org/software/global/global.html"
@@ -14,22 +14,42 @@ SLOT="0"
 KEYWORDS="amd64 ppc x86"
 IUSE="doc emacs vim"
 
-RDEPEND="|| ( dev-libs/libltdl:0 sys-devel/libtool:2 )
+RDEPEND="
 	sys-libs/ncurses
 	emacs? ( >=app-editors/emacs-23.1:* )
-	vim? ( || ( app-editors/vim app-editors/gvim ) )"
-DEPEND="${DEPEND}
-	doc? ( app-text/texi2html sys-apps/texinfo )"
+	vim? ( || (
+			app-editors/vim
+			app-editors/gvim
+		)
+	)
+	|| (
+		dev-libs/libltdl:0
+		sys-devel/libtool:2
+	)"
+
+DEPEND="${RDEPEND}
+	doc? (
+		app-text/texi2html
+		sys-apps/texinfo
+	)"
 
 SITEFILE="50gtags-gentoo.el"
 
+PATCHES=(
+	"${FILESDIR}/${PN}-6.2.9-tinfo.patch"
+	"${FILESDIR}/${PN}-6.6.4-fno-common.patch"
+)
+
+DOCS=( AUTHORS FAQ NEWS README THANKS )
+
 src_prepare() {
-	epatch "${FILESDIR}/${PN}-6.2.9-tinfo.patch"
+	default
 	eautoreconf
 }
 
 src_configure() {
-	econf "$(use_with emacs lispdir "${SITELISP}/${PN}")"
+	econf \
+		"$(use_with emacs lispdir "${SITELISP}/${PN}")"
 }
 
 src_compile() {
@@ -46,15 +66,7 @@ src_compile() {
 }
 
 src_install() {
-	emake DESTDIR="${D}" install
-
-	if use doc; then
-		dohtml doc/global.html
-		# doc/global.pdf is generated if tex executable (e.g. /usr/bin/tex) is available.
-		[[ -f doc/global.pdf ]] && dodoc doc/global.pdf
-	fi
-
-	dodoc AUTHORS FAQ NEWS README THANKS
+	default
 
 	insinto /etc
 	doins gtags.conf
@@ -69,7 +81,13 @@ src_install() {
 		elisp-site-file-install "${FILESDIR}/${SITEFILE}"
 	fi
 
-	prune_libtool_files
+	if use doc; then
+		# doc/global.pdf is generated if tex executable (e.g. /usr/bin/tex) is available.
+		[[ -f doc/global.pdf ]] && DOCS+=( doc/global.pdf )
+	fi
+
+	einstalldocs
+	find "${ED}" -name '*.la' -type f -delete || die
 }
 
 pkg_postinst() {

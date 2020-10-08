@@ -1,0 +1,1 @@
+.puppet-lint.ebuild.0

@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="7"
@@ -10,11 +10,11 @@ SRC_URI="https://download.strongswan.org/${P}.tar.bz2"
 
 LICENSE="GPL-2 RSA DES"
 SLOT="0"
-KEYWORDS="amd64 arm ppc ~ppc64 x86"
+KEYWORDS="amd64 arm ~arm64 ppc ~ppc64 x86"
 IUSE="+caps curl +constraints debug dhcp eap farp gcrypt +gmp ldap mysql networkmanager +non-root +openssl selinux sqlite systemd pam pkcs11"
 
 STRONGSWAN_PLUGINS_STD="led lookip systime-fix unity vici"
-STRONGSWAN_PLUGINS_OPT="aesni blowfish ccm chapoly ctr forecast gcm ha ipseckey newhope ntru padlock rdrand save-keys unbound whitelist"
+STRONGSWAN_PLUGINS_OPT="aesni blowfish bypass-lan ccm chapoly ctr forecast gcm ha ipseckey newhope ntru padlock rdrand save-keys unbound whitelist"
 for mod in $STRONGSWAN_PLUGINS_STD; do
 	IUSE="${IUSE} +strongswan_plugins_${mod}"
 done
@@ -338,9 +338,9 @@ pkg_postinst() {
 	elog
 	elog "Make sure you have _all_ required kernel modules available including"
 	elog "the appropriate cryptographic algorithms. A list is available at:"
-	elog "  http://wiki.strongswan.org/projects/strongswan/wiki/KernelModules"
+	elog "  https://wiki.strongswan.org/projects/strongswan/wiki/KernelModules"
 	elog
 	elog "The up-to-date manual is available online at:"
-	elog "  http://wiki.strongswan.org/"
+	elog "  https://wiki.strongswan.org/"
 	elog
 }

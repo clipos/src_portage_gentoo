@@ -1,0 +1,1 @@
+.ibus-typing-booster.ebuild.0

@@ -6,17 +6,18 @@ inherit autotools flag-o-matic toolchain-funcs multilib-minimal
 
 MY_P="SDL2-${PV}"
 DESCRIPTION="Simple Direct Media Layer"
-HOMEPAGE="http://www.libsdl.org"
-SRC_URI="http://www.libsdl.org/release/${MY_P}.tar.gz"
+HOMEPAGE="https://www.libsdl.org/"
+SRC_URI="https://www.libsdl.org/release/${MY_P}.tar.gz"
 
 LICENSE="ZLIB"
 SLOT="0"
 KEYWORDS="~alpha amd64 arm arm64 ~hppa ~ia64 ppc ppc64 sparc x86"
 
-IUSE="cpu_flags_x86_3dnow alsa altivec aqua custom-cflags dbus gles2 haptic libsamplerate +joystick kms cpu_flags_x86_mmx nas opengl oss pulseaudio +sound cpu_flags_x86_sse cpu_flags_x86_sse2 static-libs +threads tslib udev +video video_cards_vc4 vulkan wayland X xinerama xscreensaver"
+IUSE="alsa aqua cpu_flags_ppc_altivec cpu_flags_x86_3dnow cpu_flags_x86_mmx cpu_flags_x86_sse cpu_flags_x86_sse2 custom-cflags dbus gles2 haptic jack +joystick kms libsamplerate nas opengl oss pulseaudio +sound static-libs +threads tslib udev +video video_cards_vc4 vulkan wayland X xinerama xscreensaver"
 REQUIRED_USE="
 	alsa? ( sound )
 	gles2? ( video )
+	jack? ( sound )
 	nas? ( sound )
 	opengl? ( video )
 	pulseaudio? ( sound )
@@ -29,6 +30,7 @@ CDEPEND="
 	alsa? ( >=media-libs/alsa-lib-1.0.27.2[${MULTILIB_USEDEP}] )
 	dbus? ( >=sys-apps/dbus-1.6.18-r1[${MULTILIB_USEDEP}] )
 	gles2? ( >=media-libs/mesa-9.1.6[${MULTILIB_USEDEP},gles2] )
+	jack? ( virtual/jack[${MULTILIB_USEDEP}] )
 	kms? (
 		>=x11-libs/libdrm-2.4.46[${MULTILIB_USEDEP}]
 		>=media-libs/mesa-9.0.0[${MULTILIB_USEDEP},gbm]
@@ -78,8 +80,8 @@ MULTILIB_WRAPPED_HEADERS=(
 )
 
 PATCHES=(
-	# https://bugzilla.libsdl.org/show_bug.cgi?id=1431
-	"${FILESDIR}"/${PN}-2.0.10-static-libs.patch
+	"${FILESDIR}"/${PN}-2.0.12-static-libs.patch
+	"${FILESDIR}"/${PN}-2.0.12-vulkan-headers.patch
 )
 
 S="${WORKDIR}/${MY_P}"
@@ -88,7 +90,7 @@ src_prepare() {
 	default
 
 	# Unbundle some headers.
-	rm -rv src/video/khronos || die
+	rm -r src/video/khronos || die
 	ln -s "${SYSROOT}${EPREFIX}"/usr/include src/video/khronos || die
 
 	AT_M4DIR="/usr/share/aclocal acinclude" eautoreconf
@@ -115,15 +117,17 @@ multilib_src_configure() {
 		--enable-loadso
 		--enable-cpuinfo
 		--enable-assembly
+		$(use_enable cpu_flags_ppc_altivec altivec)
 		$(use_enable cpu_flags_x86_sse ssemath)
 		$(use_enable cpu_flags_x86_mmx mmx)
 		$(use_enable cpu_flags_x86_3dnow 3dnow)
 		$(use_enable cpu_flags_x86_sse sse)
 		$(use_enable cpu_flags_x86_sse2 sse2)
-		$(use_enable altivec)
 		$(use_enable oss)
 		$(use_enable alsa)
 		--disable-alsa-shared
+		$(use_enable jack)
+		--disable-jack-shared
 		--disable-esd
 		$(use_enable pulseaudio)
 		--disable-pulseaudio-shared
@@ -181,9 +185,8 @@ multilib_src_install() {
 }
 
 multilib_src_install_all() {
+	# Do not delete the static .a libraries here as some are
+	# mandatory. They may be needed even when linking dynamically.
 	find "${ED}" -type f -name "*.la" -delete || die
-	if ! use static-libs ; then
-		find "${ED}" -type f -name "*.a" -delete || die
-	fi
 	dodoc {BUGS,CREDITS,README,README-SDL,TODO,WhatsNew}.txt docs/README*.md
 }

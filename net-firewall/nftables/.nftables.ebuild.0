@@ -3,43 +3,42 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{6,7,8} )
+PYTHON_COMPAT=( python3_{6,7,8,9} )
 
 inherit autotools linux-info python-r1 systemd
 
 DESCRIPTION="Linux kernel (3.13+) firewall, NAT and packet mangling tools"
 HOMEPAGE="https://netfilter.org/projects/nftables/"
-#SRC_URI="https://git.netfilter.org/nftables/snapshot/v${PV}.tar.gz -> ${P}.tar.gz"
 SRC_URI="https://netfilter.org/projects/nftables/files/${P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="amd64 arm ~arm64 ~ia64 ~ppc64 ~sparc x86"
-IUSE="debug +doc +gmp json +modern-kernel python +readline static-libs xtables"
+KEYWORDS="amd64 arm arm64 ~ia64 ~ppc64 ~sparc x86"
+IUSE="debug doc +gmp json +modern-kernel python +readline static-libs xtables"
 
 RDEPEND="
-	>=net-libs/libmnl-1.0.3:0=
+	>=net-libs/libmnl-1.0.4:0=
 	gmp? ( dev-libs/gmp:0= )
 	json? ( dev-libs/jansson )
 	python? ( ${PYTHON_DEPS} )
 	readline? ( sys-libs/readline:0= )
-	>=net-libs/libnftnl-1.1.5:0=
+	>=net-libs/libnftnl-1.1.7:0=
 	xtables? ( >=net-firewall/iptables-1.6.1 )
 "
 
 DEPEND="${RDEPEND}"
 
 BDEPEND="
-	doc? ( app-text/asciidoc )
-	>=app-text/docbook2X-0.8.8-r4
-	sys-devel/bison
-	sys-devel/flex
+	doc? (
+		app-text/asciidoc
+		>=app-text/docbook2X-0.8.8-r4
+	)
 	virtual/pkgconfig
 "
 
-REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
-
-#S="${WORKDIR}/v${PV}"
+REQUIRED_USE="
+	python? ( ${PYTHON_REQUIRED_USE} )
+"
 
 python_make() {
 	emake \
@@ -47,7 +46,7 @@ python_make() {
 		abs_builddir="${S}" \
 		DESTDIR="${D}" \
 		PYTHON_BIN="${PYTHON}" \
-		${@}
+		"${@}"
 }
 
 pkg_setup() {
@@ -93,13 +92,19 @@ src_configure() {
 src_compile() {
 	default
 
-	if use python ; then
+	if use python; then
 		python_foreach_impl python_make
 	fi
 }
 
 src_install() {
 	default
+
+	if ! use doc; then
+		pushd doc >/dev/null || die
+		doman *.?
+		popd >/dev/null || die
+	fi
 
 	local mksuffix="$(usex modern-kernel '-mk' '')"
 
@@ -113,6 +118,7 @@ src_install() {
 
 	if use python ; then
 		python_foreach_impl python_make install
+		python_foreach_impl python_optimize
 	fi
 
 	find "${ED}" -type f -name "*.la" -delete || die
@@ -134,11 +140,23 @@ pkg_postinst() {
 		ewarn "    'chmod 600 \"${save_file}\"'"
 	fi
 
-	elog "If you wish to enable the firewall rules on boot (on systemd) you"
-	elog "will need to enable the nftables-restore service."
-	elog "    'systemd_enable_service basic.target ${PN}-restore.service'"
-	elog
-	elog "If you are creating firewall rules before the next system restart "
-	elog "the nftables-restore service must be manually started in order to "
-	elog "save those rules on shutdown."
+	if has_version 'sys-apps/systemd'; then
+		elog "If you wish to enable the firewall rules on boot (on systemd) you"
+		elog "will need to enable the nftables-restore service."
+		elog "    'systemctl enable ${PN}-restore.service'"
+		elog
+		elog "If you are creating firewall rules before the next system restart"
+		elog "the nftables-restore service must be manually started in order to"
+		elog "save those rules on shutdown."
+	fi
+	if has_version 'sys-apps/openrc'; then
+		elog "If you wish to enable the firewall rules on boot (on openrc) you"
+		elog "will need to enable the nftables service."
+		elog "    'rc-update add ${PN} default'"
+		elog
+		elog "If you are creating or updating the firewall rules and wish to save"
+		elog "them to be loaded on the next restart, use the \"save\" functionality"
+		elog "in the init script."
+		elog "    'rc-service ${PN} save'"
+	fi
 }

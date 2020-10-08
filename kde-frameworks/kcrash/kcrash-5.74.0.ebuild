@@ -1,0 +1,1 @@
+.kcrash.ebuild.0

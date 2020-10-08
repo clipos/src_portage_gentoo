@@ -6,17 +6,17 @@ EAPI=7
 ECM_HANDBOOK="optional"
 ECM_TEST="forceoptional"
 KDE_RELEASE_SERVICE="true"
-KFMIN=5.60.0
-QTMIN=5.12.3
+KFMIN=5.70.0
+QTMIN=5.14.2
 inherit ecm kde.org
 
 DESCRIPTION="Simple music player by KDE"
-HOMEPAGE="https://community.kde.org/Elisa"
+HOMEPAGE="https://elisa.kde.org/ https://kde.org/applications/en/elisa"
 
 LICENSE="LGPL-3+"
 SLOT="5"
 KEYWORDS="amd64 arm64 x86"
-IUSE="mpris semantic-desktop vlc"
+IUSE="mpris semantic-desktop +vlc"
 
 BDEPEND="sys-devel/gettext"
 DEPEND="
@@ -25,7 +25,6 @@ DEPEND="
 	>=dev-qt/qtmultimedia-${QTMIN}:5
 	>=dev-qt/qtsql-${QTMIN}:5
 	>=dev-qt/qtwidgets-${QTMIN}:5
-	>=kde-frameworks/kcmutils-${KFMIN}:5
 	>=kde-frameworks/kconfig-${KFMIN}:5
 	>=kde-frameworks/kconfigwidgets-${KFMIN}:5
 	>=kde-frameworks/kcoreaddons-${KFMIN}:5
@@ -47,6 +46,7 @@ DEPEND="
 "
 RDEPEND="${DEPEND}
 	>=dev-qt/qtgraphicaleffects-${QTMIN}:5
+	>=dev-qt/qtquickcontrols-${QTMIN}:5
 	>=dev-qt/qtquickcontrols2-${QTMIN}:5
 "
 

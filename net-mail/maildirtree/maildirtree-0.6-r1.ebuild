@@ -1,1 +1,0 @@
-.maildirtree.ebuild.0

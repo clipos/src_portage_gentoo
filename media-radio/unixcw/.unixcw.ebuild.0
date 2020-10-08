@@ -1,9 +1,9 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=5
+EAPI=7
 
-inherit autotools eutils flag-o-matic ltprune multilib
+inherit autotools flag-o-matic multilib
 
 DESCRIPTION="A package of programs that fit together to form a morse code tutor program"
 HOMEPAGE="http://unixcw.sourceforge.net"
@@ -23,14 +23,14 @@ RDEPEND="ncurses? ( sys-libs/ncurses:= )
 	pulseaudio? ( media-sound/pulseaudio )"
 DEPEND="${RDEPEND}
 	virtual/pkgconfig
-	sys-devel/libtool
-	!<=app-misc/cw-1.0.16-r1"
+	sys-devel/libtool"
 
 src_prepare() {
 	append-cflags -std=gnu11
 	append-cxxflags -std=gnu++11
-	epatch "${FILESDIR}"/$PN-3.5-tinfo.patch \
-	    "${FILESDIR}"/$PN-tests.patch
+	eapply -p0 "${FILESDIR}"/$PN-3.5-tinfo.patch \
+		"${FILESDIR}"/$PN-tests.patch
+	eapply_user
 	eautoreconf
 }
 
@@ -39,12 +39,13 @@ src_configure() {
 		$(use_enable pulseaudio ) \
 		$(use_enable alsa ) \
 		$(use_enable ncurses cwcp ) \
-		$(use_enable qt5 xcwcp )
+		$(use_enable qt5 xcwcp ) \
+		--disable-static
 }
 
 src_install() {
 	emake DESTDIR="${D}" install
-	prune_libtool_files
+	find "${D}" -name '*.la' -type f -delete || die
 	dodoc ChangeLog NEWS README
 	if ! use suid ; then
 		fperms 711 /usr/bin/cw

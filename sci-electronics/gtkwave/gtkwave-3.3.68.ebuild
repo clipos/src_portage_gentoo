@@ -1,1 +1,0 @@
-.gtkwave.ebuild.0

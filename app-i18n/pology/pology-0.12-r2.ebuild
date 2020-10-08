@@ -1,1 +1,0 @@
-.pology.ebuild.0

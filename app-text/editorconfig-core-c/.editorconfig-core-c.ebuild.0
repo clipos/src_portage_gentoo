@@ -1,9 +1,9 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
-inherit cmake-utils
+inherit cmake
 
 DESCRIPTION="EditorConfig core library written in C"
 HOMEPAGE="https://github.com/editorconfig/editorconfig-core-c/"
@@ -13,25 +13,26 @@ LICENSE="BSD-2"
 SLOT="0"
 KEYWORDS="amd64 ~arm arm64 ~ppc64 x86"
 IUSE="cli doc"
-CDEPEND="dev-libs/libpcre:="
-DEPEND="${CDEPEND}
-	doc? ( app-doc/doxygen )"
-RDEPEND="${CDEPEND}
+
+BDEPEND="doc? ( app-doc/doxygen )"
+DEPEND="dev-libs/libpcre2:="
+RDEPEND="${DEPEND}
 	cli? ( !dev-python/editorconfig-core-py[cli] )"
 
-src_prepare() {
-	sed -e 's:OUTPUT_NAME editorconfig_static:OUTPUT_NAME editorconfig:' \
-		-i src/lib/CMakeLists.txt || die
-	cmake-utils_src_prepare
-}
+PATCHES=( "${FILESDIR}/${P}-no-static-libs.patch" )
 
 src_configure() {
-	local mycmakeargs=()
-	use doc && mycmakeargs+=(-DINSTALL_HTML_DOC=ON)
-	cmake-utils_src_configure
+	local -a mycmakeargs=(
+		-DBUILD_DOCUMENTATION=$(usex doc 'ON' 'OFF')
+	)
+	cmake_src_configure
 }
 
 src_install() {
-	cmake-utils_src_install
-	use cli || rm -rf "${ED}usr/bin"
+	use doc && local HTML_DOCS=( "${BUILD_DIR}"/doc/html/. )
+	cmake_src_install
+
+	if ! use cli; then
+		rm -r "${ED}/usr/bin" || die
+	fi
 }

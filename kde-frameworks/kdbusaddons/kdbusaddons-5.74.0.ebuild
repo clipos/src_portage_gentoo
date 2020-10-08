@@ -1,0 +1,1 @@
+.kdbusaddons.ebuild.0

@@ -1,10 +1,9 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
-PYTHON_COMPAT=( python2_7 )
+EAPI=7
 
-inherit python-single-r1 toolchain-funcs user
+inherit toolchain-funcs
 
 MY_P="${P/_pre/pre}"
 
@@ -16,19 +15,15 @@ HOMEPAGE="http://www.mulliner.org/bluetooth/sobexsrv.php"
 SLOT="0"
 LICENSE="GPL-2"
 KEYWORDS="amd64 ppc x86"
-IUSE="gtk"
 
 DEPEND="
 	>=dev-libs/openobex-1.7.2-r1
 	net-wireless/bluez
-	gtk? ( ${PYTHON_DEPS} )"
+"
 RDEPEND="${DEPEND}
-	gtk? (
-		${PYTHON_DEPS}
-		>=dev-python/pygtk-2.2
-	)"
-REQUIRED_USE="
-	gtk? ( ${PYTHON_REQUIRED_USE} )"
+	acct-user/sobexsrv
+	acct-group/sobexsrv
+"
 
 S="${WORKDIR}/${MY_P}"
 
@@ -36,13 +31,6 @@ PATCHES=(
 	"${DISTDIR}/${P}"-fix64.patch
 	"${FILESDIR}/${P}"-openobex16.patch
 )
-
-pkg_setup() {
-	use gtk && python-single-r1_pkg_setup
-
-	enewgroup sobexsrv
-	enewuser sobexsrv -1 -1 /var/spool/sobexsrv sobexsrv
-}
 
 src_prepare() {
 	default
@@ -65,19 +53,10 @@ src_compile() {
 src_install() {
 	default
 	dodoc AUTHOR CONFIG SECURITY THANKS
-
-	if use gtk; then
-		python_doscript "${D}/usr/bin/sobexsrv_handler"
-		newdoc "${S}/scripts/test" sobexsrv_handler.sample_script
-	else
-		rm "${D}/usr/bin/sobexsrv_handler" || die
-	fi
+	rm "${D}/usr/bin/sobexsrv_handler" || die
 
 	newinitd "${FILESDIR}/init.d_sobexsrv" sobexsrv
 	newconfd "${FILESDIR}/conf.d_sobexsrv" sobexsrv
-
-	keepdir /var/spool/sobexsrv
-	fowners sobexsrv:sobexsrv /var/spool/sobexsrv
 }
 
 pkg_postinst() {

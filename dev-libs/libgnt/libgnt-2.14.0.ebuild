@@ -1,0 +1,1 @@
+.libgnt.ebuild.0

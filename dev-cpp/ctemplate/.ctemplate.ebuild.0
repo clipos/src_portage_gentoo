@@ -1,15 +1,16 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
-PYTHON_COMPAT=( python2_7 )
+PYTHON_COMPAT=( python3_{6,7,8} )
 
 inherit autotools elisp-common python-any-r1
 
 DESCRIPTION="A simple but powerful template language for C++"
 HOMEPAGE="https://github.com/olafvdspek/ctemplate"
-SRC_URI="https://dev.gentoo.org/~pinkbyte/distfiles/${P}.tar.bz2"
+SRC_URI="https://github.com/OlafvdSpek/ctemplate/archive/${P}.tar.gz"
+S="${WORKDIR}/ctemplate-${P}"
 
 LICENSE="BSD"
 SLOT="0"
@@ -25,8 +26,6 @@ SITEFILE="70ctemplate-gentoo.el"
 
 # Some tests are broken in 2.3
 RESTRICT="test"
-
-PATCHES=( "${FILESDIR}"/${PN}-2.3-fix-build-system.patch )
 
 src_prepare() {
 	default
@@ -48,7 +47,7 @@ src_compile() {
 src_install() {
 	default
 	if ! use doc; then
-		rm -r "${ED%/}"/usr/share/doc/${PF}/html || die
+		rm -r "${ED}"/usr/share/doc/${PF}/html || die
 	fi
 
 	if use vim-syntax; then

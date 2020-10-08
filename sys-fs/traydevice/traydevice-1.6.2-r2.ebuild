@@ -1,1 +1,0 @@
-.traydevice.ebuild.0

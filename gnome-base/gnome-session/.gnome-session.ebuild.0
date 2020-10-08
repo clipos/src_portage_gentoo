@@ -6,14 +6,13 @@ inherit gnome.org gnome2-utils meson xdg
 
 DESCRIPTION="Gnome session manager"
 HOMEPAGE="https://gitlab.gnome.org/GNOME/gnome-session"
-SRC_URI+=" https://dev.gentoo.org/~leio/distfiles/${PF}-patchset.tar.xz"
+SRC_URI+=" https://dev.gentoo.org/~leio/distfiles/${P}-patchset.tar.xz"
 
 LICENSE="GPL-2+"
 SLOT="0"
 KEYWORDS="~alpha amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 ~sparc x86 ~amd64-linux ~x86-linux ~x86-solaris"
-IUSE="consolekit doc elogind systemd"
+IUSE="doc elogind systemd"
 # There is a null backend available, thus ?? not ^^
-# consolekit can be enabled alone, or together with a logind provider; in latter case CK is used as fallback
 REQUIRED_USE="?? ( elogind systemd )"
 
 DEPEND="
@@ -30,23 +29,19 @@ DEPEND="
 
 	systemd? ( >=sys-apps/systemd-183:0= )
 	elogind? ( >=sys-auth/elogind-239.4 )
-	consolekit? ( >=dev-libs/dbus-glib-0.76 )
 "
 
 # Pure-runtime deps from the session files should *NOT* be added here.
-# gnome-settings-daemon is assumed to be >=3.33.90, but this is about
-# removed components, so no need to strictly require it (older just
-# won't have those daemons loaded by gnome-session).
+# >=gnome-settings-daemon-3.35.91 for UsbProtection required component.
 # x11-misc/xdg-user-dirs{,-gtk} are needed to create the various XDG_*_DIRs, and
 # create .config/user-dirs.dirs which is read by glib to get G_USER_DIRECTORY_*
 # xdg-user-dirs-update is run during login (see 10-user-dirs-update-gnome below).
 # sys-apps/dbus[X] is needed for session management.
 # Our 90-xcursor-theme-gnome reads a setting from gsettings-desktop-schemas.
 RDEPEND="${DEPEND}
-	>=gnome-base/gnome-settings-daemon-3.23.2
+	>=gnome-base/gnome-settings-daemon-3.35.91
 	>=gnome-base/gsettings-desktop-schemas-0.1.7
 	sys-apps/dbus[X]
-	consolekit? ( sys-auth/consolekit )
 
 	x11-misc/xdg-user-dirs
 	x11-misc/xdg-user-dirs-gtk
@@ -62,7 +57,7 @@ BDEPEND="
 "
 
 PATCHES=(
-	# Various patches from other downstreams + elogind support
+	# Various patches from master (no 3-36 branch yet) + elogind support
 	"${WORKDIR}"/patches/
 )
 
@@ -80,8 +75,8 @@ src_configure() {
 		$(meson_use systemd)
 		-Dsystemd_session=$(usex systemd default disable)
 		$(meson_use systemd systemd_journal)
-		$(meson_use consolekit)
 		$(meson_use doc docbook)
+		-Dconsolekit=false
 		-Dman=true
 	)
 	meson_src_configure
@@ -95,7 +90,7 @@ src_install() {
 	doexe "${FILESDIR}/Gnome"
 
 	insinto /usr/share/applications
-	newins "${FILESDIR}/defaults.list-r4" gnome-mimeapps.list
+	newins "${FILESDIR}/defaults.list-r5" gnome-mimeapps.list
 
 	dodir /etc/X11/xinit/xinitrc.d/
 	exeinto /etc/X11/xinit/xinitrc.d/
@@ -119,8 +114,8 @@ pkg_postinst() {
 		ewarn "make sure that the commands in the xinitrc.d scripts are run."
 	fi
 
-	if ! use systemd && ! use elogind && ! use consolekit; then
-		ewarn "You are building without systemd, elogind and/or consolekit support."
+	if ! use systemd && ! use elogind; then
+		ewarn "You are building without systemd or elogind support."
 		ewarn "gnome-session won't be able to correctly track and manage your session."
 	fi
 }

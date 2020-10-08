@@ -1,1 +1,0 @@
-.cpptest.ebuild.1

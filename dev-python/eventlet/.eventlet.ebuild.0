@@ -12,11 +12,12 @@ SRC_URI="mirror://pypi/e/${PN}/${P}.tar.gz"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="amd64 arm arm64 ppc ppc64 ~s390 ~sparc x86"
+KEYWORDS="amd64 arm arm64 ppc ppc64 ~s390 sparc x86"
 IUSE="doc examples test"
 
 RDEPEND="
 	>=dev-python/dnspython-1.15.0[${PYTHON_USEDEP}]
+	<dev-python/dnspython-2.0.0[${PYTHON_USEDEP}]
 	>=dev-python/greenlet-0.3[${PYTHON_USEDEP}]
 	>=dev-python/monotonic-1.4[${PYTHON_USEDEP}]
 	>=dev-python/six-1.10.0[${PYTHON_USEDEP}]"
@@ -26,7 +27,6 @@ DEPEND="doc? ( >=dev-python/python-docs-2.7.6-r1:2.7 )
 		dev-python/nose[${PYTHON_USEDEP}] )"
 
 PATCHES=(
-	"${FILESDIR}/eventlet-0.25.1-sparc.patch"
 	"${FILESDIR}/eventlet-0.25.1-tests.patch"
 )
 
@@ -34,9 +34,6 @@ distutils_enable_sphinx doc
 distutils_enable_tests nose
 
 python_prepare_all() {
-	# provided by virtual/python-enum34
-	sed -i '/enum-compat/d' setup.py || die
-
 	if use doc; then
 		local PYTHON_DOC_ATOM=$(best_version -b dev-python/python-docs:2.7)
 		local PYTHON_DOC_VERSION="${PYTHON_DOC_ATOM#dev-python/python-docs-}"
@@ -45,24 +42,15 @@ python_prepare_all() {
 		sed -i "s|'https://docs.python.org/': None|'${PYTHON_DOC}': '${PYTHON_DOC_INVENTORY}'|" doc/conf.py || die
 	fi
 
-	if use test; then
-#		sed -i '/This is a Python 3 module/d' eventlet/green/http/__init__.py || die
-#		sed -i 's/^import/from OpenSSL import/g' eventlet/green/OpenSSL/__init__.py || die
-#		sed -i 's/^from version/from OpenSSL.version/' eventlet/green/OpenSSL/__init__.py || die
-		sed -i 's/TEST_TIMEOUT = 1/TEST_TIMEOUT = 10/' tests/__init__.py || die
-	fi
-
 	# Prevent file collisions from teestsuite
 	sed -e "s:'tests', :'tests', 'tests.*', :" -i setup.py || die
 
 	distutils-r1_python_prepare_all
 }
 
-python_prepare() {
-	if ! python_is_python3; then
-		# this is for python3 only
-		rm -r eventlet/green/http || die
-	fi
+python_test() {
+	unset PYTHONPATH
+	nosetests -v || die
 }
 
 python_install_all() {

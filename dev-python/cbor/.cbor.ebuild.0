@@ -17,6 +17,24 @@ S=${WORKDIR}/cbor_py-${EGIT_COMMIT}
 
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="amd64 arm ~arm64 x86 ~amd64-linux ~x86-linux"
+KEYWORDS="amd64 arm arm64 x86 ~amd64-linux ~x86-linux"
 
-distutils_enable_tests unittest
+# upstream PR: https://github.com/brianolson/cbor_py/pull/19
+# upstream PR: https://github.com/brianolson/cbor_py/pull/11
+PATCHES=(
+	"${FILESDIR}/cbor-1.0.0.zero-length-bytes.patch"
+	"${FILESDIR}/cbor-1.0.0.Fix-broken-test_sortkeys.patch"
+	"${FILESDIR}/cbor-1.0.0.Replace-deprecated-logger.warn.patch"
+)
+
+python_test() {
+	distutils_install_for_testing
+	PYTHONPATH="${BUILD_DIR}/lib" \
+		"${PYTHON:-python}" cbor/tests/test_cbor.py    || die "Testsuite failed under ${EPYTHON}"
+	PYTHONPATH="${BUILD_DIR}/lib" \
+		"${PYTHON:-python}" cbor/tests/test_objects.py || die "Testsuite failed under ${EPYTHON}"
+	PYTHONPATH="${BUILD_DIR}/lib" \
+		"${PYTHON:-python}" cbor/tests/test_usage.py   || die "Testsuite failed under ${EPYTHON}"
+	PYTHONPATH="${BUILD_DIR}/lib" \
+		"${PYTHON:-python}" cbor/tests/test_vectors.py || die "Testsuite failed under ${EPYTHON}"
+}

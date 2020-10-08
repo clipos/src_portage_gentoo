@@ -4,8 +4,8 @@
 EAPI=7
 
 ECM_HANDBOOK="optional"
-KFMIN=5.63.0
-QTMIN=5.12.3
+KFMIN=5.70.0
+QTMIN=5.14.2
 inherit ecm kde.org
 
 DESCRIPTION="Remote desktop connection (RDP and VNC) client"
@@ -16,10 +16,12 @@ SLOT="5"
 KEYWORDS="amd64 arm64 x86"
 IUSE="+rdp +vnc"
 
-# drop kbookmarks subslot operator when KFMIN >= 5.69.0
 #nx? ( >=net-misc/nxcl-0.9-r1 ) disabled upstream, last checked 2016-01-24
 DEPEND="
-	>=kde-frameworks/kbookmarks-${KFMIN}:5=
+	>=dev-qt/qtgui-${QTMIN}:5
+	>=dev-qt/qtwidgets-${QTMIN}:5
+	>=dev-qt/qtxml-${QTMIN}:5
+	>=kde-frameworks/kbookmarks-${KFMIN}:5
 	>=kde-frameworks/kcmutils-${KFMIN}:5
 	>=kde-frameworks/kcompletion-${KFMIN}:5
 	>=kde-frameworks/kconfig-${KFMIN}:5
@@ -35,16 +37,11 @@ DEPEND="
 	>=kde-frameworks/kwidgetsaddons-${KFMIN}:5
 	>=kde-frameworks/kwindowsystem-${KFMIN}:5
 	>=kde-frameworks/kxmlgui-${KFMIN}:5
-	>=dev-qt/qtgui-${QTMIN}:5
-	>=dev-qt/qtwidgets-${QTMIN}:5
-	>=dev-qt/qtxml-${QTMIN}:5
 	vnc? ( >=net-libs/libvncserver-0.9 )
 "
 RDEPEND="${DEPEND}
 	rdp? ( >=net-misc/freerdp-1.1.0_beta1[X] )
 "
-
-PATCHES=( "${FILESDIR}/${P}-kf5bookmarks-5.69.patch" )
 
 src_configure() {
 	local mycmakeargs=(

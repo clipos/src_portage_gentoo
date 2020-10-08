@@ -26,6 +26,7 @@ CDEPEND="acct-group/clamav
 	dev-libs/libltdl
 	dev-libs/libmspack
 	|| ( dev-libs/libpcre2 >dev-libs/libpcre-6 )
+	dev-libs/tomsfastmath
 	>=sys-libs/zlib-1.2.2:=
 	bzip2? ( app-arch/bzip2 )
 	clamdtop? ( sys-libs/ncurses:0 )
@@ -50,11 +51,18 @@ PATCHES=(
 	"${FILESDIR}/${PN}-0.101.2-tinfo.patch" #670729
 	"${FILESDIR}/${PN}-0.102.1-libxml2_pkgconfig.patch" #661328
 	"${FILESDIR}/${PN}-0.102.2-fix-curl-detection.patch" #709616
+	"${FILESDIR}/${PN}-0.102.3-system-tomsfastmath.patch" # 649394
 )
 
 src_prepare() {
 	default
-	eautoconf
+
+	# Be extra sure that we're using the system copy of tomsfastmath
+	einfo "removing bundled copy of dev-libs/tomsfastmath"
+	rm -r libclamav/tomsfastmath || \
+		die "failed to remove bundled tomsfastmath"
+
+	AT_NO_RECURSIVE="yes" eautoreconf
 }
 
 src_configure() {

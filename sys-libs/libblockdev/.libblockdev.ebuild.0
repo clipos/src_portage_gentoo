@@ -66,8 +66,6 @@ BDEPEND+="
 REQUIRED_USE="${PYTHON_REQUIRED_USE}
 		escrow? ( cryptsetup )"
 
-PATCHES=( "${FILESDIR}/${P}-avoid_bashisms.patch" ) #719442
-
 pkg_setup() {
 	python-single-r1_pkg_setup
 }
@@ -75,6 +73,11 @@ pkg_setup() {
 src_prepare() {
 	xdg_environment_reset #623992
 	default
+
+	# https://bugs.gentoo.org/744289
+	find -type f \( -name "Makefile.am" -o -name "configure.ac" \) -print0 \
+		| xargs --null sed "s@ -Werror@@" -i || die
+
 	eautoreconf
 }
 
@@ -98,18 +101,9 @@ src_configure() {
 		$(use_with lvm lvm-dbus)
 		$(use_with tools)
 		$(use_with vdo)
+		--without-python2
+		--with-python3
 	)
-	if python_is_python3 ; then
-		myeconfargs+=(
-			--without-python2
-			--with-python3
-		)
-	else
-		myeconfargs+=(
-			--with-python2
-			--without-python3
-		)
-	fi
 	econf "${myeconfargs[@]}"
 }
 

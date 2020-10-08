@@ -1,0 +1,1 @@
+.scrypt.ebuild.0

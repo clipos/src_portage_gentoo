@@ -13,7 +13,7 @@ SRC_URI="https://github.com/kennethreitz/${PN}/archive/v${PV}.tar.gz -> ${P}.tar
 
 LICENSE="ISC"
 SLOT="0"
-KEYWORDS="amd64 ~x86"
+KEYWORDS="amd64 ~arm64 ~x86"
 IUSE="doc examples test"
 RESTRICT="!test? ( test )"
 
@@ -22,7 +22,9 @@ DEPEND="
 	doc? ( dev-python/sphinx[${PYTHON_USEDEP}] )
 	test? ( dev-python/pytest[${PYTHON_USEDEP}] )
 "
-RDEPEND="dev-python/args[${PYTHON_USEDEP}]"
+
+# https://github.com/kennethreitz-archive/clint/pull/180
+PATCHES=( "${FILESDIR}/${P}-disable-args-dependency.patch" )
 
 python_compile_all() {
 	use doc && emake -C docs html

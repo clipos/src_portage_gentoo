@@ -5,9 +5,9 @@ EAPI=7
 
 ECM_HANDBOOK="forceoptional"
 ECM_TEST="forceoptional"
-KFMIN=5.66.0
+KFMIN=5.71.0
 PVCUT=$(ver_cut 1-3)
-QTMIN=5.12.3
+QTMIN=5.14.2
 VIRTUALX_REQUIRED="test"
 inherit ecm kde.org
 
@@ -20,11 +20,10 @@ IUSE="appstream +calendar geolocation gps qalculate qrcode +semantic-desktop sys
 
 REQUIRED_USE="gps? ( geolocation )"
 
-# drop qtgui subslot operator when QT_MINIMAL >= 5.14.0
 COMMON_DEPEND="
 	>=dev-qt/qtdbus-${QTMIN}:5
 	>=dev-qt/qtdeclarative-${QTMIN}:5[widgets]
-	>=dev-qt/qtgui-${QTMIN}:5=[jpeg]
+	>=dev-qt/qtgui-${QTMIN}:5[jpeg]
 	>=dev-qt/qtnetwork-${QTMIN}:5
 	>=dev-qt/qtsql-${QTMIN}:5
 	>=dev-qt/qtwidgets-${QTMIN}:5
@@ -73,7 +72,7 @@ COMMON_DEPEND="
 	>=kde-plasma/libkscreen-${PVCUT}:5
 	>=kde-plasma/libksysguard-${PVCUT}:5
 	>=kde-plasma/libkworkspace-${PVCUT}:5
-	media-libs/phonon[qt5(+)]
+	>=media-libs/phonon-4.11.0
 	sys-libs/zlib
 	x11-libs/libICE
 	x11-libs/libSM
@@ -125,13 +124,11 @@ PDEPEND="
 "
 
 PATCHES=(
-	"${FILESDIR}/${PN}-5.14.2-split-libkworkspace.patch" # downstream patch
-
-	"${FILESDIR}/${P}-sddm-theme-prevent-logo-leaking.patch" # in Plasma/5.18
-
-	# Fix animation duration w/ KDE Frameworks 5.70 (Plasma/5.19 backport):
-	# https://pointieststick.com/2020/05/10/why-the-animations-in-your-plasma-5-18-feel-slow-now-and-when-it-will-be-fixed/
-	"${FILESDIR}/${P}-stop-multiplying-duration-values.patch"
+	"${FILESDIR}/${PN}-5.14.2-split-libkworkspace.patch"
+	"${FILESDIR}/${PN}-5.19.2-use-PlasmaExtras.PlaceholderMessage.patch" # KDE-Bug #422684
+	"${FILESDIR}/${P}-gpsd-3.21.patch" # bug 742392
+	"${FILESDIR}/${P}-login-button-size.patch"
+	"${FILESDIR}/${P}-guard-against-no-virtual-desktops.patch" # KDE-Bug #427106
 )
 
 RESTRICT+=" test"
@@ -220,6 +217,7 @@ pkg_postinst () {
 		rm "${EROOT}"/etc/plasma/shutdown/10-agent-shutdown.sh || die
 		elog "Removed obsolete ${EPREFIX}/etc/plasma/shutdown/10-agent-shutdown.sh"
 	fi
+	rmdir -v "${EROOT}"/etc/plasma{/startup,/shutdown,} 2> /dev/null
 
 	elog "To enable gpg-agent and/or ssh-agent in Plasma sessions,"
 	elog "edit ${EPREFIX}/etc/xdg/plasma-workspace/env/10-agent-startup.sh"

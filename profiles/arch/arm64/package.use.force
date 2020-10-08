@@ -1,6 +1,10 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
+# Joonas Niilola <juippis@gentoo.org> (2020-10-02)
+# luajit not available on this arch.
+dev-libs/efl lua
+
 # Georgy Yakovlev <gyakovlev@gentoo.org> (2020-06-18)
 # Force host target
 dev-libs/keystone llvm_targets_AArch64
@@ -22,8 +26,3 @@ dev-lang/rust llvm_targets_AArch64
 dev-ml/llvm-ocaml llvm_targets_AArch64
 sys-devel/clang llvm_targets_AArch64
 sys-devel/llvm llvm_targets_AArch64
-
-# James Le Cuirot <chewi@gentoo.org> (2016-05-16)
-# For reasons best known to themselves, Oracle do not ship the
-# libawt_xawt.so library on arm64 even though they do on arm32.
-dev-java/oracle-jdk-bin headless-awt

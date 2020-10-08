@@ -1,44 +1,51 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
-GNOME2_LA_PUNT="yes"
+EAPI=7
 
-inherit flag-o-matic gnome2
+inherit gnome.org flag-o-matic meson xdg
 
 DESCRIPTION="A window navigation construction kit"
 HOMEPAGE="https://developer.gnome.org/libwnck/stable/"
 
 LICENSE="LGPL-2+"
 SLOT="3"
-KEYWORDS="~alpha amd64 arm ~arm64 ~hppa ~ia64 ~mips ppc ppc64 sparc x86 ~amd64-linux ~x86-linux ~ppc-macos ~x86-macos ~x64-solaris ~x86-solaris"
+KEYWORDS="~alpha amd64 arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 sparc x86 ~amd64-linux ~x86-linux ~ppc-macos ~x86-macos ~x64-solaris ~x86-solaris"
 
-IUSE="+introspection startup-notification tools"
+IUSE="gtk-doc +introspection startup-notification tools"
 
 RDEPEND="
 	x11-libs/cairo[X]
-	>=x11-libs/gtk+-3.22:3[introspection?]
-	>=dev-libs/glib-2.32:2
+	>=dev-libs/glib-2.34:2
+	>=x11-libs/gtk+-3.22:3[X,introspection?]
+	startup-notification? ( >=x11-libs/startup-notification-0.4 )
 	x11-libs/libX11
 	x11-libs/libXres
-	x11-libs/libXext
-	introspection? ( >=dev-libs/gobject-introspection-0.6.14:= )
-	startup-notification? ( >=x11-libs/startup-notification-0.4 )
+	introspection? ( >=dev-libs/gobject-introspection-1.56:= )
 "
+# libXi header used by wnckprop.c, which is compiled even with USE=-tools (just not installed then)
 DEPEND="${RDEPEND}
-	>=dev-util/gtk-doc-am-1.9
-	>=sys-devel/gettext-0.19.4
+	x11-libs/libXi"
+BDEPEND="
+	gtk-doc? ( >=dev-util/gtk-doc-1.9
+		app-text/docbook-xml-dtd:4.1.2 )
+	>=sys-devel/gettext-0.19.8
 	virtual/pkgconfig
 "
-# eautoreconf needs
-#	sys-devel/autoconf-archive
+
+src_prepare() {
+	# Don't collide with SLOT=1 with USE=tools
+	sed -e "s|executable(prog|executable(prog + '-3'|" -i libwnck/meson.build || die
+	xdg_src_prepare
+}
 
 src_configure() {
-	# Don't collide with SLOT=1
-	gnome2_src_configure \
-		--disable-static \
-		$(use_enable introspection) \
-		$(use_enable startup-notification) \
-		$(use_enable tools) \
-		--program-suffix=-${SLOT}
+	local emesonargs=(
+		-Ddeprecation_flags=false
+		$(meson_use tools install_tools)
+		$(meson_feature startup-notification startup_notification)
+		$(meson_feature introspection)
+		$(meson_use gtk-doc gtk_doc)
+	)
+	meson_src_configure
 }

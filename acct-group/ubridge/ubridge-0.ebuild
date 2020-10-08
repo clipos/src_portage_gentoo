@@ -1,0 +1,1 @@
+.ubridge.ebuild.0

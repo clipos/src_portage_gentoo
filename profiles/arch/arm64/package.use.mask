@@ -1,9 +1,46 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-# Sergei Trofimovich <slyfox@gentoo.org> (2020-07-11)
-# net-libs/libslirp is not yet keyworded on arm64, bug #732144
-app-emulation/qemu slirp
+# Sam James <sam@gentoo.org> (2020-10-06)
+# Deprecated. See bug #741855.
+net-mail/dovecot vpopmail
+
+# Sam James <sam@gentoo.org> (2020-10-05)
+# Guile only supports JIT on some arches
+# (See 9.3.8 in the Guile manual)
+dev-scheme/guile -jit
+
+# Joonas Niilola <juippis@gentoo.org> (2020-10-02)
+# luajit not available on this arch.
+dev-libs/efl luajit
+
+# Sam James <sam@gentoo.org> (2020-09-05)
+# nvidia-texture-tools not useful here
+media-libs/devil nvtt
+games-strategy/0ad nvtt
+
+# Georgy Yakovlev <gyakovlev@gentoo.org> (2020-08-20)
+# zfs is keyworded on arm64
+sys-boot/grub -libzfs
+
+# Sam James <sam@gentoo.org> (2020-08-19)
+# Needed for openstack, let's come back
+# to keyword ceph another time.
+# bug #738042
+sys-block/tgt rbd
+
+# Benda Xu <heroxbd@gentoo.org> (2020-08-08)
+# dev-lua/busted is not keyworded yet
+dev-lua/mpack test
+
+# Felix Janda <felix.janda@posteo.de> (2020-08-01)
+# Requires unkeyworded dev-lang/spidermonkey:17
+>=www-client/elinks-0.13.3 javascript
+
+# Mike Pagano <mpagano@gentoo.org> (2020-07-27)
+# Failed build on arm64
+# bug #732966
+dev-util/idea-community jbr11
 
 # Sam James <sam@gentoo.org> (2020-07-10)
 # Failed build with USE=tools
@@ -115,10 +152,6 @@ media-gfx/enblend doc
 # app-text/dblatex not keyword yet
 net-firewall/nftables doc
 
-# Mart Raudsepp <leio@gentoo.org> (2019-03-11)
-# media-libs/bcg729 not keyworded yet
-net-analyzer/wireshark bcg729
-
 # Roy Bamford <neddyseagoon@gentoo.org> (2019-03-11)
 # net-misc/dropbox is binary amd64/x86 only
 kde-apps/kdenetwork-meta dropbox
@@ -158,13 +191,8 @@ kde-apps/cantor lua
 # sci-libs/oce not yet keyworded
 sci-electronics/kicad occ oce ngspice
 
-# Matthew Thode <prometheanfire@gentoo.org> (2018-07-18)
-# dev-python/pandas not keyworded and test uses pandas
-dev-python/networkx pandas test
-
 # Michał Górny <mgorny@gentoo.org> (2018-07-07)
 # Unkeyworded dependencies.
-dev-python/matplotlib doc
 net-libs/gnome-online-accounts gnome
 
 # Jan Vesely <jano.vesely@gmail.com> (2018-06-15)
@@ -175,11 +203,6 @@ media-libs/mesa opencl
 # Mart Raudsepp <leio@gentoo.org> (2018-05-30)
 # app-text/pandoc not keyworded yet
 app-emulation/xen-tools doc
-dev-python/notebook doc
-
-# Mart Raudsepp <leio@gentoo.org> (2018-05-30)
-# Require old gnome2 libraries, not keywording legacy on purpose
-sys-devel/distcc gnome
 
 # Mart Raudsepp <leio@gentoo.org> (2018-05-06)
 # New enough dev-ruby/webmock not keyworded yet
@@ -194,10 +217,6 @@ app-admin/syslog-ng mongodb
 # masked too (no-one has tested it yet).
 app-text/texlive-core luajittex
 dev-texlive/texlive-basic luajittex
-
-# Michał Górny <mgorny@gentoo.org> (2018-04-03)
-# Requires unported sys-libs/netbsd-csu.
-sys-devel/clang-runtime crt
 
 # Mart Raudsepp <leio@gentoo.org> (2018-03-31)
 # Boost.Context can be built on arm64
@@ -251,10 +270,6 @@ media-libs/opencv vtk
 dev-libs/libpeas lua
 
 # Michał Górny <mgorny@gentoo.org> (2018-01-23)
-# Requires dev-libs/efl that is not keyworded.
-dev-libs/dbus-c++ ecore
-
-# Michał Górny <mgorny@gentoo.org> (2018-01-23)
 # USE=eds requires USE=gnome that is masked here.
 # USE=postgres requires dev-db/postgresql[kerberos] (USE masked).
 # NeddySeagoon <neddysegoon@gentoo.org> (2017-08-21)
@@ -273,16 +288,11 @@ media-video/mjpegtools sdlgfx
 
 # Michał Górny <mgorny@gentoo.org> (2018-01-12)
 # Those require USE=doc that is masked in this profile.
-dev-python/python-glanceclient test
 dev-python/python-neutronclient test
 
 # NeddySeagoon <neddysegoon@gentoo.org> (2017-08-24)
 # Support for g15daemon still needs -9999 packages on all arches
 media-sound/mumble g15
-
-# Michał Górny <mgorny@gentoo.org> (2017-08-08)
-# Required VIDEO_CARDS=i965/radeonsi, both masked in this profile.
-media-libs/mesa vulkan vulkan-overlay
 
 # Alexis Ballier <aballier@gentoo.org> (2017-07-20)
 # media-libs/libemf fails with #error unknown CPU.
@@ -292,11 +302,6 @@ media-gfx/pstoedit emf
 # zfs does not build on arm64 (yet?)
 app-emulation/libvirt zfs
 sys-cluster/ceph zfs
-
-# Alexis Ballier <aballier@gentoo.org> (2017-07-11)
-# Needs indirectly clisp:
-# https://bugs.gentoo.org/show_bug.cgi?id=624532
-app-text/texlive xindy
 
 # Alexis Ballier <aballier@gentoo.org> (2017-07-11)
 # dev-libs/botan:0 fails with 'ERROR: Unknown or unidentifiable processor
@@ -330,10 +335,6 @@ app-crypt/heimdal afs
 # James Le Cuirot <chewi@gentoo.org> (2017-05-22)
 # Only available on some architectures.
 dev-java/icedtea -shenandoah
-
-# James Le Cuirot <chewi@gentoo.org> (2017-04-25)
-# Oracle doesn't include VisualVM on this platform.
-dev-java/oracle-jdk-bin visualvm
 
 # Markus Meier <maekke@gentoo.org> (2017-03-24)
 # unkeyworded deps, bug #552330
@@ -378,14 +379,6 @@ net-im/telepathy-connection-managers sipe
 # Missing keywords, bug #478254
 gnome-base/gnome classic
 
-# Benda Xu <heroxbd@gentoo.org> (2013-10-31)
-# Missing keywords from dev-ml/lablgtk, bug #487722
-net-p2p/mldonkey gtk guionly
-
-# Markus Meier <maekke@gentoo.org> (2013-09-15)
-# Unkeyworded deps, bug #481462
-dev-python/ipython nbconvert
-
 # Sergey Popov <pinkbyte@gentoo.org> (2013-09-06)
 # sci-libs/hdf does not build properly on arm
 dev-perl/PDL	hdf
@@ -416,18 +409,10 @@ media-gfx/pstoedit emf
 # keyworded here. Remove mask if this situation changes.
 gnome-extra/sushi office
 
-# Alexandre Rostovtsev <tetromino@gentoo.org> (2012-12-27)
-# remove mask when >=app-editors/gedit-3.6 is keyworded here
-dev-util/devhelp gedit
-
 # Alexandre Rostovtsev <tetromino@gentoo.org> (2012-04-12)
 # Temporary mask-in-base, unmask-in-arch for dev-python/mako keywording for
 # gobject-introspection[doctool], bug #411761
 dev-libs/gobject-introspection -doctool
-
-# Tobias Klausmann <klausman@gentoo.org> (2011-11-02)
-# libpcre jit is not supported on alpha
-dev-libs/libpcre jit
 
 # missing keywords
 media-plugins/gst-plugins-meta aac dts dv lame libvisual taglib vcd wavpack

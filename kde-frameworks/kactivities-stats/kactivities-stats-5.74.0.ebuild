@@ -1,0 +1,1 @@
+.kactivities-stats.ebuild.0

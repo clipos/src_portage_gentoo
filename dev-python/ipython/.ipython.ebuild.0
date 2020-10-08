@@ -3,10 +3,10 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{6..9} )
+PYTHON_COMPAT=( python3_{7..9} )
 PYTHON_REQ_USE='readline,sqlite,threads(+)'
 
-inherit distutils-r1 eutils virtualx
+inherit distutils-r1 optfeature virtualx
 
 DESCRIPTION="Advanced interactive shell for Python"
 HOMEPAGE="https://ipython.org/ https://github.com/ipython/ipython/"
@@ -14,15 +14,15 @@ SRC_URI="mirror://pypi/${PN:0:1}/${PN}/${P}.tar.gz"
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="amd64 ~arm ~arm64 ~ppc ppc64 ~x86 ~amd64-linux ~x86-linux"
+KEYWORDS="amd64 ~arm arm64 ~ppc ppc64 x86 ~amd64-linux ~x86-linux"
 IUSE="doc examples matplotlib notebook nbconvert qt5 +smp test"
 RESTRICT="!test? ( test )"
 
 CDEPEND="
 	dev-python/backcall[${PYTHON_USEDEP}]
 	dev-python/decorator[${PYTHON_USEDEP}]
-	dev-python/jedi[${PYTHON_USEDEP}]
-	dev-python/pexpect[${PYTHON_USEDEP}]
+	>=dev-python/jedi-0.10[${PYTHON_USEDEP}]
+	>=dev-python/pexpect-4.3[${PYTHON_USEDEP}]
 	dev-python/pickleshare[${PYTHON_USEDEP}]
 	>=dev-python/prompt_toolkit-2[${PYTHON_USEDEP}]
 	<dev-python/prompt_toolkit-3.1[${PYTHON_USEDEP}]
@@ -34,9 +34,9 @@ CDEPEND="
 RDEPEND="${CDEPEND}
 	nbconvert? ( dev-python/nbconvert[${PYTHON_USEDEP}] )"
 
-DEPEND="${CDEPEND}
-	dev-python/setuptools[${PYTHON_USEDEP}]
+BDEPEND="
 	test? (
+		${CDEPEND}
 		app-text/dvipng[truetype]
 		>=dev-python/ipykernel-5.1.0[${PYTHON_USEDEP}]
 		dev-python/nbformat[${PYTHON_USEDEP}]

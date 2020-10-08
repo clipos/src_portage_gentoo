@@ -1,1 +1,0 @@
-.python-pathlib.ebuild.0

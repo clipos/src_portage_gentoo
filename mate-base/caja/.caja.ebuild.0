@@ -17,17 +17,16 @@ SLOT="0"
 
 IUSE="+introspection +mate packagekit xmp"
 
-RDEPEND="
+COMMON_DEPEND="
 	dev-libs/atk
-	>=dev-libs/glib-2.50:2
+	>=dev-libs/glib-2.58.1:2
 	>=dev-libs/libxml2-2.4.7:2
 	gnome-base/dconf
 	>=gnome-base/gvfs-1.10.1:0[udisks]
 	>=mate-base/mate-desktop-1.17.3:0
 	>=media-libs/libexif-0.6.14:0
-	virtual/libintl
 	x11-libs/cairo
-	x11-libs/gdk-pixbuf:2
+	>=x11-libs/gdk-pixbuf-2.36.5:2
 	>=x11-libs/gtk+-3.22:3[introspection?]
 	>=x11-libs/libnotify-0.7.0:0
 	x11-libs/libICE
@@ -40,16 +39,20 @@ RDEPEND="
 	introspection? ( >=dev-libs/gobject-introspection-0.6.4:= )
 	packagekit? ( app-admin/packagekit-base )
 	xmp? ( >=media-libs/exempi-1.99.5:2 )
-	!!mate-base/mate-file-manager"
+"
 
-DEPEND="${RDEPEND}
+RDEPEND="${COMMON_DEPEND}
+	virtual/libintl
+	!!mate-base/mate-file-manager
+"
+
+DEPEND="${COMMON_DEPEND}
 	>=dev-lang/perl-5:=
 	dev-util/gdbus-codegen
 	dev-util/glib-utils
 	dev-util/gtk-doc
 	dev-util/gtk-doc-am
-	>=dev-util/intltool-0.40.1
-	sys-devel/gettext
+	>=sys-devel/gettext-0.19.8:*
 	virtual/pkgconfig"
 
 PDEPEND="mate? ( >=x11-themes/mate-icon-theme-${MATE_BRANCH} )"
@@ -57,10 +60,6 @@ PDEPEND="mate? ( >=x11-themes/mate-icon-theme-${MATE_BRANCH} )"
 # TODO: Test fails because Caja is not merged yet:
 # GLib-GIO-ERROR **: Settings schema 'org.mate.caja.preferences' is not installed
 RESTRICT="test"
-
-PATCHES=(
-	"${FILESDIR}/${P}-gcc-10-fno-common.patch"
-)
 
 src_prepare() {
 	# Remove unnecessary CFLAGS.

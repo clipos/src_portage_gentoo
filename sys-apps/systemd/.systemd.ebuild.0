@@ -133,7 +133,7 @@ RDEPEND="${COMMON_DEPEND}
 # sys-apps/dbus: the daemon only (+ build-time lib dep for tests)
 PDEPEND=">=sys-apps/dbus-1.9.8[systemd]
 	hwdb? ( >=sys-apps/hwids-20150417[udev] )
-	>=sys-fs/udev-init-scripts-25
+	>=sys-fs/udev-init-scripts-34
 	policykit? ( sys-auth/polkit )
 	!vanilla? ( sys-apps/gentoo-systemd-integration )"
 
@@ -167,7 +167,7 @@ pkg_pretend() {
 		local CONFIG_CHECK="~AUTOFS4_FS ~BLK_DEV_BSG ~CGROUPS
 			~CHECKPOINT_RESTORE ~DEVTMPFS ~EPOLL ~FANOTIFY ~FHANDLE
 			~INOTIFY_USER ~IPV6 ~NET ~NET_NS ~PROC_FS ~SIGNALFD ~SYSFS
-			~TIMERFD ~TMPFS_XATTR ~UNIX
+			~TIMERFD ~TMPFS_XATTR ~UNIX ~USER_NS
 			~CRYPTO_HMAC ~CRYPTO_SHA256 ~CRYPTO_USER_API_HASH
 			~!GRKERNSEC_PROC ~!IDE ~!SYSFS_DEPRECATED
 			~!SYSFS_DEPRECATED_V2"
@@ -220,15 +220,13 @@ src_prepare() {
 
 	# Add local patches here
 	PATCHES+=(
-		"${FILESDIR}/245-libmicrohttpd-0.9.71.patch"
 	)
 
 	if ! use vanilla; then
 		PATCHES+=(
-			"${FILESDIR}/gentoo-Dont-enable-audit-by-default.patch"
-			"${FILESDIR}/gentoo-systemd-user-pam.patch"
-			"${FILESDIR}/gentoo-generator-path-r1.patch"
+			"${FILESDIR}/gentoo-generator-path-r2.patch"
 			"${FILESDIR}/gentoo-systemctl-disable-sysv-sync.patch"
+			"${FILESDIR}/gentoo-journald-audit.patch"
 		)
 	fi
 

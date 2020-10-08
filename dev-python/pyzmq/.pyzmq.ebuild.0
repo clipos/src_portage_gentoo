@@ -3,35 +3,40 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{6,7,8} )
+PYTHON_COMPAT=( python3_{6..9} )
 PYTHON_REQ_USE="threads(+)"
 
 inherit flag-o-matic distutils-r1 toolchain-funcs
 
+EGIT_COMMIT="dd4dac055152d47c829034224cdecf594c7b3f12"
 DESCRIPTION="Lightweight and super-fast messaging library built on top of the ZeroMQ library"
-HOMEPAGE="https://www.zeromq.org/bindings:python https://pypi.org/project/pyzmq/"
-SRC_URI="mirror://pypi/${PN:0:1}/${PN}/${P}.tar.gz"
+HOMEPAGE="
+	https://www.zeromq.org/bindings:python
+	https://pypi.org/project/pyzmq/
+	https://github.com/zeromq/pyzmq/"
+SRC_URI="
+	https://github.com/zeromq/pyzmq/archive/${EGIT_COMMIT}.tar.gz
+		-> ${P}.tar.gz"
+S=${WORKDIR}/${PN}-${EGIT_COMMIT}
 
 LICENSE="LGPL-3"
 SLOT="0"
-KEYWORDS="amd64 arm ~arm64 ~mips ~ppc ppc64 x86 ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos"
-IUSE="doc +draft test"
-RESTRICT="!test? ( test )"
+KEYWORDS="amd64 arm arm64 ~mips ~ppc ppc64 x86 ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos"
+IUSE="+draft"
 
-RDEPEND="
+DEPEND="
 	>=net-libs/zeromq-4.2.2-r2:=[drafts]
+"
+RDEPEND="${DEPEND}
 	dev-python/py[${PYTHON_USEDEP}]
 	dev-python/cffi:=[${PYTHON_USEDEP}]
 "
-DEPEND="${RDEPEND}
+BDEPEND="
 	dev-python/cython[${PYTHON_USEDEP}]
 	test? (
 		>=www-servers/tornado-5.0.2[${PYTHON_USEDEP}]
 	)
-	doc? (
-		>=dev-python/sphinx-1.3[${PYTHON_USEDEP}]
-		dev-python/numpydoc[${PYTHON_USEDEP}]
-	)"
+"
 
 PATCHES=(
 	"${FILESDIR}/pyzmq-19.0.0-tests.patch"
@@ -42,10 +47,8 @@ distutils_enable_sphinx docs \
 	"dev-python/numpydoc"
 
 python_prepare_all() {
-	# Prevent un-needed download during build
-	sed -e "/'sphinx.ext.intersphinx',/d" -i docs/source/conf.py || die
-	# some tests fail with cffi backend
-	rm zmq/tests/asyncio/test_asyncio.py || die
+	# probably broken with new numpy
+	sed -i -e 's:test_buffer_numpy:_&:' zmq/tests/test_message.py || die
 
 	distutils-r1_python_prepare_all
 }

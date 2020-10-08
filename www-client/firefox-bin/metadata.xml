@@ -13,4 +13,10 @@
 		<email>proxy-maint@gentoo.org</email>
 		<name>Proxy Maintainers</name>
 	</maintainer>
+	<use>
+		<flag name="gmp-autoupdate">
+			Allow Gecko Media Plugins (binary blobs) to be automatically
+			downloaded and kept up-to-date in user profiles
+		</flag>
+	</use>
 </pkgmetadata>

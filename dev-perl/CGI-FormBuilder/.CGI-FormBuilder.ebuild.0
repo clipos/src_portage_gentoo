@@ -1,7 +1,7 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 DIST_AUTHOR=BIGPRESH
 DIST_VERSION=3.10
@@ -9,7 +9,8 @@ inherit perl-module
 
 DESCRIPTION="Extremely fast, reliable form generation and processing module"
 HOMEPAGE="http://www.formbuilder.org/ https://metacpan.org/release/CGI-FormBuilder"
-
+# Explicit declaration by upstream
+LICENSE="|| ( Artistic GPL-1 )"
 SLOT="0"
 KEYWORDS="amd64 ~x86"
 IUSE="test"
@@ -22,7 +23,7 @@ PATCHES=(
 #	>=dev-perl/CGI-SSI-0.920.0
 
 RDEPEND="dev-perl/CGI"
-DEPEND="${RDEPEND}
+BDEPEND="${RDEPEND}
 	virtual/perl-ExtUtils-MakeMaker
 "
 

@@ -1,1 +1,0 @@
-.ant-eclipse-ecj.ebuild.2

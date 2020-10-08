@@ -1,1 +1,0 @@
-.mini-amf.ebuild.0

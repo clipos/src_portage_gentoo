@@ -11,10 +11,10 @@ DESCRIPTION="A user interface designer for GTK+ and GNOME"
 HOMEPAGE="https://glade.gnome.org/"
 
 LICENSE="GPL-2+ FDL-1.1+"
-SLOT="3.10/6" # subslot = suffix of libgladeui-2.so
-KEYWORDS="~alpha amd64 arm arm64 ~ia64 ~mips ppc ppc64 sparc x86"
+SLOT="3.10/12" # subslot = suffix of libgladeui-2.so
+KEYWORDS="~alpha amd64 arm arm64 ~ia64 ~mips ~ppc ~ppc64 sparc x86"
 
-IUSE="debug +introspection python webkit"
+IUSE="+introspection python webkit"
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
 
 RDEPEND="
@@ -23,7 +23,7 @@ RDEPEND="
 	>=dev-libs/libxml2-2.4.0:2
 	x11-libs/cairo:=
 	x11-libs/gdk-pixbuf:2[introspection?]
-	>=x11-libs/gtk+-3.20.0:3[introspection?]
+	>=x11-libs/gtk+-3.22.0:3[introspection?]
 	x11-libs/pango[introspection?]
 	introspection? ( >=dev-libs/gobject-introspection-1.32:= )
 	python? (
@@ -39,8 +39,8 @@ DEPEND="${RDEPEND}
 	app-text/docbook-xml-dtd:4.1.2
 	dev-libs/libxslt
 	>=dev-util/gtk-doc-am-1.13
-	>=dev-util/intltool-0.41.0
 	dev-util/itstool
+	>=sys-devel/gettext-0.19.8
 	virtual/pkgconfig
 "
 # eautoreconf requires:
@@ -63,9 +63,9 @@ pkg_setup() {
 src_configure() {
 	gnome2_src_configure \
 		--disable-static \
+		--disable-debug \
 		--enable-gladeui \
 		--enable-libtool-lock \
-		$(usex debug --enable-debug ' ') \
 		$(use_enable introspection) \
 		$(use_enable python) \
 		$(use_enable webkit webkit2gtk)

@@ -1,1 +1,0 @@
-.kicad.ebuild.0

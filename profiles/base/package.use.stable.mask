@@ -4,9 +4,17 @@
 # This file requires eapi 5 or later. New entries go on top.
 # Please use the same syntax as in package.use.mask
 
-# Andreas Sturmlechner <asturm@gentoo.org> (2020-07-01)
-# dev-qt/qtquicktimeline-5.15.0 not yet stable, bug 711120
-dev-qt/qt-creator qmldesigner
+# Michał Górny <mgorny@gentoo.org> (2020-09-20)
+# Always build python-exec with all the targets.
+dev-lang/python-exec -python_targets_python3_9
+
+# Georgy Yakovlev <gyakovlev@gentoo.org> (2020-09-18)
+# openjfx:8 will never be stabilized
+dev-java/openjdk:8 javafx
+
+# Pacho Ramos <pacho@gentoo.org> (2020-08-21)
+# app-text/pandoc is hard to stabilize #737612
+sys-apps/earlyoom docs
 
 # Andreas Sturmlechner <asturm@gentoo.org> (2020-06-06)
 # dev-python/wxpython:4.0 w/ py3 is not stable, bug #714566
@@ -15,7 +23,6 @@ dev-python/matplotlib wxwidgets
 # Sergei Trofimovich <slyfox@gentoo.org> (2020-04-13)
 # app-text/pandoc (dev-lang/ghc) has no stable keywords.
 app-emulation/xen-tools doc
-dev-python/notebook doc
 
 # Sergei Trofimovich <slyfox@gentoo.org> (2020-04-13)
 # dev-util/shellcheck (dev-lang/ghc) has no stable keywords.
@@ -37,15 +44,11 @@ dev-lang/rust miri nightly parallel-compiler system-bootstrap
 
 # Andreas Sturmlechner <asturm@gentoo.org> (2019-12-18)
 # Neither sys-apps/bolt nor kde-plasma/plasma-thunderbolt are stable
-kde-plasma/plasma-meta thunderbolt
+<kde-plasma/plasma-meta-5.19 thunderbolt
 
 # Andreas Sturmlechner <asturm@gentoo.org> (2019-12-09)
 # Declared experimental, and dev-cpp/websocketpp not stable yet
 sci-libs/indilib websocket
-
-# Andreas Sturmlechner <asturm@gentoo.org> (2019-11-28)
-# sci-libs/vtk is not stable anymore
-media-libs/opencv vtk
 
 # Kent Fredric <kentnl@gentoo.org> (2019-08-29)
 # Support for DBD-mysql to use mariadb is sketchy. Use DBD-MariaDB
@@ -68,7 +71,6 @@ dev-perl/Business-ISBN barcode
 dev-perl/Template-Toolkit gd
 media-fonts/unifont utils fontforge
 media-video/vdrsync dvdr
-www-apps/bugzilla extras
 
 # Andreas Sturmlechner <asturm@gentoo.org> (2019-07-16)
 # sci-libs/dcmtk is not stable
@@ -105,10 +107,6 @@ app-admin/sudo sssd
 # app-misc/ddcutil is not yet stable.
 kde-plasma/powerdevil brightness-control
 
-# Michał Górny <mgorny@gentoo.org> (2018-06-07)
-# sys-libs/netbsd-csu not stable yet.
-sys-devel/clang-runtime crt
-
 # Thomas Deutschmann <whissi@gentoo.org> (2018-06-01)
 # Needs dev-ruby/asciidoctor which has a lot of unstable deps
 net-analyzer/wireshark doc
@@ -116,10 +114,6 @@ net-analyzer/wireshark doc
 # Andreas Sturmlechner <asturm@gentoo.org> (2018-05-21)
 # Depends on lots of unstable dependencies
 dev-python/s3fs test
-
-# Andreas Sturmlechner <asturm@gentoo.org> (2018-03-03)
-# sci-geosciences/grass is not stable
-sci-geosciences/qgis grass
 
 # Matthias Maier <tamiko@gentoo.org> (2018-03-18)
 # dev-libs/capstone hasn't been stabilized yet
@@ -174,20 +168,6 @@ kde-apps/cantor julia
 # This is stable masked as g-sorcery is being not actively developed.
 app-portage/layman g-sorcery
 
-# David Seifert <soap@gentoo.org> (2017-02-12)
-# Unknown future, stable deps are hopelessly
-# broken, only allow for unstable keywords
-# Bug: #581058
-net-misc/asterisk osplookup
-
-# Michael Palimaka <kensington@gentoo.org (2017-01-26)
-# Requires testing version of media-libs/opencv
-media-libs/mlt opencv
-
-# Michael Palimaka <kensington@gentoo.org (2017-01-18)
-# www-client/weboob is horribly outdated and not stable
-app-office/kmymoney weboob
-
 # Andreas K. Hüttel <dilfridge@gentoo.org> (2017-01-15)
 # Has no stable reverse deps requiring this useflag
 # Stable-masking it so Boost 1.62 stabilization can go ahead
@@ -206,10 +186,6 @@ net-libs/gnutls test-full
 # flag until a source based version that doesn't depend
 # on a vulnerable libgcrypt version is in tree
 dev-db/mariadb sst-xtrabackup
-
-# Sergey Popov <pinkbyte@gentoo.org> (2016-02-15)
-# Mask monitoring capabilities of Ganeti on stable branches
-app-emulation/ganeti monitoring
 
 # Pacho Ramos <pacho@gentoo.org> (2015-05-15)
 # Version compatible with current ffmpeg is not ready to be stabilized

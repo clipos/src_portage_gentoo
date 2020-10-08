@@ -1,1 +1,0 @@
-.plasma-mediacenter.ebuild.0

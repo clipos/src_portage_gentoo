@@ -3,7 +3,7 @@
 
 EAPI=7
 
-EGIT_COMMIT="88bb0fcdaab5bdd1176a3b6b485a6415a137ec27"
+EGIT_COMMIT="85fc0d9d8659269b00499975d184d75e67f63a9f"
 
 inherit qmake-utils
 
@@ -35,14 +35,6 @@ DEPEND="
 
 S="${WORKDIR}/${PN}-${EGIT_COMMIT}"
 
-src_prepare() {
-	default
-
-	# Currently the test tst_IrcLagTimer fails, so disabling
-	# See: https://github.com/communi/libcommuni/issues/63
-	sed -e '/irclagtimer/d' -i tests/auto/auto.pro || die
-}
-
 src_configure() {
 	local myqmakeargs=( libcommuni.pro
 		# Disables compile run-time benchmarks, as they don't make any sense
@@ -54,8 +46,7 @@ src_configure() {
 		# Don't silence all compile messages
 		-config verbose
 		-config $(usex examples '' 'no_')examples
-		-config $(usex qml '' 'no_')install_imports
-		-config $(usex qml '' 'no_')install_qml
+		-config $(usex qml '' 'no_')qml
 		-config $(usex test '' 'no_')tests
 		-config $(usex uchardet 'no_' '')icu
 		-config $(usex uchardet '' 'no_')uchardet )

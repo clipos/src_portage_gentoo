@@ -2,6 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
+VALA_MIN_API_VERSION="0.44"
 inherit gnome.org gnome2-utils meson vala xdg
 
 DESCRIPTION="Make lines of the same color to win"
@@ -16,7 +17,7 @@ IUSE=""
 RDEPEND="
 	>=dev-libs/glib-2.40.0:2
 	>=media-libs/gsound-1.0.2
-	>=x11-libs/gtk+-3.13.2:3
+	>=x11-libs/gtk+-3.22.23:3
 	>=gnome-base/librsvg-2.32.0
 "
 DEPEND="${RDEPEND}"

@@ -1,1 +1,0 @@
-.pysha3.ebuild.0

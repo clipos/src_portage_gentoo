@@ -1,79 +1,63 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
-inherit autotools flag-o-matic toolchain-funcs multilib-minimal
+CMAKE_ECLASS=cmake
+inherit cmake-multilib flag-o-matic toolchain-funcs
 
 DESCRIPTION="ILM's OpenEXR high dynamic-range image file format libraries"
 HOMEPAGE="https://www.openexr.com/"
-SRC_URI="https://github.com/openexr/openexr/releases/download/v${PV}/${P}.tar.gz"
+SRC_URI="https://github.com/AcademySoftwareFoundation/openexr/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="BSD"
-SLOT="0/24" # based on SONAME
-KEYWORDS="amd64 -arm arm64 hppa ~ia64 ppc ppc64 sparc x86 ~amd64-linux ~x86-linux ~x64-macos ~x86-solaris"
-IUSE="cpu_flags_x86_avx examples static-libs"
+SLOT="0/25" # based on SONAME
+KEYWORDS="amd64 -arm arm64 hppa ~ia64 ~ppc ~ppc64 sparc x86 ~amd64-linux ~x86-linux ~x64-macos ~x86-solaris"
+IUSE="cpu_flags_x86_avx doc examples static-libs utils test"
+RESTRICT="!test? ( test )"
 
 RDEPEND="
-	>=media-libs/ilmbase-${PV}:=[${MULTILIB_USEDEP}]
+	media-libs/ilmbase:=[${MULTILIB_USEDEP}]
 	sys-libs/zlib[${MULTILIB_USEDEP}]
 "
-DEPEND="${RDEPEND}
-	>=sys-devel/autoconf-archive-2016.09.16
-	virtual/pkgconfig
-"
+DEPEND="${RDEPEND}"
+BDEPEND="virtual/pkgconfig"
 
-RESTRICT="test" # Tests broken upstream doesn't really care about them, bug #656680
+S="${WORKDIR}/${P}/OpenEXR"
 
-DOCS=( AUTHORS ChangeLog NEWS README.md )
-MULTILIB_WRAPPED_HEADERS=( /usr/include/OpenEXR/OpenEXRConfig.h )
+DOCS=( PATENTS README.md )
 
-PATCHES=(
-	"${FILESDIR}/${PN}-2.2.0-fix-cpuid-on-abi_x86_32.patch"
-	"${FILESDIR}/${PN}-2.2.0-fix-config.h-collision.patch"
-	"${FILESDIR}/${PN}-2.2.0-Install-missing-header-files.patch"
-	"${FILESDIR}/${P}-fix-build-system.patch"
-	"${FILESDIR}/${P}-fix-bashisms.patch"
-	# From Debian
-	"${FILESDIR}/${PN}-2.3.0-tests-32bits.patch"
-	"${FILESDIR}/${PN}-2.3.0-skip-bogus-tests.patch"
-	"${FILESDIR}/${PN}-2.3.0-bigendian.patch"
-	"${FILESDIR}/${PN}-2.3.0-bigendian2.patch"
-	"${FILESDIR}/${PN}-2.3.0-tests-32bits-2.patch"
-)
+MULTILIB_WRAPPED_HEADERS=( /usr/include/OpenEXR/OpenEXRConfigInternal.h )
 
 src_prepare() {
-	default
+	cmake_src_prepare
+
 	# Fix path for testsuite
-	sed -i -e "s:/var/tmp/:${T}:" IlmImfTest/tmpDir.h || die
-	eautoreconf
+	sed -i -e "s:/var/tmp/:${T}:" "${S}"/IlmImfTest/tmpDir.h || die "failed to set temp path for tests"
+
+	if use abi_x86_32 && use test; then
+		eapply "${FILESDIR}/${P}-0001-IlmImfTest-main.cpp-disable-tests.patch"
+	fi
 }
 
 multilib_src_configure() {
-	local myeconfargs=(
-		--disable-imffuzztest
-		--disable-imfhugetest
-		--enable-threading
-		$(use_enable cpu_flags_x86_avx avx)
-		$(use_enable examples imfexamples)
-		$(use_enable static-libs static)
+	local mycmakeargs=(
+		-DBUILD_TESTING=$(usex test)
+		-DINSTALL_OPENEXR_DOCS=$(usex doc)
+		-DINSTALL_OPENEXR_EXAMPLES=$(usex examples)
+		-DOPENEXR_BUILD_BOTH_STATIC_SHARED=$(usex static-libs)
+		-DOPENEXR_BUILD_UTILS=$(usex utils)
+		-DOPENEXR_INSTALL_PKG_CONFIG=ON				# default
 	)
 
-	# TODO: check if this still applies on updates!
-	# internal tool dwaLookup fails to run when linked with gold linker
-	tc-ld-disable-gold
-
-	ECONF_SOURCE="${S}" econf "${myeconfargs[@]}"
+	cmake_src_configure
 }
 
 multilib_src_install_all() {
+	if use doc; then
+		DOCS+=( doc/*.pdf )
+	fi
 	einstalldocs
 
-	if use examples; then
-		docompress -x /usr/share/doc/${PF}/examples
-	else
-		rm -rf "${ED%/}"/usr/share/doc/${PF}/examples || die
-	fi
-
-	find "${D}" -name '*.la' -type f -delete || die
+	use examples && docompress -x /usr/share/doc/${PF}/examples
 }

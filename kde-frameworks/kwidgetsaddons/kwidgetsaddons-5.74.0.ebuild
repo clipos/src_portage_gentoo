@@ -1,0 +1,1 @@
+.kwidgetsaddons.ebuild.0

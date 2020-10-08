@@ -1,0 +1,1 @@
+.kwallet.ebuild.0

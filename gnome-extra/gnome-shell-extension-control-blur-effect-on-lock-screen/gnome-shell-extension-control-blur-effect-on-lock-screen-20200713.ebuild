@@ -1,0 +1,1 @@
+.gnome-shell-extension-control-blur-effect-on-lock-screen.ebuild.0

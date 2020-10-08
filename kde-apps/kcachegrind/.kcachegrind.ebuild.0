@@ -4,8 +4,8 @@
 EAPI=7
 
 ECM_HANDBOOK="forceoptional"
-KFMIN=5.63.0
-QTMIN=5.12.3
+KFMIN=5.70.0
+QTMIN=5.14.2
 inherit ecm kde.org
 
 DESCRIPTION="Frontend for Cachegrind by KDE"
@@ -21,6 +21,9 @@ BDEPEND="
 	nls? ( >=dev-qt/linguist-tools-${QTMIN}:5 )
 "
 DEPEND="
+	>=dev-qt/qtdbus-${QTMIN}:5
+	>=dev-qt/qtgui-${QTMIN}:5
+	>=dev-qt/qtwidgets-${QTMIN}:5
 	>=kde-frameworks/karchive-${KFMIN}:5
 	>=kde-frameworks/kconfig-${KFMIN}:5
 	>=kde-frameworks/kconfigwidgets-${KFMIN}:5
@@ -31,9 +34,6 @@ DEPEND="
 	>=kde-frameworks/kjobwidgets-${KFMIN}:5
 	>=kde-frameworks/kwidgetsaddons-${KFMIN}:5
 	>=kde-frameworks/kxmlgui-${KFMIN}:5
-	>=dev-qt/qtdbus-${QTMIN}:5
-	>=dev-qt/qtgui-${QTMIN}:5
-	>=dev-qt/qtwidgets-${QTMIN}:5
 "
 RDEPEND="${DEPEND}
 	media-gfx/graphviz

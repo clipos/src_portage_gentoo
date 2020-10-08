@@ -1,1 +1,0 @@
-.libgnome.ebuild.0

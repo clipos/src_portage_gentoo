@@ -1,0 +1,1 @@
+.qtawesome.ebuild.0

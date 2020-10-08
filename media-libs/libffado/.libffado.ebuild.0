@@ -1,9 +1,9 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI="6"
+EAPI=7
 
-PYTHON_COMPAT=( python3_6 )
+PYTHON_COMPAT=( python3_{6,7,8} )
 
 inherit desktop python-single-r1 scons-utils toolchain-funcs udev multilib-minimal
 
@@ -23,7 +23,10 @@ SLOT="0"
 IUSE="debug qt5 test-programs"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
-COMMON_DEPEND="${PYTHON_DEPS}
+BDEPEND="
+	virtual/pkgconfig
+"
+CDEPEND="${PYTHON_DEPS}
 	dev-cpp/libxmlpp:2.6[${MULTILIB_USEDEP}]
 	dev-libs/dbus-c++
 	dev-libs/libconfig[cxx,${MULTILIB_USEDEP}]
@@ -39,15 +42,8 @@ COMMON_DEPEND="${PYTHON_DEPS}
 		')
 		x11-misc/xdg-utils
 	)"
-DEPEND="${COMMON_DEPEND}
-	virtual/pkgconfig"
-RDEPEND="${COMMON_DEPEND}
-	!<media-sound/jack-audio-connection-kit-0.122.0:0
-	!<media-sound/jack-audio-connection-kit-1.9.9:2"
-
-PATCHES=(
-	"${FILESDIR}/${P}-python3-scons-fix.patch"
-)
+DEPEND="${CDEPEND}"
+RDEPEND="${CDEPEND}"
 
 myescons() {
 	local myesconsargs=(
@@ -63,8 +59,7 @@ myescons() {
 		# -fomit-frame-pointer is added also which can cripple debugging.
 		# we set flags from portage instead
 		ENABLE_OPTIMIZATIONS=false
-		# This only works for JACK1>=0.122.0 or JACK2>=1.9.9, so we block
-		# lower versions.
+		# This only works for JACK1>=0.122.0 or JACK2>=1.9.9.
 		ENABLE_SETBUFFERSIZE_API_VER=force
 	)
 	if multilib_is_native_abi; then

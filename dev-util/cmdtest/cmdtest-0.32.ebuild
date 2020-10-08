@@ -1,1 +1,0 @@
-.cmdtest.ebuild.0

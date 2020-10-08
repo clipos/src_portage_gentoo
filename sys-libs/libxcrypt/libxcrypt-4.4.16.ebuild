@@ -1,0 +1,1 @@
+.libxcrypt.ebuild.0

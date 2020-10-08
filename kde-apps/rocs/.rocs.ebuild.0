@@ -5,8 +5,8 @@ EAPI=7
 
 ECM_HANDBOOK="optional"
 ECM_TEST="true"
-KFMIN=5.63.0
-QTMIN=5.12.3
+KFMIN=5.70.0
+QTMIN=5.14.2
 inherit ecm kde.org
 
 DESCRIPTION="Interface to work with Graph Theory"
@@ -18,6 +18,15 @@ KEYWORDS="amd64 arm64 x86"
 IUSE=""
 
 RDEPEND="
+	dev-libs/grantlee:5
+	>=dev-qt/qtconcurrent-${QTMIN}:5
+	>=dev-qt/qtdeclarative-${QTMIN}:5[widgets]
+	>=dev-qt/qtgui-${QTMIN}:5
+	>=dev-qt/qtscript-${QTMIN}:5[scripttools]
+	>=dev-qt/qtsvg-${QTMIN}:5
+	>=dev-qt/qtwidgets-${QTMIN}:5
+	>=dev-qt/qtxml-${QTMIN}:5
+	>=dev-qt/qtxmlpatterns-${QTMIN}:5
 	>=kde-frameworks/karchive-${KFMIN}:5
 	>=kde-frameworks/kconfig-${KFMIN}:5
 	>=kde-frameworks/kconfigwidgets-${KFMIN}:5
@@ -31,16 +40,6 @@ RDEPEND="
 	>=kde-frameworks/ktexteditor-${KFMIN}:5
 	>=kde-frameworks/ktextwidgets-${KFMIN}:5
 	>=kde-frameworks/kxmlgui-${KFMIN}:5
-	>=dev-qt/qtconcurrent-${QTMIN}:5
-	>=dev-qt/qtdeclarative-${QTMIN}:5[widgets]
-	>=dev-qt/qtgui-${QTMIN}:5
-	>=dev-qt/qtscript-${QTMIN}:5[scripttools]
-	>=dev-qt/qtsvg-${QTMIN}:5
-	>=dev-qt/qtwebkit-5.212.0_pre20180120:5
-	>=dev-qt/qtwidgets-${QTMIN}:5
-	>=dev-qt/qtxml-${QTMIN}:5
-	>=dev-qt/qtxmlpatterns-${QTMIN}:5
-	dev-libs/grantlee:5
 "
 DEPEND="${RDEPEND}
 	>=dev-libs/boost-1.49

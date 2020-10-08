@@ -1,1 +1,0 @@
-.gnome2-vfs-perl.ebuild.0

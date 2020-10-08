@@ -1,7 +1,7 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=4
+EAPI=7
 
 VIRTUALX_REQUIRED="manual"
 
@@ -17,12 +17,12 @@ KEYWORDS="amd64 arm ppc ppc64 x86"
 IUSE="examples test"
 RESTRICT="!test? ( test )"
 
-RDEPEND=">=dev-lang/lua-5.1
+BDEPEND="virtual/pkgconfig"
+RDEPEND=">=dev-lang/lua-5.1:=
 		dev-libs/gobject-introspection
 		dev-libs/glib
-		virtual/libffi"
+		virtual/libffi:0="
 DEPEND="${RDEPEND}
-		virtual/pkgconfig
 		test? (
 			x11-libs/cairo[glib]
 			x11-libs/gtk+[introspection]
@@ -30,6 +30,8 @@ DEPEND="${RDEPEND}
 		)"
 
 src_prepare() {
+	default
+
 	sed -i \
 		-e "s:^LUA_LIBDIR.*$:LUA_LIBDIR = $($(tc-getPKG_CONFIG) --variable INSTALL_CMOD lua):" \
 		-e "s:^LUA_SHAREDIR.*$:LUA_SHAREDIR = $($(tc-getPKG_CONFIG) --variable INSTALL_LMOD lua):" \
@@ -41,13 +43,14 @@ src_compile() {
 }
 
 src_test() {
-	Xemake CC="$(tc-getCC)" COPTFLAGS="-Wall -Wextra ${CFLAGS}" LIBFLAG="-shared ${LDFLAGS}" check
+	virtx emake CC="$(tc-getCC)" COPTFLAGS="-Wall -Wextra ${CFLAGS}" LIBFLAG="-shared ${LDFLAGS}" check
 }
 
 src_install() {
 	emake DESTDIR="${D}" install
-	dohtml -r docs/*
+	docompress -x /usr/share/doc/${PF}
 	dodoc README.md
+	dodoc -r docs/*
 	if use examples; then
 		dodoc -r samples
 	fi

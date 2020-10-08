@@ -1,7 +1,9 @@
-# Copyright 1999-2015 Gentoo Foundation
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI="4"
+EAPI=5
+
+JAVA_PKG_IUSE="doc source"
 
 inherit toolchain-funcs versionator autotools java-pkg-2
 
@@ -11,38 +13,35 @@ MY_P="${PN}-${MY_PV}"
 DESCRIPTION="Native lib providing serial and parallel communication for Java"
 HOMEPAGE="http://rxtx.qbang.org/"
 SRC_URI="ftp://ftp.qbang.org/pub/rxtx/${MY_P}.zip"
-
-LICENSE="LGPL-2"
+LICENSE="LGPL-2.1+"
 SLOT="2"
 KEYWORDS="amd64 x86"
-IUSE="doc source lfd"
+IUSE="lfd"
 
-RDEPEND=">=virtual/jre-1.4"
+RDEPEND=">=virtual/jre-1.6
+	lfd? ( sys-apps/xinetd )"
 
-DEPEND=">=virtual/jdk-1.4
-	app-arch/unzip
-	dev-java/ant-core
-	lfd? ( sys-apps/xinetd )
-	source? ( app-arch/zip )"
+DEPEND=">=virtual/jdk-1.6
+	app-arch/unzip"
 
 S="${WORKDIR}/${MY_P}"
 
 src_prepare() {
-	# some minor fixes
-	sed -i -e "s:UTS_RELEASE::g" configure.in || die
-	sed -i -e "s:|1.5\*:|1.5*|1.6*|1.7*:g" configure.in || die
-	sed -i -e "s:AM_CONFIG_HEADER:AC_CONFIG_HEADERS:g" configure.in || die
 	sed -i -e "s:\(\$(JAVADOC)\):\1 -d api:g" Makefile.am || die
+	sed -i \
+		-e "s:UTS_RELEASE::g" \
+		-e "s:AM_CONFIG_HEADER:AC_CONFIG_HEADERS:g" \
+		-e "s:-source ... -target ...:$(java-pkg_javac-args):g" \
+		configure.in || die
 
-	# some patches
-	epatch "${FILESDIR}/${PN}-2.1-7r2-lfd.diff"
-	epatch "${FILESDIR}/${PN}-2.1-7r2-nouts.diff"
-	epatch "${FILESDIR}/${P}-add-ttyACM.patch"
+	epatch \
+		"${FILESDIR}/${PN}-2.1-7r2-lfd.diff" \
+		"${FILESDIR}/${PN}-2.1-7r2-nouts.diff" \
+		"${FILESDIR}/${P}-add-ttyACM.patch" \
+		"${FILESDIR}/${P}-limits.patch"
 
-	# update autotools stuff
-	rm acinclude.m4
+	rm acinclude.m4 || die
 	eautoreconf
-	elibtoolize
 }
 
 src_configure() {
@@ -55,17 +54,17 @@ src_compile() {
 
 	if use lfd ; then
 		# see INSTALL in src/ldf
-		$(tc-getCC) ${LDFLAGS} ${CFLAGS} src/lfd/lockdaemon.c -o src/lfd/in.lfd || die "compiling lfd failed"
+		$(tc-getCC) ${LDFLAGS} ${CFLAGS} src/lfd/lockdaemon.c -o src/lfd/in.lfd || die
 	fi
 
 	if use doc ; then
 		emake docs
 	fi
 
-	#Fix for src zip creation
+	# Fix for src zip creation
 	if use source ; then
-		mkdir -p src_with_pkg/gnu
-		ln -s ../../src src_with_pkg/gnu/io
+		mkdir -p src_with_pkg/gnu || die
+		ln -s ../../src src_with_pkg/gnu/io || die
 	fi
 }
 
@@ -74,7 +73,8 @@ src_install() {
 	java-pkg_doso ${CHOST}/.libs/*.so
 
 	dodoc AUTHORS ChangeLog INSTALL PORTING TODO SerialPortInstructions.txt
-	dohtml RMISecurityManager.html
+	docinto html
+	dodoc RMISecurityManager.html
 
 	if use lfd ; then
 		insinto /etc/xinetd.d

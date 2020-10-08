@@ -1,1 +1,0 @@
-.sphinx3.ebuild.0

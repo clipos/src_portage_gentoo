@@ -18,6 +18,7 @@ DEPEND="
 	net-libs/gnome-online-accounts:=
 	>=x11-libs/gtk+-3.19.3:3
 	>=gnome-extra/evolution-data-server-3.33.2:=
+	>=gui-libs/libhandy-0.0.10:0.0=
 	dev-libs/libxml2:2
 	sys-apps/util-linux
 	>=net-libs/webkit-gtk-2.10:4

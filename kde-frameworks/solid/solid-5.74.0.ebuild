@@ -1,0 +1,1 @@
+.solid.ebuild.0

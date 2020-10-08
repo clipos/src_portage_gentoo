@@ -3,8 +3,8 @@
 
 EAPI=7
 
-KFMIN=5.63.0
-QTMIN=5.12.3
+KFMIN=5.70.0
+QTMIN=5.14.2
 inherit ecm kde.org
 
 DESCRIPTION="KDE Telepathy contact, presence and chat Plasma applets"
@@ -16,11 +16,11 @@ KEYWORDS="amd64 arm64 x86"
 IUSE=""
 
 RDEPEND="
+	>=dev-qt/qtdbus-${QTMIN}:5
+	>=dev-qt/qtdeclarative-${QTMIN}:5
 	>=kde-frameworks/kdeclarative-${KFMIN}:5
 	>=kde-frameworks/kwindowsystem-${KFMIN}:5
 	>=kde-frameworks/plasma-${KFMIN}:5
-	>=dev-qt/qtdbus-${QTMIN}:5
-	>=dev-qt/qtdeclarative-${QTMIN}:5
 "
 DEPEND="${RDEPEND}
 	>=kde-frameworks/ki18n-${KFMIN}:5

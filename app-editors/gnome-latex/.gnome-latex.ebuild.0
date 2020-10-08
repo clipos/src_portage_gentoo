@@ -20,7 +20,7 @@ COMMON_DEPEND="
 	gnome-base/gsettings-desktop-schemas
 	>=x11-libs/gtk+-3.22:3
 	>=x11-libs/gtksourceview-4.0:4
-	>=gui-libs/tepl-4.2:4
+	>=gui-libs/tepl-4.4:4
 	x11-libs/gdk-pixbuf:2
 	x11-libs/pango
 	introspection? ( >=dev-libs/gobject-introspection-1.30.0:= )

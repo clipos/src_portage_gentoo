@@ -1,1 +1,0 @@
-.pygobject.ebuild.1

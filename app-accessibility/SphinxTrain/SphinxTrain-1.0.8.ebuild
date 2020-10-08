@@ -1,1 +1,0 @@
-.SphinxTrain.ebuild.0

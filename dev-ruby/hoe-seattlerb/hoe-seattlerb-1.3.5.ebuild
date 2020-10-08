@@ -1,1 +1,0 @@
-.hoe-seattlerb.ebuild.0

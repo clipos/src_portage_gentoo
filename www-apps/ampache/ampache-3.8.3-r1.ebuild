@@ -1,1 +1,0 @@
-.ampache.ebuild.0

@@ -9,8 +9,8 @@ HOMEPAGE="http://tug.org/texlive/"
 LICENSE="metapackage"
 SLOT="0"
 KEYWORDS="~alpha amd64 arm ~arm64 ~hppa ~ia64 ~mips ppc ppc64 s390 sparc x86 ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
-IUSE="cjk context detex dvi2tty extra epspdf games graphics
-humanities jadetex luatex metapost music pdfannotextractor png pstricks publishers
+IUSE="cjk context extra epspdf games graphics
+humanities luatex metapost music pdfannotextractor png pstricks publishers
 science tex4ht texi2html truetype xetex xml X"
 
 LANGS="af ar as bg bn br ca cs cy da de el en eo es et eu fa fi fr ga gl gu he
@@ -33,9 +33,7 @@ RDEPEND="${DEPEND}
 	app-text/t1utils
 	>=app-text/lcdf-typetools-2.92[kpathsea]
 	truetype? ( >=app-text/ttf2pk2-2.0_p20150521 )
-	detex? ( dev-tex/detex )
 	app-text/ps2eps
-	dvi2tty? ( dev-tex/dvi2tty )
 	png? ( app-text/dvipng )
 	X? ( >=app-text/xdvik-22.87 )
 	>=${TEXLIVE_CAT}/texlive-basic-${PV}
@@ -48,7 +46,6 @@ RDEPEND="${DEPEND}
 	>=${TEXLIVE_CAT}/texlive-plaingeneric-${PV}
 	pdfannotextractor? ( dev-tex/pdfannotextractor )
 	extra? (
-		dev-tex/chktex
 		app-text/dvisvgm
 		dev-tex/latexdiff
 		>=dev-tex/latexmk-418
@@ -70,11 +67,7 @@ RDEPEND="${DEPEND}
 	games? ( >=${TEXLIVE_CAT}/texlive-games-${PV} )
 	humanities? ( >=${TEXLIVE_CAT}/texlive-humanities-${PV} )
 	tex4ht? ( >=dev-tex/tex4ht-20090611_p1038-r3 )
-	xml? (
-		>=${TEXLIVE_CAT}/texlive-formatsextra-${PV}
-		app-text/passivetex
-	)
-	jadetex? ( >=app-text/jadetex-3.13-r2 )
+	xml? ( >=${TEXLIVE_CAT}/texlive-formatsextra-${PV} )
 	l10n_af?    ( >=${TEXLIVE_CAT}/texlive-langother-${PV} )
 	l10n_ar?    ( >=${TEXLIVE_CAT}/texlive-langarabic-${PV} )
 	l10n_fa?    ( >=${TEXLIVE_CAT}/texlive-langarabic-${PV} )
@@ -85,8 +78,7 @@ RDEPEND="${DEPEND}
 	l10n_br?    ( >=${TEXLIVE_CAT}/texlive-langeuropean-${PV} )
 	l10n_ru?    ( >=${TEXLIVE_CAT}/texlive-langcyrillic-${PV} )
 	l10n_uk?    ( >=${TEXLIVE_CAT}/texlive-langcyrillic-${PV} )
-	l10n_cs?    ( >=${TEXLIVE_CAT}/texlive-langczechslovak-${PV}
-	              >=app-text/vlna-1.3 )
+	l10n_cs?    ( >=${TEXLIVE_CAT}/texlive-langczechslovak-${PV} )
 	l10n_sk?    ( >=${TEXLIVE_CAT}/texlive-langczechslovak-${PV} )
 	l10n_da?    ( >=${TEXLIVE_CAT}/texlive-langeuropean-${PV} )
 	l10n_nl?    ( >=${TEXLIVE_CAT}/texlive-langeuropean-${PV} )
@@ -133,7 +125,7 @@ RDEPEND="${DEPEND}
 	l10n_ro?    ( >=${TEXLIVE_CAT}/texlive-langeuropean-${PV} )
 	l10n_sq?    ( >=${TEXLIVE_CAT}/texlive-langeuropean-${PV} )
 	l10n_sr?    ( >=${TEXLIVE_CAT}/texlive-langeuropean-${PV}
-	              >=${TEXLIVE_CAT}/texlive-langcyrillic-${PV} )
+				  >=${TEXLIVE_CAT}/texlive-langcyrillic-${PV} )
 	l10n_sl?    ( >=${TEXLIVE_CAT}/texlive-langeuropean-${PV} )
 	l10n_tr?    ( >=${TEXLIVE_CAT}/texlive-langeuropean-${PV} )
 	l10n_pl?    ( >=${TEXLIVE_CAT}/texlive-langpolish-${PV} )

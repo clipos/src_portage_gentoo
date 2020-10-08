@@ -1,0 +1,1 @@
+.darkstat.ebuild.0

@@ -1,1 +1,0 @@
-.json.ebuild.1

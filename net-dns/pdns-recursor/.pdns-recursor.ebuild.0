@@ -12,7 +12,8 @@ SRC_URI="https://downloads.powerdns.com/releases/${P/_/-}.tar.bz2"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="amd64 ~arm x86"
-IUSE="debug libressl luajit protobuf snmp sodium systemd"
+IUSE="debug dnstap libressl luajit protobuf snmp sodium systemd"
+REQUIRED_USE="dnstap? ( protobuf )"
 
 DEPEND="!luajit? ( >=dev-lang/lua-5.1:= )
 	luajit? ( dev-lang/luajit:= )
@@ -20,6 +21,7 @@ DEPEND="!luajit? ( >=dev-lang/lua-5.1:= )
 		dev-libs/protobuf
 		>=dev-libs/boost-1.42:=
 	)
+	dnstap? ( dev-libs/fstrm )
 	systemd? ( sys-apps/systemd:0= )
 	snmp? ( net-analyzer/net-snmp )
 	sodium? ( dev-libs/libsodium:= )
@@ -35,8 +37,7 @@ BDEPEND="virtual/pkgconfig"
 S="${WORKDIR}"/${P/_/-}
 
 PATCHES=(
-	"${FILESDIR}"/${P}-boost-1.73.0.patch
-	"${FILESDIR}"/${P}-gcc-10.patch
+	"${FILESDIR}"/${PN}-4.3.1-boost-1.73.0.patch
 )
 
 pkg_setup() {
@@ -49,6 +50,7 @@ src_configure() {
 		--with-lua=$(usex luajit luajit lua) \
 		$(use_enable debug verbose-logging) \
 		$(use_enable systemd) \
+		$(use_enable dnstap dnstap) \
 		$(use_with sodium libsodium) \
 		$(use_with protobuf) \
 		$(use_with snmp net-snmp)

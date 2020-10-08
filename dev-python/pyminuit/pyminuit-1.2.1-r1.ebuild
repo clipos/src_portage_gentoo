@@ -1,1 +1,0 @@
-.pyminuit.ebuild.0

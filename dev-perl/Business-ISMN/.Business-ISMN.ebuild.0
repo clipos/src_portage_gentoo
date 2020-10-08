@@ -1,10 +1,10 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 DIST_AUTHOR=BDFOY
-DIST_VERSION=1.132
+DIST_VERSION=1.201
 inherit perl-module
 
 DESCRIPTION="International Standard Music Numbers"
@@ -19,7 +19,7 @@ RDEPEND="
 	>=dev-perl/Tie-Cycle-1.210.0
 	virtual/perl-Scalar-List-Utils
 "
-DEPEND="${RDEPEND}
+BDEPEND="${RDEPEND}
 	>=virtual/perl-ExtUtils-MakeMaker-6.640.0
 	virtual/perl-File-Spec
 	test? ( >=virtual/perl-Test-Simple-0.950.0 )

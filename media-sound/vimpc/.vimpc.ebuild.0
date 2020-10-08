@@ -9,7 +9,7 @@ DESCRIPTION="An ncurses based mpd client with vi-like key bindings"
 HOMEPAGE="https://github.com/boysetsfrog/vimpc"
 SRC_URI="https://github.com/boysetsfrog/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
-LICENSE="GPL-3"
+LICENSE="GPL-3+"
 SLOT="0"
 KEYWORDS="amd64 x86"
 IUSE="boost taglib"
@@ -21,7 +21,7 @@ RDEPEND="dev-libs/libpcre
 DEPEND="${RDEPEND}"
 BDEPEND="virtual/pkgconfig"
 
-DOCS=( AUTHORS README.md doc/vimpcrc.example )
+PATCHES=( "${FILESDIR}"/${P}-boost.patch )
 
 src_prepare() {
 	default
@@ -35,6 +35,7 @@ src_configure() {
 }
 
 src_install() {
+	local DOCS=( AUTHORS README.md doc/vimpcrc.example )
 	default
 
 	# vimpc will look for help.txt

@@ -1,1 +1,1 @@
-.jzlib.ebuild.2
+.jzlib.ebuild.1

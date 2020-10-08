@@ -1,1 +1,0 @@
-.libvirt.ebuild.1

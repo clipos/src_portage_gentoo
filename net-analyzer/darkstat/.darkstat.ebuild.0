@@ -1,8 +1,9 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
-inherit autotools user
+
+inherit autotools
 
 DESCRIPTION="Network traffic analyzer with cute web interface"
 HOMEPAGE="https://unix4lyfe.org/darkstat/"
@@ -13,6 +14,7 @@ SLOT="0"
 KEYWORDS="amd64 ppc x86"
 
 DEPEND="
+	acct-user/darkstat
 	dev-libs/libbsd
 	net-libs/libpcap
 	sys-libs/zlib
@@ -48,10 +50,6 @@ src_install() {
 
 	keepdir "${DARKSTAT_CHROOT_DIR}"
 	chown darkstat:0 "${D}${DARKSTAT_CHROOT_DIR}"
-}
-
-pkg_preinst() {
-	enewuser darkstat
 }
 
 pkg_postinst() {

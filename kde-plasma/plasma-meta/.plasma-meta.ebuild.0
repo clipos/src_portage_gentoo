@@ -10,10 +10,10 @@ LICENSE="metapackage"
 SLOT="5"
 KEYWORDS="amd64 ~arm arm64 ~ppc64 x86"
 IUSE="bluetooth +browser-integration crypt +desktop-portal discover
-+display-manager elogind grub gtk +handbook +kwallet +legacy-systray
++display-manager +elogind grub gtk +handbook +kwallet +legacy-systray
 +networkmanager plymouth pulseaudio qrcode +sddm sdk systemd thunderbolt +wallpapers"
 
-REQUIRED_USE="?? ( elogind systemd )"
+REQUIRED_USE="^^ ( elogind systemd )"
 
 RDEPEND="
 	>=kde-plasma/breeze-${PV}:${SLOT}
@@ -31,6 +31,7 @@ RDEPEND="
 	>=kde-plasma/ksshaskpass-${PV}:${SLOT}
 	>=kde-plasma/ksysguard-${PV}:${SLOT}
 	>=kde-plasma/kwayland-integration-${PV}:${SLOT}
+	>=kde-plasma/kwayland-server-${PV}:${SLOT}
 	>=kde-plasma/kwin-${PV}:${SLOT}
 	>=kde-plasma/kwrited-${PV}:${SLOT}
 	>=kde-plasma/libkscreen-${PV}:${SLOT}
@@ -63,6 +64,7 @@ RDEPEND="
 	gtk? (
 		>=kde-plasma/breeze-gtk-${PV}:${SLOT}
 		>=kde-plasma/kde-gtk-config-${PV}:${SLOT}
+		x11-misc/appmenu-gtk-module
 	)
 	handbook? ( kde-apps/khelpcenter:5 )
 	kwallet? ( >=kde-plasma/kwallet-pam-${PV}:${SLOT} )
@@ -84,7 +86,6 @@ RDEPEND="
 
 pkg_postinst() {
 	has_version sys-auth/consolekit || return
-	use elogind || use systemd || return
 	ewarn "An existing installation of sys-auth/consolekit was detected even though"
 	ewarn "${PN} was configured with USE $(usex elogind elogind systemd)."
 	ewarn "There can only be one session manager at runtime, otherwise random issues"

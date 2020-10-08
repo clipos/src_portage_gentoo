@@ -49,6 +49,9 @@ multilib_src_install() {
 		INSTALL_PKGCONFIG="${EPREFIX}"/usr/$(get_libdir)/pkgconfig \
 		INSTALL_PLUGINS="${EPREFIX}"/usr/$(get_libdir)/vamp \
 		install
+
+	# fix .pc files
+	sed -Ei "s/lib$/$(get_libdir)/g" "${D}"/usr/$(get_libdir)/pkgconfig/*.pc
 }
 
 multilib_src_install_all() {

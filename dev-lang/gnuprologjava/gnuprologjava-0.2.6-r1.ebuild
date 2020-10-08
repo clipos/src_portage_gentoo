@@ -1,0 +1,1 @@
+.gnuprologjava.ebuild.0

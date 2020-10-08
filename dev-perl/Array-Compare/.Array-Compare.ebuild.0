@@ -1,10 +1,10 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 DIST_AUTHOR=DAVECROSS
-DIST_VERSION=v3.0.1
+DIST_VERSION=v3.0.3
 inherit perl-module
 
 DESCRIPTION="Perl extension for comparing arrays"
@@ -20,6 +20,9 @@ RDEPEND="
 	dev-perl/Type-Tiny
 "
 DEPEND="
+	dev-perl/Module-Build
+"
+BDEPEND="
 	>=dev-perl/Module-Build-0.420.0
 	test? ( ${RDEPEND}
 		dev-perl/Test-NoWarnings

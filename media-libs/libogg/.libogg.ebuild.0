@@ -1,7 +1,7 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 inherit multilib-minimal
 
 DESCRIPTION="the Ogg media file format library"
@@ -25,5 +25,5 @@ multilib_src_configure() {
 
 multilib_src_install_all() {
 	einstalldocs
-	find "${ED}" -name "*.la" -delete || die
+	find "${ED}" -type f -name "*.la" -delete || die
 }

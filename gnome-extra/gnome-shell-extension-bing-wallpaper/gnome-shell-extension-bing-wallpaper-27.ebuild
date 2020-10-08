@@ -1,0 +1,1 @@
+.gnome-shell-extension-bing-wallpaper.ebuild.0

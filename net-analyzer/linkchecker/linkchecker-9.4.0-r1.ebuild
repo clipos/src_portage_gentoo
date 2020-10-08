@@ -1,1 +1,0 @@
-.linkchecker.ebuild.0

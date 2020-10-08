@@ -1,8 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
+CMAKE_ECLASS=cmake
 inherit multilib cmake-multilib
 
 DESCRIPTION="PulseAudio emulation for ALSA"
@@ -11,7 +12,7 @@ SRC_URI="https://github.com/i-rinat/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="MIT LGPL-2.1"
 SLOT="0"
-KEYWORDS="amd64 x86"
+KEYWORDS="amd64 ~ppc64 x86"
 
 IUSE="debug sdk test"
 RESTRICT="!test? ( test )"
@@ -22,10 +23,14 @@ DEPEND="dev-libs/glib:2[${MULTILIB_USEDEP}]
 RDEPEND="${DEPEND}
 	!!media-plugins/alsa-plugins[pulseaudio]"
 
-PATCHES=( "${FILESDIR}/sdk.patch" )
+PATCHES=(
+	"${FILESDIR}/sdk.patch"
+	"${FILESDIR}/check-key-before-remove.patch"
+	"${FILESDIR}/man.patch"
+)
 
 src_prepare() {
-	cmake-utils_src_prepare
+	cmake_src_prepare
 
 	if ! use sdk; then
 		# Ensure all relevant libdirs are added, to support all ABIs
@@ -42,17 +47,22 @@ multilib_src_configure() {
 		"-DLOG_TO_STDERR=$(usex debug)"
 		"-DWITH_TRACE=$(usex debug)"
 	)
-	cmake-utils_src_configure
+	cmake_src_configure
 }
 
 multilib_src_test() {
-	emake check
+	_test() {
+		pushd tests || die
+		cmake -S "${S}/tests" -B . || die
+		emake test_ringbuffer
+		ctest -j "$(makeopts_jobs)" --test-load "$(makeopts_loadavg)" || die
+		popd || die
+	}
+	multilib_foreach_abi _test
 }
 
 multilib_src_install_all() {
-	# Do not use deprecated MULTILIB_CHOST_TOOLS
 	if ! use sdk; then
-		unset BUILD_DIR
 		_install_wrapper() { newbin "${BUILD_DIR}/apulse" "${CHOST}-apulse"; }
 		multilib_foreach_abi _install_wrapper
 		dobin "${T}/apulse"

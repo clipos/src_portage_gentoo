@@ -1,1 +1,1 @@
-.kwidgetsaddons.ebuild.0
+.kwidgetsaddons.ebuild.1

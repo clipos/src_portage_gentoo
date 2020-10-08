@@ -1,15 +1,11 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
-inherit autotools
-
-# This thing change with every release, how idiotic...
-NODE_NUMBER=275
 
 DESCRIPTION="lightweight, extensible meta-backup system"
-HOMEPAGE="http://riseuplabs.org/backupninja/"
-SRC_URI="https://labs.riseup.net/code/attachments/download/${NODE_NUMBER}/${P}.tar.gz"
+HOMEPAGE="https://0xacab.org/riseuplabs/backupninja"
+SRC_URI="https://0xacab.org/riseuplabs/backupninja/-/archive/backupninja_upstream/${PV}/backupninja-backupninja_upstream-${PV}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -18,11 +14,7 @@ KEYWORDS="amd64 x86"
 RDEPEND="dev-util/dialog"
 DEPEND=""
 
-src_prepare() {
-	default
-	mv configure.in configure.ac
-	eautoreconf
-}
+S="${WORKDIR}/${PN}-${PN}_upstream-${PV}"
 
 src_configure() {
 	econf --localstatedir=/var #578614

@@ -1,1 +1,0 @@
-.notify-python.ebuild.0

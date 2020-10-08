@@ -1,0 +1,1 @@
+.coolreader.ebuild.0

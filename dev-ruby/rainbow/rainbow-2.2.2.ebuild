@@ -1,1 +1,0 @@
-.rainbow.ebuild.1

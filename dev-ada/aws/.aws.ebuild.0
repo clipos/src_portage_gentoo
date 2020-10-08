@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -6,12 +6,12 @@ EAPI=7
 ADA_COMPAT=( gnat_2019 )
 inherit ada multiprocessing
 
-MY_P=${P}-20190512-18AB9-src
+MYP=${P}-20200429-19A9F-src
 
 DESCRIPTION="A complete Web development framework"
 HOMEPAGE="http://libre.adacore.com/tools/aws/"
-SRC_URI="http://mirrors.cdn.adacore.com/art/5cdf85a031e87aa2cdf16b19
-	-> ${MY_P}.tar.gz"
+SRC_URI="https://community.download.adacore.com/v1/c1b0f6863d1a30acaee1df022a65ad11d5737a84?filename=${MYP}.tar.gz
+	-> ${MYP}.tar.gz"
 
 LICENSE="GPL-3"
 SLOT="0"
@@ -25,10 +25,10 @@ DEPEND="${RDEPEND}
 
 REQUIRED_USE="${ADA_REQUIRED_USE}"
 
-S="${WORKDIR}"/${MY_P}
+S="${WORKDIR}"/${MYP}
 
 PATCHES=(
-	"${FILESDIR}"/${PN}-2016-gentoo.patch
+	"${FILESDIR}"/${P}-gentoo.patch
 )
 
 src_configure() {

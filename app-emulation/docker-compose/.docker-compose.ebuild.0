@@ -34,7 +34,7 @@ RDEPEND="dev-python/setuptools[${PYTHON_USEDEP}]
 
 DEPEND="${RDEPEND}
 	test? (
-		<dev-python/pytest-4[${PYTHON_USEDEP}]
+		>=dev-python/pytest-5[${PYTHON_USEDEP}]
 		dev-python/ddt[${PYTHON_USEDEP}]
 	)"
 

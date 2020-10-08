@@ -1,1 +1,0 @@
-.mox.ebuild.0

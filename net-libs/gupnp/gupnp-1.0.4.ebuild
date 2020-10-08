@@ -1,1 +1,0 @@
-.gupnp.ebuild.1

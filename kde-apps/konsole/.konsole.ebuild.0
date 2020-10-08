@@ -5,8 +5,8 @@ EAPI=7
 
 ECM_HANDBOOK="optional"
 ECM_TEST="true"
-KFMIN=5.63.0
-QTMIN=5.12.3
+KFMIN=5.70.0
+QTMIN=5.14.2
 VIRTUALX_REQUIRED="test"
 inherit ecm kde.org
 
@@ -19,7 +19,6 @@ SLOT="5"
 KEYWORDS="amd64 arm64 ~ppc64 x86"
 IUSE="X"
 
-# drop kbookmarks subslot operator when KFMIN >= 5.69.0
 DEPEND="
 	>=dev-qt/qtdbus-${QTMIN}:5
 	>=dev-qt/qtgui-${QTMIN}:5
@@ -27,7 +26,7 @@ DEPEND="
 	>=dev-qt/qtprintsupport-${QTMIN}:5
 	>=dev-qt/qtwidgets-${QTMIN}:5
 	>=dev-qt/qtxml-${QTMIN}:5
-	>=kde-frameworks/kbookmarks-${KFMIN}:5=
+	>=kde-frameworks/kbookmarks-${KFMIN}:5
 	>=kde-frameworks/kcompletion-${KFMIN}:5
 	>=kde-frameworks/kconfig-${KFMIN}:5
 	>=kde-frameworks/kconfigwidgets-${KFMIN}:5
@@ -53,12 +52,6 @@ DEPEND="
 	X? ( x11-libs/libX11 )
 "
 RDEPEND="${DEPEND}"
-
-PATCHES=(
-	"${FILESDIR}/${PN}-19.12.2-darkbackground-detect.patch"
-	"${FILESDIR}/${P}-no-ccache.patch"
-	"${FILESDIR}/${P}-kf5bookmarks-5.69.patch" # KDE-Bug 419981
-)
 
 src_configure() {
 	local mycmakeargs=(

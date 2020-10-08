@@ -1,1 +1,0 @@
-.fdsend.ebuild.0

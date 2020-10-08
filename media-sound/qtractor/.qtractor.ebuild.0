@@ -44,7 +44,7 @@ DEPEND="
 RDEPEND="${DEPEND}"
 
 PATCHES=(
-	"${FILESDIR}/${P}-dont-compress-manpages.patch"
+	"${FILESDIR}/${PN}-0.9.13-dont-compress-manpages.patch"
 )
 
 src_configure() {

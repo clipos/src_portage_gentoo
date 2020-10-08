@@ -11,7 +11,7 @@ if [ "${PV}" == "9999" ]; then
 	EGIT_REPO_URI="https://github.com/python/${PN}"
 	SRC_URI=""
 else
-	TYPESHED_COMMIT="a06abc5"
+	TYPESHED_COMMIT="e199c2e"
 	SRC_URI="https://github.com/python/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz
 			https://api.github.com/repos/python/typeshed/tarball/${TYPESHED_COMMIT} -> mypy-typeshed-${PV}-${TYPESHED_COMMIT}.tar.gz"
 fi
@@ -21,12 +21,19 @@ HOMEPAGE="http://www.mypy-lang.org/"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="amd64 x86"
+KEYWORDS="amd64 ~arm64 x86"
 IUSE="doc test"
 
 DEPEND="
 	dev-python/setuptools[${PYTHON_USEDEP}]
-	test? ( dev-python/flake8[${PYTHON_USEDEP}] )
+	test? ( dev-python/flake8[${PYTHON_USEDEP}]
+			>=dev-python/pytest-3.0[${PYTHON_USEDEP}]
+			>=dev-python/pytest-xdist-1.18[${PYTHON_USEDEP}]
+			>=dev-python/pytest-cov-2.4.0[${PYTHON_USEDEP}]
+			>=dev-python/psutil-5.4.0[${PYTHON_USEDEP}]
+			>=dev-python/lxml-4.1.1[${PYTHON_USEDEP}]
+			>=dev-python/py-1.5.2[${PYTHON_USEDEP}]
+			>=dev-python/virtualenv-16.0.0[${PYTHON_USEDEP}] )
 	doc? (
 		dev-python/sphinx[${PYTHON_USEDEP}]
 		dev-python/sphinx_rtd_theme[${PYTHON_USEDEP}]

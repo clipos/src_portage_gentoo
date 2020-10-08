@@ -1,26 +1,26 @@
-# Copyright 2010-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 DB_VER="4.8"
 inherit autotools bash-completion-r1 db-use systemd
 
-BITCOINCORE_COMMITHASH="49e34e288005a5b144a642e197b628396f5a0765"
-KNOTS_PV="${PV}.knots20180918"
+BITCOINCORE_COMMITHASH="bf0dc356ac4a2bdeda1908af021dea2de0dfb35a"
+KNOTS_PV="${PV}.knots20200815"
 KNOTS_P="bitcoin-${KNOTS_PV}"
 
 DESCRIPTION="Original Bitcoin crypto-currency wallet for automated services"
 HOMEPAGE="https://bitcoincore.org/ https://bitcoinknots.org/"
 SRC_URI="
 	https://github.com/bitcoin/bitcoin/archive/${BITCOINCORE_COMMITHASH}.tar.gz -> bitcoin-v${PV}.tar.gz
-	https://bitcoinknots.org/files/0.16.x/${KNOTS_PV}/${KNOTS_P}.patches.txz -> ${KNOTS_P}.patches.tar.xz
+	https://bitcoinknots.org/files/0.20.x/${KNOTS_PV}/${KNOTS_P}.patches.txz -> ${KNOTS_P}.patches.tar.xz
 "
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="amd64 ~arm ~arm64 ~mips ~ppc x86 ~amd64-linux ~x86-linux"
-IUSE="+asm examples knots libressl test upnp +wallet zeromq"
+KEYWORDS="amd64 ~arm ~arm64 ~mips ~ppc ~ppc64 x86 ~amd64-linux ~x86-linux"
+IUSE="+asm examples knots +system-leveldb test upnp +wallet zeromq"
 RESTRICT="!test? ( test )"
 
 DEPEND="
@@ -28,18 +28,31 @@ DEPEND="
 	acct-user/bitcoin
 	>=dev-libs/boost-1.52.0:=[threads(+)]
 	dev-libs/libevent:=
-	>=dev-libs/libsecp256k1-0.0.0_pre20151118:=[recovery]
-	dev-libs/univalue:=
-	virtual/bitcoin-leveldb
-	!libressl? ( dev-libs/openssl:0=[-bindist] )
-	libressl? ( dev-libs/libressl:0= )
+	>dev-libs/libsecp256k1-0.1_pre20170321:=[recovery]
+	>=dev-libs/univalue-1.0.4:=
+	system-leveldb? ( virtual/bitcoin-leveldb )
 	upnp? ( >=net-libs/miniupnpc-1.9.20150916:= )
 	wallet? ( sys-libs/db:$(db_ver_to_slot "${DB_VER}")=[cxx] )
 	zeromq? ( net-libs/zeromq:= )
 "
 RDEPEND="${DEPEND}"
+BDEPEND="
+	>=sys-devel/autoconf-2.69
+	>=sys-devel/automake-1.13
+"
 
-DOCS=( doc/bips.md doc/files.md doc/reduce-traffic.md doc/release-notes.md doc/REST-interface.md doc/tor.md )
+DOCS=(
+	doc/bips.md
+	doc/bitcoin-conf.md
+	doc/descriptors.md
+	doc/files.md
+	doc/JSON-RPC-interface.md
+	doc/psbt.md
+	doc/reduce-traffic.md
+	doc/release-notes.md
+	doc/REST-interface.md
+	doc/tor.md
+)
 
 S="${WORKDIR}/bitcoin-${BITCOINCORE_COMMITHASH}"
 
@@ -47,11 +60,11 @@ pkg_pretend() {
 	if use knots; then
 		elog "You are building ${PN} from Bitcoin Knots."
 		elog "For more information, see:"
-		elog "https://bitcoinknots.org/files/0.16.x/${KNOTS_PV}/${KNOTS_P}.desc.html"
+		elog "https://bitcoinknots.org/files/0.20.x/${KNOTS_PV}/${KNOTS_P}.desc.html"
 	else
 		elog "You are building ${PN} from Bitcoin Core."
 		elog "For more information, see:"
-		elog "https://bitcoincore.org/en/2018/09/18/release-${PV}/"
+		elog "https://bitcoincore.org/en/2020/08/01/release-${PV}/"
 	fi
 	elog "Replace By Fee policy is now always enabled by default: Your node will"
 	elog "preferentially mine and relay transactions paying the highest fee, regardless"
@@ -63,7 +76,6 @@ src_prepare() {
 
 	local knots_patchdir="${WORKDIR}/${KNOTS_P}.patches/"
 
-	eapply "${FILESDIR}"/${PN}-0.16.3-missing-include.patch
 	eapply "${knots_patchdir}/${KNOTS_P}.syslibs.patch"
 
 	if use knots; then
@@ -72,21 +84,23 @@ src_prepare() {
 		eapply "${knots_patchdir}/${KNOTS_P}.ts.patch"
 	fi
 
-	eapply_user
+	default
 
 	echo '#!/bin/true' >share/genbuild.sh || die
 	mkdir -p src/obj || die
 	echo "#define BUILD_SUFFIX gentoo${PVR#${PV}}" >src/obj/build.h || die
 
 	eautoreconf
-	rm -r src/leveldb src/secp256k1 || die
+	rm -r src/secp256k1 || die
+	if use system-leveldb; then
+		rm -r src/leveldb || die
+	fi
 }
 
 src_configure() {
 	local my_econf=(
 		$(use_enable asm)
 		--without-qtdbus
-		--with-libevent
 		--without-qrencode
 		$(use_with upnp miniupnpc)
 		$(use_enable upnp upnp-default)
@@ -96,12 +110,14 @@ src_configure() {
 		--with-daemon
 		--disable-util-cli
 		--disable-util-tx
+		--disable-util-wallet
 		--disable-bench
 		--without-libs
 		--without-gui
+		--disable-fuzz
 		--disable-ccache
 		--disable-static
-		--with-system-leveldb
+		$(use_with system-leveldb)
 		--with-system-libsecp256k1
 		--with-system-univalue
 	)
@@ -136,7 +152,7 @@ src_install() {
 
 	if use examples; then
 		docinto examples
-		dodoc -r contrib/{linearize,qos,tidy_datadir.sh}
+		dodoc -r contrib/{linearize,qos}
 		use zeromq && dodoc -r contrib/zmq
 	fi
 

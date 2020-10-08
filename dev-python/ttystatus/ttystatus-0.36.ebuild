@@ -1,1 +1,0 @@
-.ttystatus.ebuild.0

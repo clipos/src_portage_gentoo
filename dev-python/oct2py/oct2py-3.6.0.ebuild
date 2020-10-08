@@ -1,1 +1,0 @@
-.oct2py.ebuild.0

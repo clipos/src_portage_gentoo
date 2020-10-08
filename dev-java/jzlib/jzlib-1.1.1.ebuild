@@ -1,1 +1,0 @@
-.jzlib.ebuild.1

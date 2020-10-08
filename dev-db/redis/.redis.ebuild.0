@@ -51,9 +51,13 @@ PATCHES=(
 src_prepare() {
 	default
 
+	# don't call ar directly
+	sed -e '/^STLIB_MAKE_CMD/s/ar/$(AR)/g' \
+		-i deps/hiredis/Makefile || die
+
 	# Copy lua modules into build dir
-	cp "${S}"/deps/lua/src/{fpconv,lua_bit,lua_cjson,lua_cmsgpack,lua_struct,strbuf}.c "${S}"/src || die
-	cp "${S}"/deps/lua/src/{fpconv,strbuf}.h "${S}"/src || die
+	cp deps/lua/src/{fpconv,lua_bit,lua_cjson,lua_cmsgpack,lua_struct,strbuf}.c src/ || die
+	cp deps/lua/src/{fpconv,strbuf}.h src/ || die
 	# Append cflag for lua_cjson
 	# https://github.com/antirez/redis/commit/4fdcd213#diff-3ba529ae517f6b57803af0502f52a40bL61
 	append-cflags "-DENABLE_CJSON_GLOBAL"
@@ -102,8 +106,7 @@ src_prepare() {
 }
 
 src_configure() {
-	econf \
-		$(use_with luajit)
+	econf $(use_with luajit)
 
 	# Linenoise can't be built with -std=c99, see https://bugs.gentoo.org/451164
 	# also, don't define ANSI/c99 for lua twice
@@ -111,8 +114,6 @@ src_configure() {
 }
 
 src_compile() {
-	tc-export CC AR RANLIB
-
 	local myconf=""
 
 	if use tcmalloc; then
@@ -123,7 +124,8 @@ src_compile() {
 		myconf="${myconf} MALLOC=yes"
 	fi
 
-	emake ${myconf} V=1 CC="${CC}" AR="${AR} rcu" RANLIB="${RANLIB}"
+	tc-export AR CC RANLIB
+	emake V=1 ${myconf} AR="${AR}" CC="${CC}" RANLIB="${RANLIB}"
 }
 
 src_install() {

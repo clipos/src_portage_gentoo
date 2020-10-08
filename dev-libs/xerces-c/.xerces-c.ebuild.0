@@ -31,10 +31,6 @@ DEPEND="${RDEPEND}
 	test? ( dev-lang/perl )"
 
 DOCS=( CREDITS KEYS NOTICE README )
-PATCHES=(
-	"${FILESDIR}/${P}-fix-XERCESC-2161.patch"
-	"${FILESDIR}/${P}-fix-XERCESC-2163.patch"
-)
 
 pkg_setup() {
 	export ICUROOT="${EPREFIX}/usr"
@@ -79,6 +75,7 @@ src_configure() {
 	# for interix maybe: transcoder="windows"
 
 	local mycmakeargs=(
+		-DCMAKE_INSTALL_DOCDIR="${EPREFIX}/usr/share/doc/${PF}"
 		-Dnetwork-accessor="${netaccessor}"
 		-Dmessage-loader="${msgloader}"
 		-Dtranscoder="${transcoder}"

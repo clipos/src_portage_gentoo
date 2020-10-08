@@ -1,0 +1,1 @@
+.networkmanager-qt.ebuild.0

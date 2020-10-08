@@ -3,8 +3,8 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_6 )
-inherit gnome2-utils multilib python-single-r1 qmake-utils xdg-utils
+PYTHON_COMPAT=( python3_{6,7} )
+inherit python-single-r1 qmake-utils xdg-utils
 
 DESCRIPTION="A general purpose tile map editor"
 HOMEPAGE="https://www.mapeditor.org/"
@@ -18,11 +18,11 @@ IUSE="examples python"
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
 
 RDEPEND="
-	>=dev-qt/qtcore-5.10:5
-	>=dev-qt/qtdeclarative-5.10:5
-	>=dev-qt/qtgui-5.10:5
-	>=dev-qt/qtnetwork-5.10:5
-	>=dev-qt/qtwidgets-5.10:5
+	>=dev-qt/qtcore-5.14:5
+	>=dev-qt/qtdeclarative-5.14:5
+	>=dev-qt/qtgui-5.14:5
+	>=dev-qt/qtnetwork-5.14:5
+	>=dev-qt/qtwidgets-5.14:5
 	sys-libs/zlib
 	python? ( ${PYTHON_DEPS} )
 "

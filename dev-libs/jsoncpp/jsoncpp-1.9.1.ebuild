@@ -1,1 +1,0 @@
-.jsoncpp.ebuild.1

@@ -1,10 +1,11 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=5
+EAPI=7
 
-MODULE_AUTHOR=XAOC
-MODULE_VERSION=1.106
+DIST_AUTHOR=XAOC
+DIST_VERSION=1.107
+DIST_EXAMPLES=("examples/*")
 inherit perl-module
 
 DESCRIPTION="Perl interface to the cairo library"
@@ -18,7 +19,10 @@ RESTRICT="!test? ( test )"
 RDEPEND="
 	>=x11-libs/cairo-1.0.0
 "
-DEPEND="${RDEPEND}
+DEPEND="
+	>=x11-libs/cairo-1.0.0
+"
+BDEPEND="${RDEPEND}
 	virtual/perl-ExtUtils-MakeMaker
 	>=dev-perl/ExtUtils-Depends-0.200.0
 	>=dev-perl/ExtUtils-PkgConfig-1.0.0
@@ -26,10 +30,12 @@ DEPEND="${RDEPEND}
 		dev-perl/Test-Number-Delta
 	)
 "
-
-SRC_TEST="do"
-
-src_prepare() {
-	perl-module_src_prepare
-	sed -i -e 's,exit 0,exit 1,' "${S}"/Makefile.PL || die
+PATCHES=(
+	"${FILESDIR}/${PN}-1.107-fatal-exit.patch"
+)
+src_compile() {
+	mymake=(
+		"OPTIMIZE=${CFLAGS}"
+	)
+	perl-module_src_compile
 }

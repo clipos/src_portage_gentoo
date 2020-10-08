@@ -33,7 +33,6 @@ dev-util/patchutils test
 
 # Rolf Eike Beer <eike@sf-mail.de> (2020-04-11)
 # no stable app-editors/{,g}vim
-dev-util/gtk-doc vim
 sys-fs/dosfstools test
 
 # Rolf Eike Beer <eike@sf-mail.de> (2020-04-11)
@@ -42,7 +41,7 @@ media-libs/libtheora examples
 
 # Matt Turner <mattst88@gentoo.org> (2020-04-01)
 # net-libs/mbedtls has no stable keywords
-net-misc/curl curl_ssl_mbedtls
+net-misc/curl curl_ssl_mbedtls mbedtls
 dev-libs/libzip mbedtls
 net-libs/libssh mbedtls
 net-libs/libssh2 mbedtls
@@ -82,7 +81,6 @@ sys-libs/freeipmi nagios
 media-gfx/imagemagick raw
 
 # Andreas Sturmlechner <asturm@gentoo.org> (2018-05-20)
-# media-video/faac is not stable.
 # media-libs/{libdc1394,x264} is not stable.
 # media-libs/game-music-emu is not stable.
 media-video/ffmpeg gme ieee1394 x264

@@ -6,7 +6,7 @@ EAPI=7
 ECM_DESIGNERPLUGIN="true"
 ECM_TEST="forceoptional"
 PVCUT=$(ver_cut 1-2)
-QTMIN=5.12.3
+QTMIN=5.14.2
 VIRTUALX_REQUIRED="test"
 inherit ecm kde.org xdg-utils
 
@@ -71,7 +71,10 @@ PDEPEND="
 # tests hang
 RESTRICT+=" test"
 
-PATCHES=( "${FILESDIR}"/${PN}-5.70.0-fix-run-in-terminal.patch )
+PATCHES=(
+	"${FILESDIR}"/${P}-kio_trash-too-strict-perms-check.patch
+	"${FILESDIR}"/${P}-handle-shell-scripts-consistenty.patch
+)
 
 src_configure() {
 	local mycmakeargs=(

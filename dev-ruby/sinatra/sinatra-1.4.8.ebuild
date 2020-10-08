@@ -1,1 +1,0 @@
-.sinatra.ebuild.1

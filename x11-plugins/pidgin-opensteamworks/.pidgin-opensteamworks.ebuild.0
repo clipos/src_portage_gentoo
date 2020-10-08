@@ -1,7 +1,7 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=5
+EAPI=7
 
 inherit toolchain-funcs
 
@@ -14,12 +14,14 @@ SLOT="0"
 KEYWORDS="amd64 ~ppc x86"
 IUSE=""
 
-RDEPEND="dev-libs/glib:2
+RDEPEND="
+	app-crypt/libsecret
+	dev-libs/glib:2
 	dev-libs/json-glib
 	dev-libs/nss
-	gnome-base/libgnome-keyring
 	net-im/pidgin"
-DEPEND="${RDEPEND}
+DEPEND="${RDEPEND}"
+BDEPEND="
 	app-arch/unzip
 	virtual/pkgconfig"
 
@@ -32,8 +34,8 @@ pkg_setup() {
 }
 
 src_prepare() {
-	# see https://code.google.com/p/pidgin-opensteamworks/issues/detail?id=31
-	cp "${FILESDIR}"/${PN}-1.3-Makefile "${S}"/${P}/steam-mobile/Makefile || die
+	default
+
 	unzip "${S}"/${P}/steam-mobile/releases/icons.zip || die
 }
 

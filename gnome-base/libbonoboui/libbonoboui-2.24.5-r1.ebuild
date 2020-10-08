@@ -1,1 +1,0 @@
-.libbonoboui.ebuild.0

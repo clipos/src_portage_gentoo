@@ -17,6 +17,6 @@ BDEPEND="sys-apps/texinfo"
 
 DOCS="ChangeLog keyword-generation.sh"
 ELISP_TEXINFO="${PN}.texi"
-SITEFILE="50${PN}-gentoo-1.39.el"
+SITEFILE="50${PN}-gentoo-1.51.el"
 DOC_CONTENTS="Some optional features may require installation of additional
 	packages, like dev-python/docutils-glep for glep."

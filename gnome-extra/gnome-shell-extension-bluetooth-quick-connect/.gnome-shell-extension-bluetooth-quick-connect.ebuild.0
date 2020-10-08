@@ -19,16 +19,12 @@ COMMON_DEPEND="
 RDEPEND="${COMMON_DEPEND}
 	net-wireless/bluez
 	app-eselect/eselect-gnome-shell-extensions
-	>=gnome-base/gnome-shell-3.26.2
+	>=gnome-base/gnome-shell-3.36
 "
 DEPEND="${COMMON_DEPEND}"
 BDEPEND=""
 
 S="${WORKDIR}/${P/shell-extension-}"
-
-PATCHES=(
-	"${FILESDIR}"/${P}-3.34.patch
-)
 
 src_install() {
 	einstalldocs

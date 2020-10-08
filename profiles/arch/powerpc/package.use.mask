@@ -1,9 +1,13 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-# Sergei Trofimovich <slyfox@gentoo.org> (2020-07-11)
-# net-libs/libslirp is not yet keyworded on ppc64, bug #732144
-app-emulation/qemu slirp
+# Georgy Yakovlev <gyakovlev@gentoo.org> (2020-10-05)
+# criu is masked on big-endian ppc*
+app-emulation/crun criu
+
+# Sergei Trofimovich <slyfox@gentoo.org> (2020-08-07)
+# dev-vcs/darcs is not keyworded on ppc/ppc64
+app-portage/layman darcs
 
 # Sergei Trofimovich <slyfox@gentoo.org> (2018-03-27)
 # dev-ruby/capybara depends on www-client/firefox which has no keywords
@@ -45,10 +49,6 @@ app-emulation/qemu sdl-image
 # requires fwupd, which is not yet keyworded
 kde-plasma/discover firmware
 
-# Michał Górny <mgorny@gentoo.org> (2020-01-11)
-# Unkeyworded test deps.
-dev-cpp/eigen test
-
 # Rick Farina <zerochaos@gentoo.com> (2020-01-03)
 # ubertooth needs net-libs/libbtbb and net-wireless/ubertooth which aren't keyworded
 # rtl-sdr needs net-wireless/rtl-sdr
@@ -72,7 +72,7 @@ app-misc/lcdproc freetype lcd_devices_glcd png
 
 # Georgy Yakovlev <gyakovlev@gentoo.org> (2019-06-01)
 # not yet keyworded
-dev-java/openjdk javafx
+dev-java/openjdk:11 javafx
 
 # Patrick McLean <chutzpah@gentoo.org> (2019-04-15)
 # deps not available on platform
@@ -104,10 +104,6 @@ net-analyzer/icinga2 mariadb
 # Luca Barbato <lu_zero@gentoo.org> (2018-08-12)
 # grub pc is not supported on powerpc
 sys-boot/grub:2 grub_platforms_pc grub_platforms_efi-32 grub_platforms_efi-64 grub_platforms_xen grub_platforms_xen-pvh
-
-# Luke Dashjr <luke-jr+gentoobugs@utopios.org> (2018-06-08)
-# Requires unported sys-libs/netbsd-csu
-sys-devel/clang-runtime crt
 
 # Luke Dashjr <luke-jr+gentoobugs@utopios.org> (2018-06-08)
 # sys-devel/llvmgold not yet keyworded
@@ -162,10 +158,6 @@ app-forensics/sleuthkit java
 # Michał Górny <mgorny@gentoo.org> (2017-08-10)
 # Requires USE=ipmi which is masked in this profile.
 sys-power/nut ups_drivers_nut-ipmipsu
-
-# Michał Górny <mgorny@gentoo.org> (2017-08-08)
-# Required VIDEO_CARDS=i965/radeonsi, both masked in this profile.
-media-libs/mesa vulkan vulkan-overlay
 
 # Michał Górny <mgorny@gentoo.org> (2017-08-08)
 # Requires USE=opencl that is masked in this profile.
@@ -228,17 +220,9 @@ x11-base/xorg-drivers video_cards_amdgpu
 # Missing keywords
 net-dns/unbound dnstap
 
-# Mike Frysinger <vapier@gentoo.org> (2015-03-16)
-# Needs sci-physics/bullet & media-libs/libsdl2 tested #499974
-dev-libs/efl physics sdl
-
 # Andreas K. Huettel <dilfridge@gentoo.org> (2015-02-15)
 # There's no keyworded office implementation anymore.
 gnome-extra/sushi office
-
-# Markos Chandras <hwoarang@gentoo.org> (2015-02-07)
-# app-admin/cgmanager misses PPC/PPC64 keywords. Bug #539208
-app-emulation/lxc cgmanager
 
 # Mark Wright <gienah@gentoo.org> (2014-12-14/2014-12-24, 2015-04-01)
 # test dependencies need keywording
@@ -370,17 +354,9 @@ media-libs/opencv cuda
 # sys-apps/usbredir
 app-emulation/qemu     spice xen rbd usbredir
 
-# Kacper Kowalik <xarthisius@gentoo.org> (2011-01-16)
-# bug 350513, app-pda/jpilot is not keyworded
-mail-client/claws-mail pda
-
 # Sebastian Pipping <sping@gentoo.org> (2011-02-22)
 # No media-sound/lilypond here, yet (bug #356069)
 app-text/asciidoc test
-
-# Justin Lecher <jlec@gentoo.org> (2010-11-01)
-# Deps not Keyworded
-sci-chemistry/apbs fetk iapbs python
 
 # Alexey Shvetsov <alexxy@gentoo.org> (2010-08-22)
 # sci-chemistry/msms not available for this arch

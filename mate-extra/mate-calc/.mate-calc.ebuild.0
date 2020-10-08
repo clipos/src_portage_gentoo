@@ -22,10 +22,12 @@ COMMON_DEPEND="
 	>=x11-libs/gtk+-3.22:3
 	x11-libs/pango"
 
-RDEPEND="${COMMON_DEPEND}"
+RDEPEND="${COMMON_DEPEND}
+	virtual/libintl
+"
 
 DEPEND="${COMMON_DEPEND}
 	app-text/yelp-tools
-	>=dev-util/intltool-0.35.0
-	sys-devel/gettext:*
+	dev-libs/libxml2
+	>=sys-devel/gettext-0.19.8:*
 	virtual/pkgconfig:*"

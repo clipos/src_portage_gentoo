@@ -1,1 +1,0 @@
-.eclipse-ecj.ebuild.2

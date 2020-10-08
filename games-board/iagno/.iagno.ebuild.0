@@ -2,10 +2,12 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
+VALA_MIN_API_VERSION="0.44"
+
 inherit gnome.org gnome2-utils meson vala xdg
 
 DESCRIPTION="Dominate the board in a classic version of Reversi"
-HOMEPAGE="https://wiki.gnome.org/Apps/Iagno"
+HOMEPAGE="https://wiki.gnome.org/Apps/Reversi"
 
 LICENSE="GPL-3+ CC-BY-SA-3.0"
 SLOT="0"
@@ -13,7 +15,7 @@ KEYWORDS="amd64 ~arm ~arm64 x86"
 IUSE=""
 
 RDEPEND="
-	>=dev-libs/glib-2.40.0:2
+	>=dev-libs/glib-2.42.0:2
 	>=media-libs/gsound-1.0.2
 	>=x11-libs/gtk+-3.24.0:3
 	>=gnome-base/librsvg-2.32.0:2
@@ -30,6 +32,10 @@ BDEPEND="
 	media-libs/gsound[vala]
 	gnome-base/librsvg:2[vala]
 "
+
+PATCHES=(
+	"${FILESDIR}"/${PV}-vala-posix.patch
+)
 
 src_prepare() {
 	xdg_src_prepare

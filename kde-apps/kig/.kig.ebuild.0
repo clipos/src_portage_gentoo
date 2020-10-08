@@ -5,9 +5,9 @@ EAPI=7
 
 ECM_HANDBOOK="forceoptional"
 ECM_TEST="true"
-PYTHON_COMPAT=( python3_{6,7} )
-KFMIN=5.63.0
-QTMIN=5.12.3
+PYTHON_COMPAT=( python3_{7,8} )
+KFMIN=5.70.0
+QTMIN=5.14.2
 inherit python-single-r1 ecm kde.org
 
 DESCRIPTION="KDE Interactive Geometry tool"
@@ -50,11 +50,7 @@ DEPEND="${RDEPEND}
 	>=kde-frameworks/ktexteditor-${KFMIN}:5
 "
 
-PATCHES=(
-	"${FILESDIR}"/${PN}-4.12.0-boostpython.patch
-	"${FILESDIR}"/${PN}-19.08.3-pykig-python3.patch
-	"${FILESDIR}"/${PN}-19.08.3-scripter-crash.patch
-)
+PATCHES=( "${FILESDIR}"/${PN}-4.12.0-boostpython.patch )
 
 pkg_setup() {
 	python-single-r1_pkg_setup

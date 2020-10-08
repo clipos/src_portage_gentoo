@@ -1,1 +1,0 @@
-.awstats.ebuild.0
