@@ -1,1 +1,0 @@
-.ntpclient.ebuild.0

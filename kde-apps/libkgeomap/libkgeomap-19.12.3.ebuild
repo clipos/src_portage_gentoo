@@ -1,1 +1,0 @@
-.libkgeomap.ebuild.0

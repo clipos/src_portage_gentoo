@@ -1,1 +1,0 @@
-.dogpile-core.ebuild.0

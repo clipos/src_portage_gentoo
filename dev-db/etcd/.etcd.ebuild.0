@@ -1,53 +1,65 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
-
-inherit user systemd golang-vcs-snapshot
-
-KEYWORDS="amd64"
-EGO_PN="github.com/coreos/etcd"
-GIT_COMMIT="6d80523"
+EAPI=7
+inherit go-module systemd
+GIT_COMMIT=4873f5516
 MY_PV="${PV/_rc/-rc.}"
+
 DESCRIPTION="Highly-available key value store for shared configuration and service discovery"
 HOMEPAGE="https://github.com/etcd-io/etcd"
-SRC_URI="https://${EGO_PN}/archive/v${MY_PV}.tar.gz -> ${P}.tar.gz"
+SRC_URI="https://github.com/etcd-io/etcd/archive/v${MY_PV}.tar.gz -> ${P}.tar.gz"
+
 LICENSE="Apache-2.0 BSD BSD-2 MIT"
 SLOT="0"
+KEYWORDS="amd64"
 IUSE="doc +server"
-DEPEND=">=dev-lang/go-1.12:="
-RDEPEND="!dev-db/etcdctl"
+
+COMMON_DEPEND="server? (
+	acct-group/etcd
+	acct-user/etcd
+	)"
+DEPEND="${COMMON_DEPEND}"
+RDEPEND="${COMMON_DEPEND}
+	!dev-db/etcdctl"
+
+# Tests hang and emit this error:
+# Too many goroutines running after all test(s).
+RESTRICT="test"
 
 src_prepare() {
+	export GO_BUILD_FLAGS="-mod=vendor -v -x"
 	default
 	sed -e "s|GIT_SHA=.*|GIT_SHA=${GIT_COMMIT}|"\
-		-i "${S}"/src/${EGO_PN}/build || die
+		-i "${S}"/build || die
 	sed -e 's:\(for p in \)shellcheck :\1 :' \
 		-e 's:^			gofmt \\$:\\:' \
 		-e 's:^			govet \\$:\\:' \
-		-i "${S}"/src/${EGO_PN}/test || die
+		-e 's:^			govet_shadow \\$:\\:' \
+		-i "${S}"/test || die
 	# missing ... in args forwarded to print-like function
 	sed -e 's:l\.Logger\.Panic(v):l.Logger.Panic(v...):' \
-		-i "${S}"/src/${EGO_PN}/raft/logger.go || die
-}
+		-i "${S}"/raft/logger.go || die
 
-pkg_setup() {
-	if use server; then
-		enewgroup ${PN}
-		enewuser ${PN} -1 -1 /var/lib/${PN} ${PN}
-	fi
+	sed -e 's:TestGetDefaultInterface(:_\0:' \
+		-e 's:TestGetDefaultHost(:_\0:' \
+		-i "${S}"/pkg/netutil/routes_linux_test.go || die
+
+	rm "${S}"/pkg/tlsutil/cipher_suites_test.go || die
+
+	sed -e "s|GO_BUILD_FLAGS=\"[^\"]*\"|GO_BUILD_FLAGS=\"${GO_BUILD_FLAGS}\"|" \
+		-e "s|go test |go test ${GO_BUILD_FLAGS} |" \
+		-i ./test || die
+
+	mkdir -p vendor/github.com/coreos || die
+	ln -s ../../.. vendor/github.com/coreos/etcd || die
 }
 
 src_compile() {
-	export -n GOCACHE XDG_CACHE_HOME #651934
-	export GOPATH=${S}
-	pushd src/${EGO_PN} || die
-	GO_BUILD_FLAGS=-v ./build || die
-	popd || die
+	 ./build || die
 }
 
 src_install() {
-	pushd src/${EGO_PN} || die
 	dobin bin/etcdctl
 	use doc && dodoc -r Documentation
 	if use server; then
@@ -68,11 +80,8 @@ src_install() {
 		fowners ${PN}:${PN} /var/log/${PN}
 		fperms 755 /var/log/${PN}
 	fi
-	popd || die
 }
 
 src_test() {
-	pushd src/${EGO_PN} || die
 	./test || die
-	popd || die
 }

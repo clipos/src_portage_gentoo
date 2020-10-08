@@ -1,6 +1,28 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
+# Adam Feldman <NP-Hardass@gentoo.org> (2020-09-05)
+# dev-util/dogtail is not keyworded for arm
+app-text/atril test
+
+# Sam James <sam@gentoo.org> (2020-09-05)
+# nvidia-texture-tools not useful here
+media-libs/devil nvtt
+games-strategy/0ad nvtt
+
+# James Le Cuirot <chewi@gentoo.org> (2020-08-19)
+# Cinnamon is not keyworded on this architecture.
+x11-themes/arc-theme cinnamon
+
+# Mart Raudsepp <leio@gentoo.org> (2020-08-02)
+# armv5 and older has no virtual/rust support yet, needed by newer
+# gnome-base/librsvg, et al
+>=media-gfx/eog-3.33.1 svg
+
+# Andreas Sturmlechner <asturm@gentoo.org> (2020-07-28)
+# Requires dev-libs/boost[context] which is masked on arm, bug #727138
+dev-libs/msgpack boost
+
 # Sam James <sam@gentoo.org> (2020-07-11)
 # Don't drag in qtwebengine for Plasma right now
 # Not going for nuclear option of general mask
@@ -9,10 +31,6 @@
 # See bug #713900
 kde-plasma/libksysguard webengine
 kde-plasma/kdeplasma-addons webengine
-
-# Robin H. Johnson <robbat2@gentoo.org> (2020-07-02)
-# Mask io-uring & zbc pending keywording
-sys-block/fio io-uring zbc
 
 # Sam James <sam@gentoo.org> (2020-06-27)
 # Tests require Valgrind, not available on <armv7a
@@ -49,10 +67,6 @@ net-misc/whois xcrypt
 # and as for now we have only stable mate versions
 mate-base/mate bluetooth
 
-# Andreas Sturmlechner <asturm@gentoo.org> (2020-01-26)
-# media-libs/libheif is not keyworded
-media-gfx/gimp heif
-
 # Georgy Yakovlev <gyakovlev@gentoo.org (2020-01-04)
 # zfs is not keyworded on arm
 dev-util/schroot zfs
@@ -64,11 +78,6 @@ app-admin/syslog-ng test
 # Robin H. Johnson <robbat2@gentoo.org> (2019-12-06)
 # PPS should work on all arches, but only keyworded on some arches
 >=net-misc/ntp-4.2.6_p3-r1 -parse-clocks
-
-# Andreas Sturmlechner <asturm@gentoo.org> (2019-11-28)
-# >=sci-libs/vtk-8 is not keyworded, bug #649054
-media-libs/opencv vtk
-sci-libs/pcl vtk
 
 # Andreas Sturmlechner <asturm@gentoo.org> (2019-10-29)
 # Neither sys-apps/bolt nor kde-plasma/plasma-thunderbolt are keyworded
@@ -110,10 +119,6 @@ sys-apps/fwupd dell thunderbolt
 # The corresponding Qt5 modules are not keyworded on arm, and we don't want to
 # keyword them solely because of PyQt5 while there are no other in-tree users.
 dev-python/PyQt5 networkauth
-
-# Michał Górny <mgorny@gentoo.org> (2018-10-18)
-# Requires unported sys-libs/netbsd-csu.
-sys-devel/clang-runtime crt
 
 # Thomas Deutschmann <whissi@gentoo.org> (2018-10-12)
 # Requires www-client/firefox which isn't available on ARM yet
@@ -167,10 +172,6 @@ sys-power/nut ups_drivers_nut-ipmipsu
 dev-python/ipython test
 
 # Michał Górny <mgorny@gentoo.org> (2017-08-08)
-# Required VIDEO_CARDS=i965/radeonsi, both masked in this profile.
-media-libs/mesa vulkan vulkan-overlay
-
-# Michał Górny <mgorny@gentoo.org> (2017-08-08)
 # Requires USE=opencl that is masked in this profile.
 net-misc/bfgminer adl lm-sensors
 
@@ -178,10 +179,6 @@ net-misc/bfgminer adl lm-sensors
 # dev-tcltk/tcllib is not keyworded, and tests are restricted anyway, so
 # no point in pursuing it right now.
 app-shells/bash-completion test
-
-# James Le Cuirot <chewi@gentoo.org> (2017-04-25)
-# Oracle doesn't include VisualVM on this platform.
-dev-java/oracle-jdk-bin visualvm
 
 # Patrice Clement <monsieurp@gentoo.org> (2017-04-09)
 # Enable MQTT support on supported architectures
@@ -224,7 +221,6 @@ dev-db/mariadb -jdbc
 # media-gfx/graphicsmagick is not keyworded on arm, users will need
 # to enable imagemagick flag and disable graphicsmagick use flag
 # to enable conversion facilities
-sci-mathematics/octave graphicsmagick
 media-gfx/zbar graphicsmagick
 
 # Amy Winston <amynka@gentoo.org> (2016-06-12)
@@ -250,10 +246,6 @@ sci-mathematics/flint ntl
 # Markus Meier <maekke@gentoo.org> (2016-02-26)
 # unmask scanner for net-print/hplip, bug #518456
 media-sound/moc timidity
-
-# Justin Lecher <jlec@gentoo.org> (2016-02-22)
-# Missing test deps keyword #575366
-dev-cpp/eigen test
 
 # James Le Cuirot <chewi@gentoo.org> (2016-01-30)
 # scrollview requires SWT, which is currently unsupported on ARM.
@@ -309,10 +301,6 @@ media-libs/clutter-gtk wayland
 dev-python/ipython doc
 dev-python/oct2py doc
 
-# Michael Weber <xmw@gentoo.org> (2014-11-15)
-# missing keywords on media-libs/libharu
-www-client/netsurf pdf-writer
-
 # Markus Meier <maekke@gentoo.org> (2014-11-14)
 # Unkeyworded deps, bug #511532
 net-im/prosody libevent mysql postgres sqlite
@@ -360,10 +348,6 @@ mail-filter/opendkim opendbx stats
 # app-emulation/qemu is not keyworded on arm arch.
 # app-text/pandoc is not keyworded on arm arch.
 app-emulation/xen-tools system-qemu doc
-
-# Markus Meier <maekke@gentoo.org> (2014-02-23)
-# Needs sci-physics/bullet tested #499974
-dev-libs/efl physics
 
 # Markus Meier <maekke@gentoo.org> (2013-12-26)
 # Unkeyworded deps, bug #488724
@@ -433,7 +417,6 @@ dev-vcs/subversion java
 media-libs/libjpeg-turbo java
 net-dns/libidn java
 net-misc/tigervnc java
-net-print/cups java
 sys-devel/gettext java
 sys-libs/db java
 

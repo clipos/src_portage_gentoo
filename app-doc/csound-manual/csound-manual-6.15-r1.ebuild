@@ -1,0 +1,1 @@
+.csound-manual.ebuild.0

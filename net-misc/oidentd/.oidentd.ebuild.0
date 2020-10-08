@@ -3,7 +3,7 @@
 
 EAPI=7
 
-inherit systemd
+inherit autotools systemd
 
 DESCRIPTION="Another (RFC1413 compliant) ident daemon"
 HOMEPAGE="https://oidentd.janikrabe.com/"
@@ -22,10 +22,14 @@ RDEPEND="
 	selinux? ( sec-policy/selinux-oident )
 	${DEPEND}"
 
+PATCHES=( "${FILESDIR}/${P}-respect-ar.patch" )
+
 src_prepare() {
 	sed -i '/ExecStart/ s|$| -u oidentd -g oidentd|' contrib/systemd/*.service || die
 
 	default
+
+	eautoreconf
 }
 
 src_configure() {

@@ -1,0 +1,1 @@
+.kconfigwidgets.ebuild.0

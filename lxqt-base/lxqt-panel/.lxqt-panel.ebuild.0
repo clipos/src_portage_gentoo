@@ -14,15 +14,15 @@ if [[ ${PV} = *9999* ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/lxqt/${PN}.git"
 else
-	SRC_URI="https://downloads.lxqt.org/downloads/${PN}/${PV}/${P}.tar.xz"
+	SRC_URI="https://github.com/lxqt/${PN}/releases/download/${PV}/${P}.tar.xz"
 	KEYWORDS="amd64 ~arm ~arm64 ~ppc64 x86"
 fi
 
-LICENSE="LGPL-2.1+"
+LICENSE="LGPL-2.1 LGPL-2.1+"
 SLOT="0"
-IUSE="+alsa colorpicker cpuload +desktopswitch +directorymenu dom +kbindicator +mainmenu
-	+mount networkmonitor pulseaudio +quicklaunch sensors +showdesktop
-	+spacer statusnotifier sysstat +taskbar +tray +volume +worldclock"
+IUSE="+alsa colorpicker cpuload +desktopswitch +directorymenu dom +kbindicator
++mainmenu +mount networkmonitor pulseaudio +quicklaunch lm-sensors +showdesktop
++spacer statusnotifier sysstat +taskbar +tray +volume +worldclock"
 
 # Work around a missing header issue: https://bugs.gentoo.org/666278
 REQUIRED_USE="
@@ -32,7 +32,7 @@ REQUIRED_USE="
 
 BDEPEND="
 	dev-qt/linguist-tools:5
-	>=dev-util/lxqt-build-tools-0.6.0
+	>=dev-util/lxqt-build-tools-0.7.0
 	virtual/pkgconfig
 "
 DEPEND="
@@ -52,9 +52,9 @@ DEPEND="
 	x11-libs/libX11
 	cpuload? ( sys-libs/libstatgrab )
 	kbindicator? ( x11-libs/libxkbcommon )
+	lm-sensors? ( sys-apps/lm-sensors )
 	mount? ( kde-frameworks/solid:5 )
 	networkmonitor? ( sys-libs/libstatgrab )
-	sensors? ( sys-apps/lm-sensors )
 	statusnotifier? ( dev-libs/libdbusmenu-qt[qt5(+)] )
 	sysstat? ( >=lxqt-base/libsysstat-0.4.1 )
 	tray? (
@@ -89,7 +89,7 @@ src_configure() {
 		-DMOUNT_PLUGIN=$(usex mount)
 		-DNETWORKMONITOR_PLUGIN=$(usex networkmonitor)
 		-DQUICKLAUNCH_PLUGIN=$(usex quicklaunch)
-		-DSENSORS_PLUGIN=$(usex sensors)
+		-DSENSORS_PLUGIN=$(usex lm-sensors)
 		-DSHOWDESKTOP_PLUGIN=$(usex showdesktop)
 		-DSPACER_PLUGIN=$(usex spacer)
 		-DSTATUSNOTIFIER_PLUGIN=$(usex statusnotifier)

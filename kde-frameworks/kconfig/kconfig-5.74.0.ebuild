@@ -1,0 +1,1 @@
+.kconfig.ebuild.0

@@ -1,0 +1,1 @@
+.curb.ebuild.0

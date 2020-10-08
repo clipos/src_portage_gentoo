@@ -1,1 +1,1 @@
-.i18n.ebuild.2
+.i18n.ebuild.1

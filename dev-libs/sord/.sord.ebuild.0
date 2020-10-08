@@ -19,7 +19,7 @@ RESTRICT="!test? ( test )"
 
 RDEPEND="
 	dev-libs/libpcre
-	>=dev-libs/serd-0.30.0
+	dev-libs/serd
 "
 DEPEND="${RDEPEND}
 	${PYTHON_DEPS}
@@ -27,6 +27,10 @@ DEPEND="${RDEPEND}
 	virtual/pkgconfig"
 
 DOCS=( "AUTHORS" "NEWS" "README.md" )
+
+PATCHES=(
+	"${FILESDIR}/${P}-x86_32.patch"
+)
 
 src_prepare() {
 	sed -i -e 's/^.*run_ldconfig/#\0/' wscript || die

@@ -1,1 +1,0 @@
-.libpst.ebuild.0

@@ -30,6 +30,8 @@ KEYWORDS="amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 x86"
 # NOTE: x11-base/xorg-server dep is for X_SERVER_PATH etc, bug #295686
 # nspr used by smartcard extension
 # dconf, dbus and g-s-d are needed at install time for dconf update
+# keyutils is automagic dep that makes autologin unlock login keyring when all the passwords match (disk encryption, user pw and login keyring)
+# dbus-run-session used at runtime
 # We need either systemd or >=openrc-0.12 to restart gdm properly, bug #463784
 COMMON_DEPEND="
 	app-text/iso-codes
@@ -53,6 +55,7 @@ COMMON_DEPEND="
 	>=x11-misc/xdg-utils-1.0.2-r3
 
 	sys-libs/pam
+	sys-apps/keyutils:=
 	elogind? ( >=sys-auth/elogind-239.3[pam] )
 	systemd? ( >=sys-apps/systemd-186:0=[pam] )
 
@@ -79,8 +82,6 @@ RDEPEND="${COMMON_DEPEND}
 	fprint? (
 		sys-auth/fprintd
 		sys-auth/pam_fprint )
-
-	!gnome-extra/fast-user-switch-applet
 "
 DEPEND="${COMMON_DEPEND}
 	app-text/docbook-xml-dtd:4.1.2

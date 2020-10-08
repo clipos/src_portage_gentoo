@@ -1,10 +1,10 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 DIST_AUTHOR=FERREIRA
-DIST_VERSION=0.13
+DIST_VERSION=0.16
 inherit perl-module
 
 DESCRIPTION="Warns and dies noisily with stack backtraces"
@@ -17,10 +17,14 @@ RESTRICT="!test? ( test )"
 RDEPEND="
 	virtual/perl-Carp
 "
-DEPEND="${RDEPEND}
+BDEPEND="${RDEPEND}
 	virtual/perl-ExtUtils-MakeMaker
 	test? (
 		virtual/perl-Test-Simple
 		dev-perl/Test-Base
 	)
 "
+PERL_RM_FILES=(
+	"t/098pod-coverage.t"
+	"t/099pod.t"
+)

@@ -1,0 +1,1 @@
+.smmsp.ebuild.0

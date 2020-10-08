@@ -1,1 +1,0 @@
-.langkit.ebuild.0

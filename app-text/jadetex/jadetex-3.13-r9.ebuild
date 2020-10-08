@@ -1,1 +1,0 @@
-.jadetex.ebuild.0

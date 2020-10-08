@@ -1,1 +1,0 @@
-.xapps.ebuild.0

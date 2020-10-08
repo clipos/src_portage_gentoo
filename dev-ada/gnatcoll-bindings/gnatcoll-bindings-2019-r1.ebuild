@@ -1,1 +1,0 @@
-.gnatcoll-bindings.ebuild.0

@@ -1,0 +1,1 @@
+.qqc2-desktop-style.ebuild.0

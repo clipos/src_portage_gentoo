@@ -1,10 +1,10 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
-DIST_AUTHOR=KENTNL
-DIST_VERSION=6.06
+DIST_AUTHOR=ETHER
+DIST_VERSION=6.08
 inherit perl-module
 
 DESCRIPTION="Report errors from perspective of caller of a clan of modules"
@@ -14,11 +14,10 @@ KEYWORDS="~alpha amd64 arm arm64 hppa ~ia64 ~m68k ppc ppc64 ~s390 sparc x86 ~ppc
 IUSE="test"
 RESTRICT="!test? ( test )"
 
-RDEPEND=""
-DEPEND="${RDEPEND}
-	test? ( dev-perl/Test-Exception )"
-
-src_test() {
-	perl_rm_files t/01pod.t t/03yaml.t
-	perl-module_src_test
-}
+BDEPEND="
+	virtual/perl-ExtUtils-MakeMaker
+	test? (
+		virtual/perl-File-Spec
+		virtual/perl-Test-Simple
+	)
+"

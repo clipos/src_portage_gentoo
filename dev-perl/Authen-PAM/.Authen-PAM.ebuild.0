@@ -1,7 +1,7 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 DIST_AUTHOR=NIKIP
 DIST_VERSION=0.16
@@ -16,8 +16,16 @@ IUSE="examples"
 
 RDEPEND="sys-libs/pam"
 DEPEND="${RDEPEND}"
+BDEPEND="${RDEPEND}"
+
 PATCHES=("${FILESDIR}/no-dot-inc.patch")
-export OPTIMIZE="$CFLAGS"
+
+src_compile() {
+	mymake=(
+		"OPTIMIZE=${CFLAGS}"
+	)
+	perl-module_src_compile
+}
 
 src_test() {
 	local MODULES=(
@@ -39,5 +47,5 @@ src_test() {
 	fi
 	ewarn "To comprehensively test this module, interactive testing is necessary"
 	ewarn "For details, see:"
-	ewarn "https://wiki.gentoo.org/wiki/Project:Perl/maint-notes/dev-perl/Authen-PAM"
+	ewarn " https://wiki.gentoo.org/wiki/Project:Perl/maint-notes/${CATEGORY}/${PN}"
 }

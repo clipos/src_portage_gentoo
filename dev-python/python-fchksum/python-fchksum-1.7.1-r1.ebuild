@@ -1,1 +1,0 @@
-.python-fchksum.ebuild.0

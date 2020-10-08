@@ -1,1 +1,0 @@
-.pygtk.ebuild.0

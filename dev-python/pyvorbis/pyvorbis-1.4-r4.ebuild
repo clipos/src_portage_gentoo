@@ -1,1 +1,0 @@
-.pyvorbis.ebuild.0

@@ -1,1 +1,0 @@
-.jpeg.ebuild.1

@@ -19,6 +19,7 @@ DEPEND="
 	>=gnome-extra/evolution-data-server-3.33.2:=[gtk]
 	net-libs/libsoup:2.4
 	>=dev-libs/libdazzle-3.33.1
+	>=gui-libs/libhandy-0.0.9:0.0=
 	>=dev-libs/glib-2.58.0:2
 	>=x11-libs/gtk+-3.22.0:3
 	>=net-libs/gnome-online-accounts-3.2.0:=

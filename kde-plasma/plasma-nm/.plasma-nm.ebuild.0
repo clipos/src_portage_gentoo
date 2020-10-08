@@ -4,9 +4,9 @@
 EAPI=7
 
 ECM_TEST="true"
-KFMIN=5.66.0
+KFMIN=5.71.0
 PVCUT=$(ver_cut 1-3)
-QTMIN=5.12.3
+QTMIN=5.14.2
 inherit ecm kde.org
 
 DESCRIPTION="KDE Plasma applet for NetworkManager"
@@ -17,7 +17,7 @@ KEYWORDS="amd64 ~arm arm64 ~ppc64 x86"
 IUSE="modemmanager openconnect teamd"
 
 DEPEND="
-	>=app-crypt/qca-2.1.1:2[qt5(+)]
+	>=app-crypt/qca-2.3.0:2
 	>=dev-qt/qtdbus-${QTMIN}:5
 	>=dev-qt/qtdeclarative-${QTMIN}:5[widgets]
 	>=dev-qt/qtgui-${QTMIN}:5
@@ -44,8 +44,8 @@ DEPEND="
 	>=kde-frameworks/solid-${KFMIN}:5
 	net-misc/networkmanager[teamd=]
 	modemmanager? (
-		>=kde-frameworks/modemmanager-qt-${KFMIN}:5
 		>=dev-qt/qtxml-${QTMIN}:5
+		>=kde-frameworks/modemmanager-qt-${KFMIN}:5
 		net-misc/mobile-broadband-provider-info
 	)
 	openconnect? (
@@ -57,10 +57,13 @@ DEPEND="
 RDEPEND="${DEPEND}
 	>=dev-qt/qtquickcontrols-${QTMIN}:5
 	>=dev-qt/qtquickcontrols2-${QTMIN}:5
+	>=kde-frameworks/kirigami-${KFMIN}:5
 	>=kde-plasma/kde-cli-tools-${PVCUT}:5
 "
 
-PATCHES=( "${FILESDIR}/${P}-missing-wireguard-icon.patch" ) # in Plasma/5.18
+PATCHES=(
+	"${FILESDIR}"/${PN}-5.19.2-fix-inline-password-field.patch # KDE-bug #423093
+)
 
 src_configure() {
 	local mycmakeargs=(

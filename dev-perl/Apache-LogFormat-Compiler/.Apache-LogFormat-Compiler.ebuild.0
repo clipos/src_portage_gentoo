@@ -1,10 +1,10 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 DIST_AUTHOR=KAZEBURO
-DIST_VERSION=0.35
+DIST_VERSION=0.36
 DIST_EXAMPLES=("eg/*")
 inherit perl-module
 
@@ -19,12 +19,15 @@ RESTRICT="!test? ( test )"
 RDEPEND="
 	>=dev-perl/POSIX-strftime-Compiler-0.300.0
 	virtual/perl-Time-Local
-	>=dev-lang/perl-5.8.4"
-
+	>=dev-lang/perl-5.8.4
+"
+DEPEND="
+	dev-perl/Module-Build-Tiny
+"
 # HTTP::Request::Common -> HTTP-Message
 # Test::More -> perl-Test-Simple
 # URI::Escape -> URI
-DEPEND="${RDEPEND}
+BDEPEND="${RDEPEND}
 		>=dev-perl/Module-Build-Tiny-0.35.0
 		test? (
 				dev-perl/HTTP-Message

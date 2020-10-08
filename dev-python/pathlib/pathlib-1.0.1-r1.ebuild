@@ -1,1 +1,0 @@
-.pathlib.ebuild.0

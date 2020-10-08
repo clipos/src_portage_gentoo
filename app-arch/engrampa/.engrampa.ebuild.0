@@ -5,7 +5,7 @@ EAPI=6
 
 MATE_LA_PUNT="yes"
 
-inherit eutils mate
+inherit mate optfeature readme.gentoo-r1
 
 if [[ ${PV} != 9999 ]]; then
 	KEYWORDS="amd64 ~arm ~arm64 x86"
@@ -17,23 +17,28 @@ SLOT="0"
 
 IUSE="caja magic packagekit"
 
-RDEPEND="
+COMMON_DEPEND="
 	>=dev-libs/glib-2.50:2
 	>=dev-libs/json-glib-0.14
 	virtual/libintl
 	x11-libs/gdk-pixbuf:2
 	>=x11-libs/gtk+-3.22:3[X]
+	x11-libs/libSM
 	x11-libs/pango
 	caja? ( >=mate-base/caja-1.17.1 )
 	magic? ( sys-apps/file )
 	packagekit? ( app-admin/packagekit-base )
-	!!app-arch/mate-file-archiver"
+"
 
-DEPEND="${RDEPEND}
+RDEPEND="${COMMON_DEPEND}
+	virtual/libintl
+	!!app-arch/mate-file-archiver
+"
+
+DEPEND="${COMMON_DEPEND}
 	app-text/yelp-tools
 	dev-util/glib-utils
-	>=dev-util/intltool-0.50.1
-	sys-devel/gettext
+	>=sys-devel/gettext-0.19.8:*
 	virtual/pkgconfig
 "
 
@@ -44,10 +49,6 @@ src_configure() {
 		$(use_enable magic) \
 		$(use_enable packagekit)
 }
-
-PATCHES=(
-	"${FILESDIR}/${P}-gcc-10-fno-common.patch"
-)
 
 src_install() {
 	mate_src_install

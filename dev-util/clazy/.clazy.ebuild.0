@@ -15,25 +15,18 @@ KEYWORDS="amd64"
 IUSE=""
 
 RDEPEND="
-	>=sys-devel/llvm-3.8:=
+	>=sys-devel/clang-5.0:=
+	>=sys-devel/llvm-5.0:=
 "
 DEPEND="${RDEPEND}"
 
-DOCS=( README.md )
-
-PATCHES=(
-	"${FILESDIR}/${P}-llvm-10.patch"
-	"${FILESDIR}/${P}-clang-cpp.patch"
-)
+PATCHES=( "${FILESDIR}/${P}-gnuinstalldirs.patch" )
 
 src_prepare() {
 	cmake_src_prepare
 
 	sed -e '/install(FILES README.md COPYING-LGPL2.txt checks.json DESTINATION/d' \
 		-i CMakeLists.txt || die
-
-	sed -e 's|${MAN_INSTALL_DIR}|share/man/man1|' \
-		-i docs/man/CMakeLists.txt || die
 }
 
 src_configure() {
@@ -44,10 +37,4 @@ src_configure() {
 	local clang_version=$(best_version "sys-devel/clang")
 	export LLVM_ROOT="/usr/lib/llvm/$(ver_cut 1 ${clang_version##sys-devel/clang-})"
 	cmake_src_configure
-}
-
-src_install() {
-	cmake_src_install
-	mv "${D}"/usr/share/doc/clazy/* "${D}"/usr/share/doc/${PF} || die
-	rmdir "${D}"/usr/share/doc/clazy || die
 }

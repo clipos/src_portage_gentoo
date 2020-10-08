@@ -20,6 +20,18 @@ PATCHES=(
 	"${FILESDIR}"/${P}-py38.patch
 )
 
+BDEPEND="
+	test? (
+		dev-python/httpretty[${PYTHON_USEDEP}]
+		dev-python/keyring[${PYTHON_USEDEP}]
+		dev-python/lxml[${PYTHON_USEDEP}]
+		dev-python/mock[${PYTHON_USEDEP}]
+		dev-python/paramiko[${PYTHON_USEDEP}]
+		dev-python/requests[${PYTHON_USEDEP}]
+		dev-python/rsa[${PYTHON_USEDEP}]
+		dev-python/selenium[${PYTHON_USEDEP}]
+	)"
+
 distutils_enable_tests nose
 
 src_prepare() {

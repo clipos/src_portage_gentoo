@@ -1,1 +1,0 @@
-.wxpython.ebuild.0

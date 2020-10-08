@@ -3,7 +3,7 @@
 
 EAPI=7
 
-inherit cmake-utils xdg
+inherit cmake xdg
 
 DESCRIPTION="Desktop Syncing Client for Nextcloud"
 HOMEPAGE="https://github.com/nextcloud/desktop"
@@ -52,7 +52,6 @@ DEPEND="${COMMON_DEPEND}
 RESTRICT="!test? ( test )"
 
 PATCHES=( "${FILESDIR}"/${PN}-2.6.1-include_tests.patch
-	"${FILESDIR}"/${P}-qt515.patch
 	)
 
 S=${WORKDIR}/desktop-${PV/_/-}
@@ -66,7 +65,7 @@ src_prepare() {
 		cmake_comment_add_subdirectory nautilus
 		popd > /dev/null || die
 	fi
-	cmake-utils_src_prepare
+	cmake_src_prepare
 }
 
 src_configure() {
@@ -79,7 +78,7 @@ src_configure() {
 		-DUNIT_TESTING=$(usex test)
 	)
 
-	cmake-utils_src_configure
+	cmake_src_configure
 }
 
 pkg_postinst() {

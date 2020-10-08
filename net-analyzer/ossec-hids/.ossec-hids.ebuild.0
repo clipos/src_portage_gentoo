@@ -1,9 +1,7 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
-
-inherit user
 
 DESCRIPTION="Open Source Host-based Intrusion Detection System"
 HOMEPAGE="https://www.ossec.net/"
@@ -12,23 +10,34 @@ SRC_URI="https://github.com/ossec/ossec-hids/archive/${PV}.tar.gz -> ${P}.tar.gz
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="amd64"
-IUSE="agent hybrid local mysql postgres server sqlite"
+IUSE="agent hybrid local mysql postgres server sqlite test"
 REQUIRED_USE="^^ ( agent hybrid local server )
 	?? ( mysql postgres )"
+RESTRICT="!test? ( test )"
 
-DEPEND="mysql? ( virtual/mysql )
-	sqlite? ( dev-db/sqlite:3 )
-	postgres? ( dev-db/postgresql:= )"
-RDEPEND="${DEPEND}"
+RDEPEND="acct-user/ossec
+	acct-user/ossecm
+	acct-user/ossecr
+	dev-libs/libevent
+	dev-libs/libpcre2[jit]
+	mysql? ( virtual/mysql )
+	postgres? ( dev-db/postgresql:= )
+	sqlite? ( dev-db/sqlite:3 )"
+DEPEND="${RDEPEND}
+	test? (
+		dev-libs/check
+		dev-python/subunit
+	)"
 S="${WORKDIR}/${P}/src"
-PATCHES=( "${FILESDIR}/makefile-${PV}.patch" )
 
 declare -a MY_OPT
 
-pkg_setup() {
-	enewuser ossec -1 -1 /var/ossec
-	enewuser ossecm -1 -1 -1 ossec
-	enewuser ossecr -1 -1 -1 ossec
+src_prepare() {
+	# Patch for the GCC version 10 -fno-common change. See
+	# https://github.com/ossec/ossec-hids/pull/1875
+	eapply -p2 "${FILESDIR}/gcc-fno-common-${PV}.patch"
+	eapply -p1 "${FILESDIR}/makefile-${PV}.patch"
+	eapply_user
 }
 
 src_configure() {
@@ -37,6 +46,7 @@ src_configure() {
 	use hybrid && target="hybrid"
 	use server && target="server"
 	MY_OPT=(
+		PCRE2_SYSTEM=yes
 		TARGET=${target}
 		USE_SQLITE=$(usex sqlite)
 		V=0

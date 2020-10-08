@@ -3,7 +3,7 @@
 
 EAPI=7
 
-inherit flag-o-matic meson xdg-utils
+inherit meson xdg-utils
 
 DESCRIPTION="Enlightenment Foundation Libraries all-in-one package"
 HOMEPAGE="https://www.enlightenment.org"
@@ -12,23 +12,23 @@ SRC_URI="https://download.enlightenment.org/rel/libs/${PN}/${P}.tar.xz"
 LICENSE="BSD-2 GPL-2 LGPL-2.1 ZLIB"
 SLOT="0"
 KEYWORDS="amd64 ~arm ~hppa ~ppc ~ppc64 x86"
-IUSE="+X bmp connman dds debug doc drm +eet elogind examples fbcon fontconfig
-	fribidi gif gles2 gnutls glib +gstreamer harfbuzz hyphen ibus ico libressl
-	lua +luajit jpeg2k json nls mono opengl +pdf physics pmaps postscript psd
-	pulseaudio raw scim sdl +sound +ssl static-libs +svg +system-lz4 systemd
-	tga tgv tiff tslib unwind v4l vlc vnc wayland webp xcf xim xine xpm
-	xpresent zeroconf"
+IUSE="+X bmp connman cpu_flags_arm_neon dds debug doc drm +eet elogind examples
+	fbcon +fontconfig fribidi gif gles2-only gnutls glib +gstreamer harfbuzz
+	hyphen ibus ico libressl lua +luajit jpeg2k json nls mono opengl +pdf
+	physics pmaps postscript psd pulseaudio raw scim sdl +sound +ssl +svg
+	+system-lz4 systemd tga tgv tiff tslib unwind v4l vnc wayland webp xcf xim
+	xpm xpresent zeroconf"
 
 REQUIRED_USE="
 	?? ( elogind systemd )
-	?? ( gles2 opengl )
+	?? ( gles2-only opengl )
 	^^ ( lua luajit )
 	ssl
-	drm? ( gles2 )
+	drm? ( gles2-only )
 	examples? ( eet svg )
-	gles2? ( || ( wayland X ) )
+	gles2-only? ( || ( wayland X ) )
 	pulseaudio? ( sound )
-	wayland? ( gles2 !opengl )
+	wayland? ( gles2-only !opengl )
 	xim? ( X )
 	xpresent? ( X )
 "
@@ -75,7 +75,7 @@ RDEPEND="
 	)
 	fontconfig? ( media-libs/fontconfig )
 	fribidi? ( dev-libs/fribidi )
-	gles2? (
+	gles2-only? (
 		media-libs/mesa[egl,gles2]
 		virtual/opengl
 	)
@@ -87,7 +87,7 @@ RDEPEND="
 	hyphen? ( dev-libs/hyphen )
 	ibus? ( app-i18n/ibus )
 	jpeg2k? ( media-libs/openjpeg:= )
-	json? ( >=media-libs/rlottie-0.0.1_pre20191101 )
+	json? ( >=media-libs/rlottie-0.0.1_pre20200424:= )
 	lua? ( dev-lang/lua:* )
 	luajit? ( dev-lang/luajit:* )
 	mono? ( dev-lang/mono )
@@ -114,7 +114,6 @@ RDEPEND="
 	tslib? ( x11-libs/tslib:= )
 	unwind? ( sys-libs/libunwind )
 	v4l? ( media-libs/libv4l )
-	vlc? ( media-video/vlc )
 	vnc? ( net-libs/libvncserver )
 	wayland? (
 		dev-libs/wayland
@@ -122,7 +121,6 @@ RDEPEND="
 		x11-libs/libxkbcommon
 	)
 	webp? ( media-libs/libwebp:= )
-	xine? ( media-libs/xine-lib )
 	xpm? ( x11-libs/libXpm )
 	xpresent? ( x11-libs/libXpresent )
 	zeroconf? ( net-dns/avahi )
@@ -140,11 +138,12 @@ src_configure() {
 		-D cocoa=false
 		-D drm-deprecated=false
 		-D g-mainloop=false
-		-D install-eo-files=false
+		-D install-eo-files=true
 		-D mono-beta=false
+		-D dotnet=false
 		-D pixman=false
 		-D wl-deprecated=false
-		-D xgesture=false
+		-D dotnet-stylecop-severity=Warning
 
 		-D edje-sound-and-video=true
 		-D eeze=true
@@ -184,7 +183,7 @@ src_configure() {
 
 	if use opengl; then
 		emesonargs+=( -D opengl=full )
-	elif use gles2; then
+	elif use gles2-only; then
 		emesonargs+=( -D opengl=es-egl )
 	else
 		emesonargs+=( -D opengl=none )
@@ -200,12 +199,6 @@ src_configure() {
 		emesonargs+=( -D network-backend=connman )
 	else
 		emesonargs+=( -D network-backend=none )
-	fi
-
-	if use static-libs; then
-		emesonargs+=( -D evas-modules=static )
-	else
-		emesonargs+=( -D evas-modules=shared )
 	fi
 
 	local disabledEvasLoaders=""
@@ -238,17 +231,6 @@ src_configure() {
 	[[ ! -z "$disabledImfLoaders" ]] && disabledImfLoaders=${disabledImfLoaders::-1}
 	emesonargs+=( -D ecore-imf-loaders-disabler="${disabledImfLoaders}" )
 
-	local disabledEmotionLoaders="gstreamer,"
-	! use gstreamer && disabledEmotionLoaders+="gstreamer1,"
-	! use vlc && disabledEmotionLoaders+="libvlc,"
-	! use xine && disabledEmotionLoaders+="xine,"
-	disabledEmotionLoaders=${disabledEmotionLoaders::-1}
-	emesonargs+=( -D emotion-loaders-disabler="${disabledEmotionLoaders}" )
-
-	local disabledGenericEmotionLoaders=""
-	! use vlc && disabledGenericEmotionLoaders+="vlc"
-	emesonargs+=( -D emotion-generic-loaders-disabler="${disabledGenericEmotionLoaders}" )
-
 	local bindingsList="cxx,"
 	use luajit && bindingsList+="luajit,"
 	use mono && bindingsList+="mono,"
@@ -263,7 +245,10 @@ src_configure() {
 	fi
 	emesonargs+=( -D lua-interpreter="${luaChoice}" )
 
-	append-cflags -fcommon
+	# Not all arm CPU's have neon instruction set, #722552
+	if use arm && ! use cpu_flags_arm_neon; then
+		emesonargs+=( -D native-arch-optimization=false )
+	fi
 
 	meson_src_configure
 }
@@ -282,6 +267,7 @@ src_install() {
 	meson_src_install
 
 	if use examples; then
+		docompress -x /usr/share/doc/${PF}/examples/
 		dodoc -r "${BUILD_DIR}"/src/examples/
 	fi
 }

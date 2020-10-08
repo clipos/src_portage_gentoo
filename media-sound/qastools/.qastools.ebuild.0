@@ -1,20 +1,22 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
-inherit cmake-utils
+EAPI=7
 
-MY_P=${PN}_${PV}
+inherit cmake
 
 DESCRIPTION="Qt5 GUI ALSA tools: mixer, configuration browser"
-HOMEPAGE="http://xwmw.org/qastools/"
-SRC_URI="mirror://sourceforge/${PN}/${PV}/${MY_P}.tar.xz"
+HOMEPAGE="https://gitlab.com/sebholt/qastools"
+SRC_URI="https://gitlab.com/sebholt/${PN}/-/archive/v${PV}/${PN}-v${PV}.tar.gz"
 
-LICENSE="GPL-3"
+LICENSE="MIT"
 SLOT="0"
-KEYWORDS="amd64 x86"
+KEYWORDS="amd64 ~x86"
 IUSE=""
 
+BDEPEND="
+	dev-qt/linguist-tools:5
+"
 RDEPEND="
 	dev-qt/qtcore:5
 	dev-qt/qtgui:5
@@ -24,13 +26,16 @@ RDEPEND="
 	media-libs/alsa-lib
 	virtual/libudev:=
 "
-DEPEND="${RDEPEND}
-	dev-qt/linguist-tools:5
-"
+DEPEND="${RDEPEND}"
 
-S=${WORKDIR}/${MY_P}
+PATCHES=( "${FILESDIR}/${P}-nomancompress.patch" )
+
+S="${WORKDIR}"/${PN}-v${PV}
 
 src_configure() {
-	local mycmakeargs=( -DSKIP_LICENSE_INSTALL=TRUE )
-	cmake-utils_src_configure
+	local mycmakeargs=(
+		-DSKIP_LICENSE_INSTALL=ON
+		-DCMAKE_DISABLE_FIND_PACKAGE_UnixCommands=ON
+	)
+	cmake_src_configure
 }

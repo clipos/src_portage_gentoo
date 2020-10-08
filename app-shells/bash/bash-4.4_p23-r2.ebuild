@@ -1,0 +1,1 @@
+.bash.ebuild.1

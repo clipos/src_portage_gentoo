@@ -30,7 +30,7 @@ RDEPEND="
 	>=dev-libs/libxml2-2
 	>=dev-libs/nspr-4.4:=
 	>=dev-libs/nss-3.9:=
-	>=net-libs/libsoup-2.42:2.4
+	>=net-libs/libsoup-2.58:2.4
 
 	dev-libs/icu:=
 	sys-libs/zlib:=
@@ -80,6 +80,8 @@ src_prepare() {
 	use vala && vala_src_prepare
 	cmake-utils_src_prepare
 	gnome2_src_prepare
+
+	eapply "${FILESDIR}"/${PV}-gtk-doc-1.32-compat.patch
 
 	# Make CMakeLists versioned vala enabled
 	sed -e "s;\(find_program(VALAC\) valac);\1 ${VALAC});" \

@@ -1,1 +1,0 @@
-.gtkglext.ebuild.0

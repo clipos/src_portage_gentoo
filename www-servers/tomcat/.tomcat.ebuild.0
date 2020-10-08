@@ -31,6 +31,10 @@ DEPEND="${COMMON_DEP}
 	app-admin/pwgen
 	>=dev-java/ant-core-1.9.13
 	virtual/jdk:1.8
+	doc? (
+		dev-java/glassfish-xmlrpc-api:0
+		dev-java/wsdl4j:0
+	)
 	test? (
 		>=dev-java/ant-junit-1.9:0
 		dev-java/easymock:3.2
@@ -52,11 +56,11 @@ src_prepare() {
 	# Remove bundled servlet-api
 	rm -rv java/javax/{el,servlet} || die
 
-	eapply "${FILESDIR}/${PN}-8.5.47-build.xml.patch"
+	eapply "${FILESDIR}/${P}-build.xml.patch"
 
 	# For use of catalina.sh in netbeans
 	sed -i -e "/^# ----- Execute The Requested Command/ a\
-		CLASSPATH=\`java-config --classpath ${PN}-${SLOT}\`" \
+		CLASSPATH=\`java-config --with-dependencies --classpath ${PN}-${SLOT}\`" \
 		bin/catalina.sh || die
 
 	java-pkg-2_src_prepare
@@ -77,6 +81,7 @@ INIT_REV="-r1"
 
 src_compile() {
 	EANT_GENTOO_CLASSPATH_EXTRA+=":$(java-pkg_getjar --build-only ant-core ant.jar)"
+	use doc && EANT_GENTOO_CLASSPATH_EXTRA+=":$(java-pkg_getjar --build-only glassfish-xmlrpc-api glassfish-xmlrpc-api.jar):$(java-pkg_getjar --build-only wsdl4j wsdl4j.jar)"
 	java-pkg-2_src_compile
 }
 

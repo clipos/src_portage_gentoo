@@ -1,1 +1,0 @@
-.telepathy-haze.ebuild.0

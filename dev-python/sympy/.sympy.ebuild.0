@@ -3,25 +3,23 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python{3_6,3_7} )
+PYTHON_COMPAT=( python3_{7,8,9} )
 
 inherit distutils-r1 eutils virtualx
 
 DESCRIPTION="Computer Algebra System in pure Python"
 HOMEPAGE="https://sympy.org"
-SRC_URI="https://github.com/${PN}/${PN}/archive/${P}.tar.gz"
+SRC_URI="https://github.com/sympy/sympy/archive/${P}.tar.gz"
+S="${WORKDIR}/${PN}-${P}"
 
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS="amd64 x86 ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos"
 IUSE="examples imaging ipython latex mathml opengl pdf png pyglet symengine test texmacs theano"
-
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
+RESTRICT="!test? ( test )"
 
-RESTRICT="test"
-# All tests actually pass, except a bunch of tests related to the deprecated pygletplot
-# It is a non-trivial work to wipe out all such tests :-(
-
+BDEPEND="test? ( dev-python/pytest[${PYTHON_USEDEP}] )"
 RDEPEND="dev-python/mpmath[${PYTHON_USEDEP}]
 	dev-python/pexpect[${PYTHON_USEDEP}]
 	imaging? ( dev-python/pillow[${PYTHON_USEDEP}] )
@@ -40,21 +38,22 @@ RDEPEND="dev-python/mpmath[${PYTHON_USEDEP}]
 	theano? ( dev-python/theano[${PYTHON_USEDEP}] )
 "
 
-DEPEND="${RDEPEND}
-	test? ( ${RDEPEND} dev-python/pytest[${PYTHON_USEDEP}] )"
-
-S="${WORKDIR}/${PN}-${P}"
+src_test() {
+	virtx distutils-r1_src_test
+}
 
 python_test() {
-	virtx "${PYTHON}" setup.py test
+	"${EPYTHON}" setup.py test || die "Tests failed with ${EPYTHON}"
 }
 
 python_install_all() {
-	local DOCS=( AUTHORS README.rst )
+	local DOCS=( AUTHORS README.md )
+
 	if use examples; then
 		dodoc -r examples
 		docompress -x /usr/share/doc/${PF}/examples
 	fi
+
 	distutils-r1_python_install_all
 
 	if use texmacs; then

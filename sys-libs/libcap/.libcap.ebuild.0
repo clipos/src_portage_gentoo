@@ -1,7 +1,7 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 inherit multilib multilib-minimal toolchain-funcs pam usr-ldscript
 
@@ -27,8 +27,8 @@ DEPEND="${RDEPEND}
 RESTRICT="test"
 
 PATCHES=(
-	"${FILESDIR}"/${PN}-2.25-build-system-fixes.patch
-	"${FILESDIR}"/${PN}-2.26-no-perl.patch
+	"${FILESDIR}"/${PN}-2.42-build-system-fixes.patch
+	"${FILESDIR}"/${PN}-2.38-no_perl.patch
 	"${FILESDIR}"/${PN}-2.25-ignore-RAISE_SETFCAP-install-failures.patch
 	"${FILESDIR}"/${PN}-2.21-include.patch
 )
@@ -46,15 +46,18 @@ run_emake() {
 		prefix="${EPREFIX}/usr"
 		PAM_CAP="$(usex pam yes no)"
 		DYNAMIC=yes
+		GOLANG=no
 	)
 	emake "${args[@]}" "$@"
 }
 
-multilib_src_compile() {
+src_configure() {
 	tc-export AR CC RANLIB
-	local BUILD_CC
 	tc-export_build_env BUILD_CC
+	multilib-minimal_src_configure
+}
 
+multilib_src_compile() {
 	run_emake
 }
 
@@ -64,11 +67,13 @@ multilib_src_install() {
 
 	gen_usr_ldscript -a cap
 	if ! use static-libs ; then
-		rm "${ED%/}"/usr/$(get_libdir)/libcap.a || die
+		# Don't remove libpsx.a!
+		# See https://bugs.gentoo.org/703912
+		rm "${ED}"/usr/$(get_libdir)/libcap.a || die
 	fi
 
-	if [[ -d "${ED%/}"/usr/$(get_libdir)/security ]] ; then
-		rm -r "${ED%/}"/usr/$(get_libdir)/security || die
+	if [[ -d "${ED}"/usr/$(get_libdir)/security ]] ; then
+		rm -r "${ED}"/usr/$(get_libdir)/security || die
 	fi
 
 	if use pam; then

@@ -62,6 +62,7 @@ PATCHES=(
 	"${FILESDIR}"/${PN}-respect-fontconfig.patch
 	"${FILESDIR}"/${P}-pdf-add-missing-flush.patch
 	"${FILESDIR}"/${P}-ft-Use-FT_Done_MM_Var-instead-of-free-when-available.patch
+	"${FILESDIR}"/${P}-strings.patch
 )
 
 src_prepare() {

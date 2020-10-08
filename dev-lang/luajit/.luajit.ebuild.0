@@ -23,7 +23,10 @@ SLOT="2"
 KEYWORDS="amd64 arm ppc x86 ~amd64-linux ~x86-linux"
 IUSE="lua52compat static-libs"
 
-PATCHES=( "${FILESDIR}/${PN}-2-ldconfig.patch" )
+PATCHES=(
+	"${FILESDIR}/${PN}-2-ldconfig.patch"
+	"${FILESDIR}/CVE-2020-15890.patch"
+)
 
 S="${WORKDIR}/${MY_P}"
 

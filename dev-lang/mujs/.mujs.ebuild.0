@@ -10,7 +10,7 @@ HOMEPAGE="
 	https://mujs.com/
 	https://github.com/ccxvii/mujs/
 "
-SRC_URI="https://github.com/ccxvii/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
+SRC_URI="https://mujs.com/downloads/${P}.tar.xz"
 
 LICENSE="ISC"
 # subslot matches SONAME

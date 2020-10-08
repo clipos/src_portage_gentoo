@@ -1,1 +1,0 @@
-.detex.ebuild.0

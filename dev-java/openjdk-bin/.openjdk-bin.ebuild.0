@@ -24,9 +24,9 @@ SRC_URI="
 "
 
 LICENSE="GPL-2-with-classpath-exception"
-KEYWORDS="amd64 ~arm arm64 ppc64"
+KEYWORDS="amd64 ~arm arm64 ~ppc64"
 
-IUSE="alsa cups examples headless-awt nsplugin selinux source webstart"
+IUSE="alsa cups examples headless-awt selinux source"
 
 RDEPEND="
 	media-libs/fontconfig:1.0
@@ -35,6 +35,7 @@ RDEPEND="
 	>=sys-libs/glibc-2.2.5:*
 	sys-libs/zlib
 	alsa? ( media-libs/alsa-lib )
+	arm? ( dev-libs/libffi-compat:6 )
 	cups? ( net-print/cups )
 	selinux? ( sec-policy/selinux-java )
 	!headless-awt? (
@@ -43,10 +44,8 @@ RDEPEND="
 		x11-libs/libXi
 		x11-libs/libXrender
 		x11-libs/libXtst
-	)"
-
-PDEPEND="webstart? ( >=dev-java/icedtea-web-1.6.1:0 )
-	nsplugin? ( >=dev-java/icedtea-web-1.6.1:0[nsplugin] )"
+	)
+"
 
 RESTRICT="preserve-libs strip"
 QA_PREBUILT="*"

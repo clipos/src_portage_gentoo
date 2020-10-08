@@ -1,7 +1,7 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 if [[ ${PV} == *9999 ]] ; then
 	SCM="git-r3"
@@ -14,14 +14,15 @@ fi
 inherit flag-o-matic toolchain-funcs ${SCM}
 
 DESCRIPTION="Implementation of the MPEG-4 Systems standard developed from scratch in ANSI C"
-HOMEPAGE="https://gpac.wp.imt.fr/"
+HOMEPAGE="https://gpac.wp.imt.fr/ https://github.com/gpac/gpac"
 
 LICENSE="GPL-2"
 # subslot == libgpac major
-SLOT="0/7"
+SLOT="0/8"
 IUSE="a52 aac alsa debug dvb ffmpeg ipv6 jack jpeg jpeg2k libressl mad opengl oss png
 	pulseaudio sdl ssl static-libs theora truetype vorbis xml xvid X"
 
+BDEPEND="virtual/pkgconfig"
 RDEPEND="
 	media-libs/libogg
 	a52? ( media-libs/a52dec )
@@ -59,16 +60,12 @@ RDEPEND="
 # disabled upstream, see applications/Makefile
 # wxwidgets? ( =x11-libs/wxGTK-2.8* )
 DEPEND="${RDEPEND}
-	virtual/pkgconfig
 	dvb? ( sys-kernel/linux-headers )
 "
 
 # DOCS="AUTHORS BUGS Changelog README.md TODO doc/CODING_STYLE doc/*.doc doc/*.bt doc/SceneGenerators doc/ipmpx_syntax.bt doc/*.txt"
 PATCHES=(
-	"${FILESDIR}/${PN}-0.7.1-configure.patch"
-	"${FILESDIR}/ffmpeg4.patch"
-	"${FILESDIR}/${PN}-freetype.patch"
-	"${FILESDIR}/${P}-openssl-1.1.patch"
+	"${FILESDIR}/${PN}-0.8.1-configure.patch"
 )
 
 DOCS=(
@@ -83,6 +80,7 @@ DOCS=(
 	README.md
 	TODO
 )
+
 HTML_DOCS="doc/*.html"
 
 my_use() {
@@ -105,6 +103,7 @@ src_configure() {
 	local myeconfargs=(
 		--extra-cflags="${CFLAGS}"
 		--cc="$(tc-getCC)"
+		--cxx="$(tc-getCXX)"
 		--libdir="/$(get_libdir)"
 		--verbose
 		--enable-pic

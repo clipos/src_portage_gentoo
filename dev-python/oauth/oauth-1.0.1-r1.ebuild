@@ -1,1 +1,0 @@
-.oauth.ebuild.0

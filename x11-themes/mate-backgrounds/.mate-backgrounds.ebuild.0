@@ -13,5 +13,6 @@ DESCRIPTION="A set of backgrounds packaged with the MATE desktop"
 LICENSE="CC-BY-SA-4.0 GPL-2+"
 SLOT="0"
 
-DEPEND=">=dev-util/intltool-0.35
-	sys-devel/gettext:*"
+DEPEND="
+	>=sys-devel/gettext-0.19.8:*
+"

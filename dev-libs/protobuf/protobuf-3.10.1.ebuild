@@ -1,1 +1,0 @@
-.protobuf.ebuild.1

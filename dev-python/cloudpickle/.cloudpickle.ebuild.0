@@ -13,7 +13,7 @@ SRC_URI="mirror://pypi/${PN::1}/${PN}/${P}.tar.gz"
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="amd64 ~arm64 ppc ~ppc64 x86 ~amd64-linux ~x86-linux"
+KEYWORDS="amd64 ~arm ~arm64 ppc ~ppc64 x86 ~amd64-linux ~x86-linux"
 
 BDEPEND="
 	test? (
@@ -24,6 +24,7 @@ BDEPEND="
 distutils_enable_tests pytest
 
 python_test() {
+	local -x PYTHONPATH=${PYTHONPATH}:tests/cloudpickle_testpkg
 	# -s unbreaks some tests
 	# https://github.com/cloudpipe/cloudpickle/issues/252
 	pytest -svv || die "Tests fail with ${EPYTHON}"

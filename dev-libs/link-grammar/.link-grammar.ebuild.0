@@ -1,11 +1,11 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
-GNOME2_LA_PUNT="yes"
-PYTHON_COMPAT=( python3_6 )
+EAPI=7
 
-inherit autotools eutils gnome2 java-pkg-opt-2 python-r1
+PYTHON_COMPAT=( python3_{6..9} )
+
+inherit autotools java-pkg-opt-2 python-r1 out-of-source
 
 DESCRIPTION="A Syntactic English parser"
 HOMEPAGE="https://www.abisource.com/projects/link-grammar/ https://www.link.cs.cmu.edu/link/"
@@ -14,7 +14,7 @@ SRC_URI="https://www.abisource.com/downloads/${PN}/${PV}/${P}.tar.gz"
 LICENSE="LGPL-2.1"
 SLOT="0"
 KEYWORDS="~alpha amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 sparc x86"
-IUSE="aspell +hunspell java python static-libs threads" # pcre
+IUSE="aspell +hunspell java python" # pcre
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
 
 # XXX: sqlite is automagic
@@ -26,17 +26,15 @@ RDEPEND="
 	hunspell? ( app-text/hunspell )
 	java? (
 		>=virtual/jdk-1.6:*
-		dev-java/ant-core )
+		dev-java/ant-core
+	)
 	python? ( ${PYTHON_DEPS} )
-	!sci-mathematics/minisat
-"
-DEPEND="${RDEPEND}
+	!sci-mathematics/minisat"
+DEPEND="${RDEPEND}"
+BDEPEND="
 	dev-lang/swig:0
 	sys-devel/autoconf-archive
-	virtual/pkgconfig
-"
-
-NORMAL_BUILD_DIR="${WORKDIR}/${P}-normal"
+	virtual/pkgconfig"
 
 pkg_setup() {
 	if use aspell && use hunspell; then
@@ -51,114 +49,77 @@ src_prepare() {
 	use java && java-pkg-opt-2_src_prepare
 
 	# http://bugzilla.abisource.com/show_bug.cgi?id=13806
-	eapply "${FILESDIR}"/${PN}-5.3.9-out-of-source-build.patch
+	eapply "${FILESDIR}"/${PN}-5.8.0-out-of-source-build.patch
+	eapply "${FILESDIR}"/${PN}-5.8.0-dont-inject-O3.patch
 	eapply_user
+
 	eautoreconf
-
-	if use python ; then
-		prepare_python() {
-			mkdir -p "${BUILD_DIR}" || die
-		}
-		python_foreach_impl prepare_python
-	fi
-
-	mkdir -p "${NORMAL_BUILD_DIR}" || die
-	gnome2_src_prepare
 }
 
-src_configure() {
+my_src_configure() {
 	local myconf=(
+		--disable-maintainer-mode
 		--disable-editline
 		--disable-perl-bindings
-		--enable-shared
+		--disable-static
 		--enable-sat-solver=bundled
 		$(use_enable aspell)
 		$(use_enable hunspell)
-		$(usex hunspell --with-hunspell-dictdir=/usr/share/myspell)
+		$(usex hunspell --with-hunspell-dictdir="${EPREFIX}"/usr/share/myspell '')
 		$(use_enable java java-bindings)
 		# $(use_enable pcre regex-tokenizer)
 		# $(use_with pcre)
-		$(use_enable static-libs static)
-		$(use_enable threads pthreads)
 	)
 
-	cd "${NORMAL_BUILD_DIR}" || die
-	ECONF_SOURCE="${S}" gnome2_src_configure \
+	econf \
 		--disable-python-bindings \
-		--disable-python3-bindings \
-		${myconf[@]}
+		"${myconf[@]}"
 
-	if use python ; then
-		prepare_python() {
-			if python_is_python3; then
-				ECONF_SOURCE="${S}" gnome2_src_configure \
-					--disable-python-bindings \
-					--enable-python3-bindings \
-					${myconf[@]}
-			else
-				ECONF_SOURCE="${S}" gnome2_src_configure \
-					--enable-python-bindings \
-					--disable-python3-bindings \
-					${myconf[@]}
-			fi
+	if use python; then
+		python_configure() {
+			econf \
+				--enable-python-bindings \
+				"${myconf[@]}"
 		}
-		python_foreach_impl run_in_build_dir prepare_python
+		python_foreach_impl run_in_build_dir python_configure
 	fi
 }
 
-src_compile() {
-	cd "${NORMAL_BUILD_DIR}" || die
-	gnome2_src_compile
+my_src_compile() {
+	local -x MAIN_BUILD_DIR="${BUILD_DIR}"
+	default
 
-	if use python ; then
-		compile_binding() {
-			local pysuffix
-			if python_is_python3; then
-				pysuffix=3
-			else
-				pysuffix=
-			fi
-
-			emake -C bindings/python$pysuffix \
-				VPATH="${S}:${NORMAL_BUILD_DIR}" \
-				_clinkgrammar_la_DEPENDENCIES="${NORMAL_BUILD_DIR}"/link-grammar/liblink-grammar.la \
-				_clinkgrammar_la_LIBADD="${NORMAL_BUILD_DIR}"/link-grammar/liblink-grammar.la
+	if use python; then
+		python_compile() {
+			emake -C bindings/python \
+				VPATH="${S}:${MAIN_BUILD_DIR}" \
+				_clinkgrammar_la_DEPENDENCIES="${MAIN_BUILD_DIR}"/link-grammar/liblink-grammar.la \
+				_clinkgrammar_la_LIBADD="${MAIN_BUILD_DIR}"/link-grammar/liblink-grammar.la
 		}
-		python_foreach_impl run_in_build_dir compile_binding
+		python_foreach_impl run_in_build_dir python_compile
 	fi
 }
 
-src_test() {
-	cd "${NORMAL_BUILD_DIR}" || die
-	ln -s "${S}"/data tests/data || die
-	emake check
-}
+my_src_install() {
+	local -x MAIN_BUILD_DIR="${BUILD_DIR}"
+	default
 
-src_install() {
-	cd "${NORMAL_BUILD_DIR}" || die
-	gnome2_src_install
-
-	if use python ; then
-		install_binding() {
-			local pysuffix
-			if python_is_python3; then
-				pysuffix=3
-			else
-				pysuffix=
-			fi
-
-			emake -C bindings/python$pysuffix \
-				VPATH="${S}:${NORMAL_BUILD_DIR}" \
-				_clinkgrammar_la_DEPENDENCIES="${NORMAL_BUILD_DIR}"/link-grammar/liblink-grammar.la \
-				_clinkgrammar_la_LIBADD="${NORMAL_BUILD_DIR}"/link-grammar/liblink-grammar.la \
+	if use python; then
+		python_install() {
+			emake -C bindings/python \
+				VPATH="${S}:${MAIN_BUILD_DIR}" \
+				_clinkgrammar_la_DEPENDENCIES="${MAIN_BUILD_DIR}"/link-grammar/liblink-grammar.la \
+				_clinkgrammar_la_LIBADD="${MAIN_BUILD_DIR}"/link-grammar/liblink-grammar.la \
 				DESTDIR="${D}" \
 				install
 		}
-		python_foreach_impl run_in_build_dir install_binding
+		python_foreach_impl run_in_build_dir python_install
 	fi
+
+	# no static archives
+	find "${ED}" -name '*.la' -delete || die
 }
 
 pkg_preinst() {
 	use java && java-pkg-opt-2_pkg_preinst
-	gnome2_pkg_preinst
 }

@@ -1,10 +1,10 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 DIST_AUTHOR=PLICEASE
-DIST_VERSION=1.15
+DIST_VERSION=1.16
 inherit perl-module
 
 DESCRIPTION="Perl-only 'which'"
@@ -17,7 +17,7 @@ RDEPEND="
 	>=dev-perl/File-Which-1.140.0
 "
 # Test2::V0 -> Test2-Suite-0.0.72
-DEPEND="${RDEPEND}
+BDEPEND="${RDEPEND}
 	virtual/perl-ExtUtils-MakeMaker
 	test? (
 		dev-perl/Capture-Tiny

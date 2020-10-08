@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-inherit multilib readme.gentoo-r1 toolchain-funcs user
+inherit multilib readme.gentoo-r1 toolchain-funcs
 
 DESCRIPTION="A tiny pseudoshell which only permits scp and sftp"
 HOMEPAGE="https://github.com/scponly/scponly"
@@ -12,7 +12,7 @@ SRC_URI="mirror://sourceforge/scponly/${P}.tgz"
 LICENSE="BSD-2"
 SLOT="0"
 KEYWORDS="amd64 ppc sparc x86"
-IUSE="+sftp scp winscp gftp rsync unison subversion wildcards quota passwd logging"
+IUSE="chroot +sftp scp winscp gftp rsync unison subversion wildcards quota passwd logging"
 REQUIRED_USE="
 	|| ( sftp scp winscp rsync unison subversion )
 "
@@ -20,6 +20,7 @@ REQUIRED_USE="
 RDEPEND="
 	sys-apps/sed
 	net-misc/openssh
+	chroot? ( acct-user/scponly acct-group/scponly )
 	quota? ( sys-fs/quota )
 	rsync? ( net-misc/rsync )
 	subversion? ( dev-vcs/subversion )
@@ -27,29 +28,18 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}"
 
-myuser="scponly"
-myhome="/home/${myuser}"
-mysubdir="/pub"
-
 PATCHES=(
 	"${FILESDIR}/${P}-rsync.patch"
 	"${FILESDIR}/${P}-gcc4.4.0.patch"
+	"${FILESDIR}/${P}-sftp-server-path.patch"
 )
-
-DOC_CONTENTS="
-	You might want to run\n
-	emerge --config =${CATEGORY}/${PF}\n
-	\nto setup the chroot. Otherwise you will have to setup chroot manually
-	Please read the docs in /usr/share/doc/${PF} for more informations, also
-	the SECURITY file.
-"
 
 src_configure() {
 	CFLAGS="${CFLAGS} ${LDFLAGS}" econf \
 		--with-sftp-server="/usr/$(get_libdir)/misc/sftp-server" \
 		--disable-restrictive-names \
-		--enable-chrooted-binary \
-		--enable-chroot-checkdir \
+		$(use_enable chroot chrooted-binary) \
+		$(use_enable chroot chrooted-checkdir) \
 		$(use_enable winscp winscp-compat) \
 		$(use_enable gftp gftp-compat) \
 		$(use_enable scp scp-compat) \
@@ -73,22 +63,29 @@ src_install() {
 
 	dodoc AUTHOR BUILDING-JAILS.TXT CHANGELOG CONTRIB README SECURITY TODO
 
-	( docinto chroot; dodoc setup_chroot.sh config.h )
-	# don't compress setup-script, so it is usable if necessary
-	docompress -x /usr/share/doc/${PF}/chroot
-
-	readme.gentoo_create_doc
-}
-
-pkg_postinst() {
-	# two slashes ('//') are used by scponlyc to determine the chroot point.
-	enewgroup "${myuser}"
-	enewuser "${myuser}" -1 /usr/sbin/scponlyc "${myhome}//" "${myuser}"
-
-	readme.gentoo_print_elog
+	if use chroot ; then
+		local DOC_CONTENTS="You might want to run\n
+			emerge --config =${CATEGORY}/${PF}\n
+			\nto setup the chroot. Otherwise you will have to setup chroot
+			manually. Please read the docs in /usr/share/doc/${PF} for more
+			informations, also the SECURITY file."
+		( docinto chroot; dodoc setup_chroot.sh config.h )
+		# don't compress setup-script, so it is usable if necessary
+		docompress -x /usr/share/doc/${PF}/chroot
+		readme.gentoo_create_doc
+	fi
 }
 
 pkg_config() {
+	if ! use chroot ; then
+		einfo "USE=chroot not enabled, nothing to configure."
+		return
+	fi
+
+	myuser="scponly"
+	myhome="/var/chroot/${myuser}"
+	mysubdir="/pub"
+
 	# pkg_postinst is based on ${S}/setup_chroot.sh.
 
 	einfo "Collecting binaries and libraries..."
@@ -151,8 +148,7 @@ pkg_config() {
 
 	# create base dirs
 	if [ ! -d "${myhome}" ]; then
-		einfo "Creating ${myhome}"
-		install -o0 -g0 -m0755 -d "${myhome}"
+		die "Home '${myhome}' should have been created by acct-user but does not exist."
 	else
 		einfo "Setting owner for ${myhome}"
 		chown 0:0 "${myhome}"

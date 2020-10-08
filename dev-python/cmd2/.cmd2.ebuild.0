@@ -20,6 +20,9 @@ RDEPEND="
 	>=dev-python/pyperclip-1.6[${PYTHON_USEDEP}]
 	dev-python/six[${PYTHON_USEDEP}]
 	dev-python/wcwidth[${PYTHON_USEDEP}]
+	$(python_gen_cond_dep '
+		>=dev-python/importlib_metadata-1.6.0[${PYTHON_USEDEP}]
+	' python3_{6,7})
 "
 BDEPEND="
 	dev-python/setuptools_scm[${PYTHON_USEDEP}]

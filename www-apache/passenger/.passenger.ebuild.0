@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
-USE_RUBY="ruby24 ruby25 ruby26"
+USE_RUBY="ruby25 ruby26 ruby27"
 
 inherit apache-module flag-o-matic multilib ruby-ng toolchain-funcs
 
@@ -12,7 +12,7 @@ SRC_URI="https://s3.amazonaws.com/phusion-passenger/releases/${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="amd64 x86"
+KEYWORDS="amd64 ~ppc ~ppc64 x86"
 IUSE="apache2 debug"
 
 ruby_add_bdepend "dev-ruby/rake"
@@ -87,6 +87,7 @@ all_ruby_compile() {
 		 HTTPD="${APACHE_BIN}" \
 		 FS_LIBDIR='/usr/'$(get_libdir) \
 		 USE_VENDORED_LIBUV="no" LIBUV_LIBS="-luv" \
+		 RANLIB=$(tc-getRANLIB) \
 		 ruby -S rake apache2 || die "rake failed"
 	fi
 }
@@ -99,6 +100,7 @@ each_ruby_compile() {
 	HTTPD="${APACHE_BIN}" \
 	FS_LIBDIR='/usr/'$(get_libdir) \
 	USE_VENDORED_LIBUV="no" LIBUV_LIBS="-luv" \
+	RANLIB=$(tc-getRANLIB) \
 	${RUBY} -S rake native_support || die "rake failed"
 }
 
@@ -123,5 +125,6 @@ each_ruby_install() {
 	FS_LIBDIR='/usr/'$(get_libdir) \
 	EXTRA_LDFLAGS="${LDFLAGS}" \
 	USE_VENDORED_LIBUV="no" LIBUV_LIBS="-luv" \
+	RANLIB=$(tc-getRANLIB) \
 	${RUBY} -S rake fakeroot || die "rake failed"
 }

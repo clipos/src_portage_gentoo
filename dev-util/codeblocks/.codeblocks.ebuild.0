@@ -8,7 +8,7 @@ WX_GTK_VER="3.0-gtk3"
 inherit autotools wxwidgets xdg-utils
 
 DESCRIPTION="The open source, cross platform, free C, C++ and Fortran IDE"
-HOMEPAGE="http://www.codeblocks.org/"
+HOMEPAGE="https://codeblocks.org/"
 LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="amd64 ~ppc x86"
@@ -38,7 +38,8 @@ RDEPEND="app-arch/zip
 DEPEND="${RDEPEND}"
 
 PATCHES=(
-	"${FILESDIR}"/codeblocks-17.12-nodebug.diff
+	"${FILESDIR}"/${P}-fix-crash-on-copypaste.patch
+	"${FILESDIR}"/${P}-nodebug.diff
 	"${WORKDIR}"/patches/
 	)
 
@@ -47,6 +48,8 @@ src_prepare() {
 	if has_version ">=dev-util/astyle-3.1" ; then
 		eapply "${WORKDIR}"/codeblocks-17.12_update_astyle_plugin_to_v3.1.patch
 	fi
+	sed -i "s:appdatadir = \$(datarootdir)/appdata:appdatadir = \$(datarootdir)/metainfo:" Makefile.am || die # bug 709450
+	sed -i "s:appdatadir = \$(datarootdir)/appdata:appdatadir = \$(datarootdir)/metainfo:" src/plugins/contrib/appdata/Makefile.am || die # bug 709450
 	eautoreconf
 }
 

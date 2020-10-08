@@ -1,11 +1,9 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
-USE_RUBY="ruby24 ruby25 ruby26"
-
-RUBY_FAKEGEM_RECIPE_DOC="rdoc"
+USE_RUBY="ruby25 ruby26 ruby27"
 
 inherit multilib ruby-fakegem
 
@@ -26,11 +24,15 @@ ruby_add_bdepend "virtual/ruby-ssl
 
 all_ruby_prepare() {
 	eapply "${FILESDIR}/${PN}-3.12.1-ruby26-waitpid.patch"
+	eapply "${FILESDIR}/${PN}-3.12.5-cve-2020-11077.patch"
 
 	sed -i -e '/bundler/ s:^:#:' test/helper.rb || die
 
 	# Avoid test failing inconsistently
 	sed -i -e '/phased_restart_via_pumactl/,/^  end/ s:^:#:' test/test_integration.rb || die
+
+	# Fix FORWARDED_PROTO
+	sed -i -e '127 s/443/80/' test/test_puma_server.rb || die
 
 	# Avoid test that trigger a bug in ruby very easily and lead to
 	# failure. This affects all current puma versions in combination

@@ -1,1 +1,0 @@
-.pinta.ebuild.0

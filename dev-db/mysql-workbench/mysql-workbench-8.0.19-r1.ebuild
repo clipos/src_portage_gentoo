@@ -1,1 +1,0 @@
-.mysql-workbench.ebuild.0

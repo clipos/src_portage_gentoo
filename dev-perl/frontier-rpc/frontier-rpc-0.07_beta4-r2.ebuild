@@ -1,1 +1,0 @@
-.frontier-rpc.ebuild.0

@@ -1,1 +1,0 @@
-.capybara.ebuild.1

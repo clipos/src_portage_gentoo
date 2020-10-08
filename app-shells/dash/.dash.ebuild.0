@@ -19,11 +19,6 @@ RDEPEND="!static? ( libedit? ( dev-libs/libedit ) )"
 DEPEND="${RDEPEND}
 	libedit? ( static? ( dev-libs/libedit[static-libs] ) )"
 
-PATCHES=(
-	"${FILESDIR}/dash-0.5.9.1-format-security.patch"
-	"${FILESDIR}/dash-0.5.20.2-gcc-fno-common.patch"
-)
-
 src_prepare() {
 	default
 
@@ -48,6 +43,7 @@ src_configure() {
 	use static && append-ldflags -static
 	# Do not pass --enable-glob due to #443552.
 	local myeconfargs=(
+		CC_FOR_BUILD="$(tc-getBUILD_CC)"
 		--bindir="${EPREFIX}"/bin
 		--enable-fnmatch
 		$(use_with libedit)

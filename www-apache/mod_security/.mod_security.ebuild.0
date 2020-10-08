@@ -1,7 +1,7 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=5
+EAPI="6"
 
 inherit apache-module
 
@@ -44,34 +44,36 @@ RESTRICT=test
 
 need_apache2
 
+pkg_setup() {
+	_init_apache2
+	_init_apache2_late
+}
+
 src_configure() {
-	econf --enable-shared \
-		  --disable-static \
-		  --with-apxs="${APXS}" \
-		  --enable-request-early \
-		  --with-pic \
-		  $(use_with fuzzyhash ssdeep) \
-		  $(use_with json yajl) \
-		  $(use_enable mlogc) \
-		  $(use_with lua) \
-		  $(use_enable lua lua-cache) \
-		  $(use_enable jit pcre-jit)
+	local myconf=(
+		--disable-static
+		--enable-request-early
+		--with-apxs="${APXS}"
+		--with-pic
+		$(use_with fuzzyhash ssdeep)
+		$(use_with json yajl)
+		$(use_enable mlogc)
+		$(use_with lua)
+		$(use_enable lua lua-cache)
+		$(use_enable jit pcre-jit)
+		$(use_enable doc docs) )
+
+	econf ${myconf[@]}
 }
 
 src_compile() {
 	default
-
-	# Building the docs is broken at the moment, see e.g.
-	# https://github.com/SpiderLabs/ModSecurity/issues/1322
-	if use doc; then
-		doxygen doc/doxygen-apache.conf || die 'failed to build documentation'
-	fi
 }
 
 src_install() {
 	apache-module_src_install
 
-	dodoc CHANGES README.TXT modsecurity.conf-recommended
+	dodoc CHANGES README.md modsecurity.conf-recommended
 
 	if use doc; then
 		dodoc -r doc/apache/html

@@ -1,1 +1,0 @@
-.consolekit.ebuild.0

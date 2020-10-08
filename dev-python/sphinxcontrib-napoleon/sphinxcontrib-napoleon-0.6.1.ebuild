@@ -1,1 +1,0 @@
-.sphinxcontrib-napoleon.ebuild.0

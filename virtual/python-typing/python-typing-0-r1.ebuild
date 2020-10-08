@@ -1,1 +1,0 @@
-.python-typing.ebuild.0

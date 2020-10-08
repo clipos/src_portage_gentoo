@@ -33,12 +33,13 @@ RDEPEND="
 	dev-qt/qtwidgets:5[png,X(-)?]
 	media-fonts/open-sans
 	media-libs/fontconfig:=
-	>=media-libs/libtgvoip-2.4.4_p20200301[alsa?,pulseaudio?]
+	>=media-libs/libtgvoip-2.4.4_p20200525[alsa?,pulseaudio?]
 	media-libs/openal[alsa?,pulseaudio?]
 	media-libs/opus:=
 	media-video/ffmpeg:=[alsa?,opus,pulseaudio?]
 	sys-libs/zlib[minizip]
 	virtual/libiconv
+	x11-libs/gtk+:3
 	dbus? (
 		dev-qt/qtdbus:5
 		dev-libs/libdbusmenu-qt[qt5(+)]
@@ -51,8 +52,8 @@ RDEPEND="
 DEPEND="
 	${PYTHON_DEPS}
 	${RDEPEND}
-	~dev-cpp/ms-gsl-2.1.0
 	dev-cpp/range-v3
+	=dev-cpp/ms-gsl-3*
 "
 
 BDEPEND="
@@ -70,10 +71,15 @@ REQUIRED_USE="
 
 S="${WORKDIR}/${MY_P}"
 
-PATCHES=(
-	"${FILESDIR}/${PV}-kde-dir.patch"
-	"${FILESDIR}/${PN}-qt5.15.patch"
-)
+pkg_pretend() {
+	if has ccache ${FEATURES}; then
+		ewarn
+		ewarn "ccache does not work with ${PN} out of the box"
+		ewarn "due to usage of precompiled headers"
+		ewarn "check bug https://bugs.gentoo.org/715114 for more info"
+		ewarn
+	fi
+}
 
 src_configure() {
 	local mycxxflags=(

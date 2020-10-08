@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
-inherit gnome2-utils meson readme.gentoo-r1
+inherit gnome2-utils meson readme.gentoo-r1 xdg
 
 DESCRIPTION="KDE Connect implementation for Gnome Shell"
 HOMEPAGE="https://github.com/andyholmes/gnome-shell-extension-gsconnect"
@@ -17,7 +17,7 @@ COMMON_DEPEND="dev-libs/glib:2"
 RDEPEND="${COMMON_DEPEND}
 	app-eselect/eselect-gnome-shell-extensions
 	>=dev-libs/gjs-1.48
-	=gnome-base/gnome-shell-3.34*
+	=gnome-base/gnome-shell-3.36*
 	gnome-base/gvfs
 	gnome-extra/evolution-data-server
 	|| ( media-libs/libcanberra media-libs/gsound )
@@ -34,16 +34,6 @@ DISABLE_AUTOFORMATTING="yes"
 DOC_CONTENTS="For knowing more about how to do the setup, please visit:
 https://github.com/andyholmes/gnome-shell-extension-gsconnect/wiki/Installation"
 
-PATCHES=(
-	# From 'master'
-	# Shell Notifications: set a limit of 10 notifications from GSConnect
-	"${FILESDIR}/${P}-notifications-limit.patch"
-
-	# Don't show duplicated WhatsApp notifications and avoid repetitions
-	"${FILESDIR}/${P}-whatsapp-duplicates.patch"
-	"${FILESDIR}/${P}-avoid-repetitions.patch"
-)
-
 src_configure() {
 	# nemo support relies on nemo-python from https://github.com/linuxmint/nemo-extensions
 	# https://bugs.gentoo.org/694388
@@ -59,10 +49,12 @@ src_install() {
 
 pkg_preinst() {
 	gnome2_schemas_savelist
+	xdg_pkg_preinst
 }
 
 pkg_postinst() {
 	gnome2_schemas_update
+	xdg_pkg_postinst
 	ebegin "Updating list of installed extensions"
 	eselect gnome-shell-extensions update
 	eend $?
@@ -71,4 +63,5 @@ pkg_postinst() {
 
 pkg_postrm() {
 	gnome2_schemas_update
+	xdg_pkg_postrm
 }

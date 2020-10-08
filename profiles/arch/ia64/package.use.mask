@@ -1,6 +1,18 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
+# Sergei Trofimovich <slyfox@gentoo.org> (2020-09-18)
+# media-libs/libilbc is not ported to ia64
+net-analyzer/wireshark ilbc
+
+# Matt Turner <mattst88@gentoo.org> (2020-08-11)
+# No drivers on this architecture support Vulkan
+media-libs/mesa vulkan vulkan-overlay zink
+
+# Mart Raudsepp <leio@gentoo.org> (2020-08-02)
+# ia64 has no virtual/rust support, needed by newer gnome-base/librsvg, et al
+>=media-gfx/eog-3.33.1 svg
+
 # Michał Górny <mgorny@gentoo.org> (2020-06-14)
 # Requires dev-python/networkx.
 app-portage/nattka depgraph-order
@@ -30,7 +42,7 @@ app-text/texlive context l10n_ja
 # Requires unsupported dev-python/gevent.
 dev-python/socketpool eventlet gevent
 
-# # Sergei Trofimovich <slyfox@gentoo.org> (2020-04-12)
+# Sergei Trofimovich <slyfox@gentoo.org> (2020-04-12)
 # ruby-2.7 dropped ia64 support, mask dependencies requiring ruby.
 # These pull in:
 # - direct ruby dependency:
@@ -100,7 +112,6 @@ app-admin/syslog-ng kafka
 # No ia64 arch support for jit. Version 17 USE=debug
 # required USE=jit.
 dev-lang/spidermonkey jit
-=dev-lang/spidermonkey-17* debug
 
 # Mart Raudsepp <leio@gentoo.org> (2019-03-17)
 # Unkeyworded media-libs/opencv dependency, bug #680656
@@ -142,10 +153,6 @@ net-firewall/nftables doc
 # Michał Górny <mgorny@gentoo.org> (2017-08-10)
 # Both USE=fluidsynth and USE=timidity are masked in this profile.
 media-libs/sdl-mixer midi
-
-# Michał Górny <mgorny@gentoo.org> (2017-08-08)
-# Required VIDEO_CARDS=i965/radeonsi, both masked in this profile.
-media-libs/mesa vulkan vulkan-overlay
 
 # Michał Górny <mgorny@gentoo.org> (2017-08-08)
 # Requires USE=seccomp that is masked in this profile.
@@ -238,10 +245,6 @@ media-sound/rhythmbox upnp-av
 >=app-editors/gedit-3.20 spell
 >=app-text/evince-3.30 spell
 
-# Justin Lecher <jlec@gentoo.org> (2016-02-22)
-# Missing test deps keyword #575366
-dev-cpp/eigen test
-
 # Pacho Ramos <pacho@gentoo.org> (2016-01-31)
 # Missing keywords, bug #560382
 media-video/ffmpeg snappy
@@ -261,10 +264,6 @@ dev-python/pyquery test
 # Tests require non-keyworded qt5
 dev-qt/qtchooser test
 
-# Justin Lecher <jlec@gentoo.org> (2015-10-14)
-# Requires dev-python/ipython which triggers a long dep chain
-dev-python/restkit cli
-
 # Brian Evans <grknight@gentoo.org> (2015-09-14)
 # Mask new USE flags for mariadb which all arches do not yet have dependencies
 >=dev-db/mariadb-10.1.0 innodb-snappy
@@ -280,10 +279,6 @@ media-sound/pulseaudio ofono-headset
 # Mike Gilbert <floppym@gentoo.org> (2015-09-05)
 # sys-boot/gnu-efi is not supported on all archs.
 sys-apps/systemd -gnuefi
-
-# James Le Cuirot <chewi@gentoo.org> (2015-07-11)
-# Requires dev-java/fop but we don't support java on ia64.
-gnome-extra/libgda reports
 
 # Pacho Ramos <pacho@gentoo.org> (2015-06-13)
 # Missing keywords, bug #513108

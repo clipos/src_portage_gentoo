@@ -1,1 +1,0 @@
-.gcc.ebuild.1

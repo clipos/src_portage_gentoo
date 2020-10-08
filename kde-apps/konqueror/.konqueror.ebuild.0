@@ -5,8 +5,8 @@ EAPI=7
 
 ECM_HANDBOOK="forceoptional" # not optional until !kdelibs4support
 ECM_TEST="true"
-KFMIN=5.63.0
-QTMIN=5.12.3
+KFMIN=5.70.0
+QTMIN=5.14.2
 VIRTUALX_REQUIRED="test"
 inherit flag-o-matic ecm kde.org
 
@@ -40,7 +40,6 @@ COMMON_DEPEND="
 	>=kde-frameworks/kdelibs4support-${KFMIN}:5
 	>=kde-frameworks/kdesu-${KFMIN}:5
 	>=kde-frameworks/kguiaddons-${KFMIN}:5
-	>=kde-frameworks/khtml-${KFMIN}:5
 	>=kde-frameworks/ki18n-${KFMIN}:5
 	>=kde-frameworks/kiconthemes-${KFMIN}:5
 	>=kde-frameworks/kio-${KFMIN}:5

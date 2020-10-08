@@ -39,7 +39,6 @@ COMMON_DEPEND="
 	x11-libs/libXxf86vm
 	x11-libs/libxklavier
 	x11-libs/pango
-	virtual/libintl
 	consolekit? ( sys-auth/consolekit )
 	libnotify? ( >=x11-libs/libnotify-0.7:0 )
 	opengl? ( virtual/opengl )
@@ -47,16 +46,20 @@ COMMON_DEPEND="
 	!pam? ( kernel_linux? ( sys-apps/shadow ) )
 	elogind? ( sys-auth/elogind )
 	systemd? ( sys-apps/systemd:= )
-	!!<gnome-extra/gnome-screensaver-3"
+"
 
 RDEPEND="${COMMON_DEPEND}
-	>=mate-base/mate-session-manager-1.6"
+	>=mate-base/mate-session-manager-1.6
+	virtual/libintl
+	!!<gnome-extra/gnome-screensaver-3
+"
 
 DEPEND="${COMMON_DEPEND}
-	>=dev-util/intltool-0.50.1
-	sys-devel/gettext:*
+	dev-libs/libxml2
+	>=sys-devel/gettext-0.19.8:*
 	x11-base/xorg-proto
-	virtual/pkgconfig:*"
+	virtual/pkgconfig:*
+"
 
 src_configure() {
 	local myconf=(

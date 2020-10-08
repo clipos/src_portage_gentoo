@@ -1,0 +1,1 @@
+.kactivities.ebuild.0

@@ -1,16 +1,17 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI="6"
-PYTHON_COMPAT=( python2_7 )
+EAPI="7"
+PYTHON_COMPAT=( python3_{7,8,9} )
 
-inherit autotools ltprune python-any-r1
+inherit autotools python-any-r1
 
 PYZY_DB="${PN}-database-1.0.0"
 
 DESCRIPTION="The Chinese PinYin and Bopomofo conversion library"
 HOMEPAGE="https://github.com/pyzy/pyzy"
-SRC_URI="https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/${PN}/${P}.tar.gz
+SRC_URI="https://dev.gentoo.org/~dlan/distfiles/${P}.tar.xz
+	https://dev.gentoo.org/~dlan/distfiles/${P}-patches.tar.xz
 	https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/${PN}/${PYZY_DB}.tar.bz2"
 
 LICENSE="LGPL-2.1"
@@ -28,14 +29,10 @@ DEPEND="${RDEPEND}
 	sys-devel/autoconf-archive
 	doc? ( app-doc/doxygen )"
 
-PATCHES=(
-	"${FILESDIR}"/${PN}-boost.patch
-	"${FILESDIR}"/${PN}-db.patch
-	"${FILESDIR}"/${PN}-opencc-1.0.0.patch
-)
-
 src_prepare() {
 	mv "${WORKDIR}"/db data/db/open-phrase || die
+
+	eapply "${WORKDIR}"/patches
 
 	default
 	eautoreconf
@@ -55,5 +52,5 @@ src_install() {
 	fi
 
 	default
-	prune_libtool_files
+	find "${ED}" -name '*.la' -delete || die
 }

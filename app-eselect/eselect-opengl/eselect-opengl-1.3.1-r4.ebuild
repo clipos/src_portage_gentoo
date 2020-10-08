@@ -1,1 +1,0 @@
-.eselect-opengl.ebuild.0

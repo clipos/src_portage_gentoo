@@ -1,1 +1,0 @@
-.linsmith.ebuild.0

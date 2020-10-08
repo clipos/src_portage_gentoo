@@ -1,0 +1,1 @@
+.qtsass.ebuild.0

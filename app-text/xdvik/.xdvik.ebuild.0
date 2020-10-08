@@ -1,8 +1,9 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=5
-inherit elisp-common eutils flag-o-matic multilib toolchain-funcs xdg-utils
+EAPI=6
+
+inherit autotools desktop elisp-common flag-o-matic toolchain-funcs xdg-utils
 
 DESCRIPTION="DVI previewer for X Window System"
 HOMEPAGE="http://xdvi.sourceforge.net/"
@@ -13,7 +14,7 @@ SLOT="0"
 LICENSE="GPL-2"
 IUSE="motif neXt Xaw3d emacs"
 
-RDEPEND="media-libs/freetype:2
+CDEPEND=">=media-libs/freetype-2.9.1-r2:2
 	x11-libs/libX11
 	x11-libs/libXi
 	x11-libs/libXmu
@@ -32,8 +33,8 @@ RDEPEND="media-libs/freetype:2
 DEPEND="sys-devel/flex
 	virtual/yacc
 	virtual/pkgconfig
-	${RDEPEND}"
-RDEPEND="${RDEPEND}
+	${CDEPEND}"
+RDEPEND="${CDEPEND}
 	virtual/latex-base
 	!<app-text/texlive-2007"
 S=${WORKDIR}/${P}/texk/xdvik
@@ -43,6 +44,13 @@ src_prepare() {
 	# Make sure system kpathsea headers are used
 	cd "${WORKDIR}/${P}/texk/kpathsea"
 	for i in *.h ; do echo "#include_next \"$i\"" > $i; done
+
+	cd "${WORKDIR}/${P}"
+	eapply "${FILESDIR}"/${P}-freetype2-config.patch
+	cd "${S}"
+	eautoreconf
+
+	eapply_user
 }
 
 src_configure() {

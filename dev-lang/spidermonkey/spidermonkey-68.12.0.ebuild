@@ -1,0 +1,1 @@
+.spidermonkey.ebuild.0

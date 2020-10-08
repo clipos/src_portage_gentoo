@@ -20,7 +20,7 @@ COMMON_DEPEND="
 "
 RDEPEND="${COMMON_DEPEND}
 	app-eselect/eselect-gnome-shell-extensions
-	>=gnome-base/gnome-shell-3.20
+	>=gnome-base/gnome-shell-3.36
 "
 DEPEND="${COMMON_DEPEND}"
 BDEPEND=""

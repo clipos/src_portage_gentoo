@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -10,8 +10,7 @@ HOMEPAGE="https://gstreamer.freedesktop.org/modules/gst-rtsp-server.html"
 
 LICENSE="LGPL-2+"
 KEYWORDS="amd64 x86"
-IUSE="examples +introspection static-libs test"
-RESTRICT="!test? ( test )"
+IUSE="examples +introspection static-libs"
 
 # gst-plugins-base for many used elements and API
 # gst-plugins-good for rtprtxsend and rtpbin elements, maybe more
@@ -31,6 +30,12 @@ DEPEND="${RDEPEND}
 # Due to gstreamer src_configure
 QA_CONFIGURE_OPTIONS="--enable-nls"
 
+PATCHES=(
+	"${FILESDIR}"/${PV}-leak-fix.patch
+	"${FILESDIR}"/${PV}-glib-deprecation-fix.patch
+	"${FILESDIR}"/${PV}-CVE-2020-6095.patch
+)
+
 multilib_src_configure() {
 	# debug: only adds -g to CFLAGS
 	# docbook: nothing behind that switch
@@ -43,7 +48,7 @@ multilib_src_configure() {
 		--disable-gtk-doc \
 		$(multilib_native_use_enable introspection) \
 		$(use_enable static-libs static) \
-		$(use_enable test tests) \
+		--disable-tests \
 		LIBCGROUP_LIBS= \
 		LIBCGROUP_FLAGS=
 

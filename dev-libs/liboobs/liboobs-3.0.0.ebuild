@@ -1,1 +1,0 @@
-.liboobs.ebuild.0

@@ -3,8 +3,8 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{6,7} )
-inherit autotools flag-o-matic multilib-minimal python-any-r1 systemd
+PYTHON_COMPAT=( python3_{7,8} )
+inherit autotools flag-o-matic multilib-minimal python-any-r1 systemd toolchain-funcs
 
 MY_P="${P/mit-}"
 P_DIR=$(ver_cut 1-2)
@@ -61,6 +61,8 @@ PATCHES=(
 	"${FILESDIR}/${PN}-1.12_warn_cflags.patch"
 	"${FILESDIR}/${PN}-config_LDFLAGS-r1.patch"
 	"${FILESDIR}/${PN}-1.16.3-libressl-r1.patch"
+	"${FILESDIR}/${PN}_dont_create_run.patch"
+	"${FILESDIR}/${PN}-1.18-libressl.patch"
 )
 
 MULTILIB_CHOST_TOOLS=(
@@ -71,7 +73,7 @@ src_prepare() {
 	default
 	# Make sure we always use the system copies.
 	rm -rf util/{et,ss,verto}
-	sed -i 's:^[[:space:]]*util/verto$::' configure.in || die
+	sed -i 's:^[[:space:]]*util/verto$::' configure.ac || die
 
 	eautoreconf
 }
@@ -85,7 +87,6 @@ src_configure() {
 }
 
 multilib_src_configure() {
-	use keyutils || export ac_cv_header_keyutils_h=no
 	ECONF_SOURCE=${S} \
 	WARN_CFLAGS="set" \
 	econf \
@@ -95,6 +96,7 @@ multilib_src_configure() {
 		$(use_enable pkinit) \
 		$(use_enable threads thread-support) \
 		$(use_with lmdb) \
+		$(use_with keyutils) \
 		--without-hesiod \
 		--enable-shared \
 		--with-system-et \
@@ -102,7 +104,9 @@ multilib_src_configure() {
 		--enable-dns-for-realm \
 		--enable-kdc-lookaside-cache \
 		--with-system-verto \
-		--disable-rpath
+		--disable-rpath \
+		\
+		AR="$(tc-getAR)"
 }
 
 multilib_src_compile() {
@@ -123,8 +127,6 @@ multilib_src_install() {
 multilib_src_install_all() {
 	# default database dir
 	keepdir /var/lib/krb5kdc
-
-	rmdir "${ED}"/var/lib/{run/krb5kdc,run}
 
 	cd ..
 	dodoc README

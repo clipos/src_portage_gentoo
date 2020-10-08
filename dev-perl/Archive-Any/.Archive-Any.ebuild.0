@@ -1,10 +1,10 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 DIST_AUTHOR=OALDERS
-DIST_VERSION=0.0945
+DIST_VERSION=0.0946
 DIST_EXAMPLES=("anonymize-archives");
 inherit perl-module
 
@@ -18,13 +18,13 @@ RESTRICT="!test? ( test )"
 RDEPEND="
 	virtual/perl-Archive-Tar
 	dev-perl/Archive-Zip
-	dev-perl/Module-Find
-	dev-perl/MIME-Types
 	dev-perl/File-MMagic
 	virtual/perl-File-Spec
+	dev-perl/Module-Find
+	dev-perl/MIME-Types
 "
-DEPEND="${RDEPEND}
-	>=dev-perl/Module-Build-0.280.0
+BDEPEND="${RDEPEND}
+	virtual/perl-ExtUtils-MakeMaker
 	test? (
 		virtual/perl-Test-Simple
 		dev-perl/Test-Warn

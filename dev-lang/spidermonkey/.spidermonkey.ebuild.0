@@ -1,158 +1,255 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI="7"
+
+PYTHON_COMPAT=( python3_{6..9} )
+
 WANT_AUTOCONF="2.1"
-inherit autotools check-reqs toolchain-funcs pax-utils mozcoreconf-v5
+
+inherit autotools check-reqs python-any-r1 toolchain-funcs
 
 MY_PN="mozjs"
-MY_P="${MY_PN}-${PV/_rc/.rc}"
-MY_P="${MY_P/_pre/pre}"
-MY_P="${MY_P%_p[0-9]*}"
-DESCRIPTION="Stand-alone JavaScript C++ library"
+MY_PV="${PV/_pre*}" # Handle Gentoo pre-releases
+
+MY_MAJOR=$(ver_cut 1)
+
+MOZ_ESR="1"
+
+# Convert the ebuild version to the upstream mozilla version
+MOZ_PV="${MY_PV/_alpha/a}" # Handle alpha for SRC_URI
+MOZ_PV="${MOZ_PV/_beta/b}" # Handle beta for SRC_URI
+MOZ_PV="${MOZ_PV%%_rc*}" # Handle rc for SRC_URI
+
+if [[ ${MOZ_ESR} == 1 ]] ; then
+	# ESR releases have slightly different version numbers
+	MOZ_PV="${MOZ_PV}esr"
+fi
+
+# Patch version
+FIREFOX_PATCHSET="firefox-68.0-patches-15"
+SPIDERMONKEY_PATCHSET="${PN}-68.6.0-patches-03"
+
+MOZ_HTTP_URI="https://archive.mozilla.org/pub/firefox/releases"
+MOZ_SRC_URI="${MOZ_HTTP_URI}/${MOZ_PV}/source/firefox-${MOZ_PV}.source.tar.xz"
+
+if [[ "${PV}" == *_rc* ]]; then
+	MOZ_HTTP_URI="https://archive.mozilla.org/pub/firefox/candidates/${MOZ_PV}-candidates/build${PV##*_rc}"
+	MOZ_SRC_URI="${MOZ_HTTP_URI}/source/firefox-${MOZ_PV}.source.tar.xz"
+fi
+
+PATCH_URIS=(
+	https://dev.gentoo.org/~{anarchy,whissi,polynomial-c,axs}/mozilla/patchsets/${FIREFOX_PATCHSET}.tar.xz
+	https://dev.gentoo.org/~{whissi,polynomial-c,axs}/mozilla/patchsets/${SPIDERMONKEY_PATCHSET}.tar.xz
+)
+
+SRC_URI="${MOZ_SRC_URI}
+	${PATCH_URIS[@]}"
+
+DESCRIPTION="SpiderMonkey is Mozilla's JavaScript engine written in C and C++"
 HOMEPAGE="https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey"
-#SRC_URI="https://archive.mozilla.org/pub/spidermonkey/prereleases/60/pre3/${MY_P}.tar.bz2
-SRC_URI="https://dev.gentoo.org/~axs/distfiles/${MY_P}.tar.bz2
-	https://dev.gentoo.org/~anarchy/mozilla/patchsets/${PN}-60.0-patches-04.tar.xz"
 
-LICENSE="NPL-1.1"
-SLOT="60"
-KEYWORDS="~alpha amd64 arm arm64 hppa ~ia64 ~mips ppc ppc64 ~s390 sparc x86"
-IUSE="debug +jit minimal +system-icu test"
+KEYWORDS="~alpha amd64 arm arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sparc x86"
 
-RESTRICT="!test? ( test ) ia64? ( test )"
+SLOT="68"
+LICENSE="MPL-2.0"
+IUSE="cpu_flags_arm_neon debug +jit test"
 
-S="${WORKDIR}/${MY_P%.rc*}"
+RESTRICT="!test? ( test )"
 
-BUILDDIR="${S}/jsobj"
+BDEPEND="dev-lang/python:2.7
+	test? ( ${PYTHON_DEPS} )"
 
-RDEPEND=">=dev-libs/nspr-4.13.1
-	virtual/libffi
+DEPEND=">=dev-libs/icu-63.1:=
+	>=dev-libs/nspr-4.21
 	sys-libs/readline:0=
-	>=sys-libs/zlib-1.2.3:=
-	system-icu? ( >=dev-libs/icu-59.1:= )"
-DEPEND="${RDEPEND}"
+	>=sys-libs/zlib-1.2.3"
+RDEPEND="${DEPEND}"
+
+S="${WORKDIR}/firefox-${MY_PV}/js/src"
 
 pkg_pretend() {
-	CHECKREQS_DISK_BUILD="2G"
+	if use test ; then
+		CHECKREQS_DISK_BUILD="6G"
+	else
+		CHECKREQS_DISK_BUILD="5G"
+	fi
+
+	check-reqs_pkg_pretend
+}
+
+pkg_setup() {
+	if use test ; then
+		CHECKREQS_DISK_BUILD="6G"
+	else
+		CHECKREQS_DISK_BUILD="5G"
+	fi
 
 	check-reqs_pkg_setup
-}
-pkg_setup() {
-	[[ ${MERGE_TYPE} == "binary" ]] || \
-		moz_pkgsetup
-	export SHELL="${EPREFIX}/bin/bash"
+
+	use test && python-any-r1_pkg_setup
 }
 
 src_prepare() {
-	eapply "${WORKDIR}/${PN}"
-	eapply "${FILESDIR}/${PN}-60.5.2-ia64-support.patch"
-	eapply "${FILESDIR}/${PN}-60.5.2-ia64-fix-virtual-address-length.patch"
+	cd ../.. || die
+	rm "${WORKDIR}"/firefox/2013_avoid_noinline_on_GCC_with_skcms.patch
+	rm "${WORKDIR}"/firefox/2015_fix_cssparser.patch
+	rm "${WORKDIR}"/firefox/2016_set_CARGO_PROFILE_RELEASE_LTO.patch
+	eapply "${WORKDIR}"/firefox
+	eapply "${WORKDIR}"/spidermonkey-patches
 
-	eapply_user
+	default
 
-	if [[ ${CHOST} == *-freebsd* ]]; then
-		# Don't try to be smart, this does not work in cross-compile anyway
-		ln -sfn "${BUILDDIR}/config/Linux_All.mk" "${S}/config/$(uname -s)$(uname -r).mk" || die
-	fi
+	# sed-in toolchain prefix
+	sed -i \
+		-e "s/objdump/${CHOST}-objdump/" \
+		python/mozbuild/mozbuild/configure/check_debug_ranges.py \
+		|| die "sed failed to set toolchain prefix"
 
-	cd "${S}/js/src" || die
-	eautoconf old-configure.in
+	MOZJS_BUILDDIR="${WORKDIR}/build"
+	mkdir "${MOZJS_BUILDDIR}" || die
+
+	cd "${S}" || die
 	eautoconf
-
-	# remove options that are not correct from js-config
-	sed '/lib-filenames/d' -i "${S}"/js/src/build/js-config.in || die "failed to remove invalid option from js-config"
-
-	# there is a default config.cache that messes everything up
-	rm -f "${S}/js/src"/config.cache || die
-
-	mkdir -p "${BUILDDIR}" || die
 }
 
 src_configure() {
-	cd "${BUILDDIR}" || die
+	tc-export CC CXX LD AR RANLIB
 
-	tc-export AR RANLIB
+	# backup current active Python version
+	local PYTHON_OLD=${PYTHON}
 
-	ECONF_SOURCE="${S}/js/src" \
-	econf \
-		--disable-jemalloc \
-		--enable-readline \
-		--with-system-nspr \
-		--with-system-zlib \
-		--disable-optimize \
-		--with-intl-api \
-		--with-toolchain-prefix="${CHOST}-" \
-		$(use_with system-icu) \
-		$(use_enable debug) \
-		$(use_enable jit ion) \
-		$(use_enable test tests) \
-		XARGS="/usr/bin/xargs" \
-		CONFIG_SHELL="${EPREFIX}/bin/bash" \
-		CC="${CC}" CXX="${CXX}" LD="${LD}" AR="${AR}" RANLIB="${RANLIB}"
-}
+	# build system will require Python2.7
+	export PYTHON=python2.7
 
-cross_make() {
-	emake \
-		CFLAGS="${BUILD_CFLAGS}" \
-		CXXFLAGS="${BUILD_CXXFLAGS}" \
-		AR="${BUILD_AR}" \
-		CC="${BUILD_CC}" \
-		CXX="${BUILD_CXX}" \
-		RANLIB="${BUILD_RANLIB}" \
-		"$@"
-}
-src_compile() {
-	cd "${BUILDDIR}" || die
-	if tc-is-cross-compiler; then
-		tc-export_build_env BUILD_{AR,CC,CXX,RANLIB}
-		cross_make \
-			MOZ_OPTIMIZE_FLAGS="" MOZ_DEBUG_FLAGS="" \
-			HOST_OPTIMIZE_FLAGS="" MODULE_OPTIMIZE_FLAGS="" \
-			MOZ_PGO_OPTIMIZE_FLAGS="" \
-			host_jsoplengen host_jskwgen
-		cross_make \
-			MOZ_OPTIMIZE_FLAGS="" MOZ_DEBUG_FLAGS="" HOST_OPTIMIZE_FLAGS="" \
-			-C config nsinstall
-		mv {,native-}host_jskwgen || die
-		mv {,native-}host_jsoplengen || die
-		mv config/{,native-}nsinstall || die
-		sed -i \
-			-e 's@./host_jskwgen@./native-host_jskwgen@' \
-			-e 's@./host_jsoplengen@./native-host_jsoplengen@' \
-			Makefile || die
-		sed -i -e 's@/nsinstall@/native-nsinstall@' config/config.mk || die
-		rm -f config/host_nsinstall.o \
-			config/host_pathsub.o \
-			host_jskwgen.o \
-			host_jsoplengen.o || die
+	cd "${MOZJS_BUILDDIR}" || die
+
+	# ../python/mach/mach/mixin/process.py fails to detect SHELL
+	export SHELL="${EPREFIX}/bin/bash"
+
+	local -a myeconfargs=(
+		--host="${CBUILD:-${CHOST}}"
+		--target="${CHOST}"
+		--disable-jemalloc
+		--disable-optimize
+		--disable-strip
+		--enable-readline
+		--enable-shared-js
+		--with-intl-api
+		--with-system-icu
+		--with-system-nspr
+		--with-system-zlib
+		--with-toolchain-prefix="${CHOST}-"
+		$(use_enable debug)
+		$(use_enable jit ion)
+		$(use_enable test tests)
+	)
+
+	# Modifications to better support ARM, bug 717344
+	if use cpu_flags_arm_neon ; then
+		myeconfargs+=( --with-fpu=neon )
+
+		if ! tc-is-clang ; then
+			# thumb options aren't supported when using clang, bug 666966
+			myeconfargs+=( --with-thumb=yes )
+			myeconfargs+=( --with-thumb-interwork=no )
+		fi
 	fi
 
-	MOZ_MAKE_FLAGS="${MAKEOPTS}" \
-	emake \
-		MOZ_OPTIMIZE_FLAGS="" MOZ_DEBUG_FLAGS="" \
-		HOST_OPTIMIZE_FLAGS="" MODULE_OPTIMIZE_FLAGS="" \
-		MOZ_PGO_OPTIMIZE_FLAGS=""
+	# Forcing system-icu allows us to skip patching bundled ICU for PPC
+	# and other minor arches
+	ECONF_SOURCE="${S}" \
+		econf \
+		${myeconfargs[@]} \
+		XARGS="${EPREFIX}/usr/bin/xargs"
+
+	# restore PYTHON
+	export PYTHON=${PYTHON_OLD}
+}
+
+src_compile() {
+	cd "${MOZJS_BUILDDIR}" || die
+	default
 }
 
 src_test() {
-	cd "${BUILDDIR}/js/src/jsapi-tests" || die
-	./jsapi-tests || die
+	if "${MOZJS_BUILDDIR}/js/src/js" -e 'print("Hello world!")'; then
+		einfo "Smoke-test successful, continuing with full test suite"
+	else
+		die "Smoke-test failed: did interpreter initialization fail?"
+	fi
+
+	local -a KNOWN_TESTFAILURES
+	KNOWN_TESTFAILURES+=( test262/intl402/RelativeTimeFormat/prototype/format/en-us-numeric-auto.js )
+	KNOWN_TESTFAILURES+=( non262/Intl/DateTimeFormat/timeZone_backward_links.js )
+	KNOWN_TESTFAILURES+=( non262/Intl/DateTimeFormat/tz-environment-variable.js )
+	KNOWN_TESTFAILURES+=( non262/Intl/RelativeTimeFormat/format.js )
+	KNOWN_TESTFAILURES+=( non262/Date/time-zones-imported.js )
+	KNOWN_TESTFAILURES+=( non262/Date/toString-localized.js )
+	KNOWN_TESTFAILURES+=( non262/Date/time-zone-path.js )
+	KNOWN_TESTFAILURES+=( non262/Date/time-zones-historic.js )
+	KNOWN_TESTFAILURES+=( non262/Date/toString-localized-posix.js )
+	KNOWN_TESTFAILURES+=( non262/Date/reset-time-zone-cache-same-offset.js )
+
+	if use x86 ; then
+		KNOWN_TESTFAILURES+=( test262/language/types/number/S8.5_A2.1.js )
+		KNOWN_TESTFAILURES+=( test262/language/types/number/S8.5_A2.2.js )
+		KNOWN_TESTFAILURES+=( test262/built-ins/Number/prototype/toPrecision/return-values.js )
+		KNOWN_TESTFAILURES+=( non262/Date/timeclip.js )
+	fi
+
+	echo "" > "${T}"/known_failures.list || die
+
+	local KNOWN_TESTFAILURE
+	for KNOWN_TESTFAILURE in ${KNOWN_TESTFAILURES[@]} ; do
+		echo "${KNOWN_TESTFAILURE}" >> "${T}"/known_failures.list
+	done
+
+	PYTHONPATH="${S}/tests/lib" \
+		${PYTHON} \
+		"${S}"/tests/jstests.py -d -s -t 1800 --wpt=disabled --no-progress \
+		--exclude-file="${T}"/known_failures.list \
+		"${MOZJS_BUILDDIR}"/js/src/js \
+		|| die
+
+	if use jit ; then
+		KNOWN_TESTFAILURES=()
+
+		echo "" > "${T}"/known_failures.list || die
+
+		for KNOWN_TESTFAILURE in ${KNOWN_TESTFAILURES[@]} ; do
+			echo "${KNOWN_TESTFAILURE}" >> "${T}"/known_failures.list
+		done
+
+		PYTHONPATH="${S}/tests/lib" \
+			${PYTHON} \
+			"${S}"/tests/jstests.py -d -s -t 1800 --wpt=disabled --no-progress \
+			--exclude-file="${T}"/known_failures.list \
+			"${MOZJS_BUILDDIR}"/js/src/js basic \
+			|| die
+	fi
 }
 
 src_install() {
-	cd "${BUILDDIR}" || die
-	emake DESTDIR="${D}" install
+	cd "${MOZJS_BUILDDIR}" || die
+	default
 
-	if ! use minimal; then
-		if use jit; then
-			pax-mark m "${ED}"usr/bin/js${SLOT}
-		fi
-	else
-		rm -f "${ED}"usr/bin/js${SLOT}
-	fi
+	# fix soname links
+	pushd "${ED}"/usr/$(get_libdir) &>/dev/null || die
+	mv lib${MY_PN}-${MY_MAJOR}.so lib${MY_PN}-${MY_MAJOR}.so.0.0.0 || die
+	ln -s lib${MY_PN}-${MY_MAJOR}.so.0.0.0 lib${MY_PN}-${MY_MAJOR}.so.0 || die
+	ln -s lib${MY_PN}-${MY_MAJOR}.so.0 lib${MY_PN}-${MY_MAJOR}.so || die
+	popd &>/dev/null || die
 
-	# We can't actually disable building of static libraries
-	# They're used by the tests and in a few other places
-	find "${D}" -iname '*.a' -o -iname '*.ajs' -delete || die
+	# remove unneeded files
+	rm \
+		"${ED}"/usr/bin/js${MY_MAJOR}-config \
+		"${ED}"/usr/$(get_libdir)/libjs_static.ajs \
+		|| die
+
+	# fix permissions
+	chmod -x \
+		"${ED}"/usr/$(get_libdir)/pkgconfig/*.pc \
+		"${ED}"/usr/include/mozjs-${MY_MAJOR}/js-config.h \
+		|| die
 }

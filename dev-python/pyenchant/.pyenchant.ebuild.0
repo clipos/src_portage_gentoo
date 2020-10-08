@@ -3,36 +3,30 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( pypy3 python{2_7,3_{6,7,8}} )
+PYTHON_COMPAT=( pypy3 python3_{6..9} )
 
 inherit distutils-r1
 
 DESCRIPTION="Python bindings for the Enchant spellchecking system"
-HOMEPAGE="http://pyenchant.sourceforge.net https://pypi.org/project/pyenchant/"
-SRC_URI="mirror://pypi/${PN:0:1}/${PN}/${P}.tar.gz"
+HOMEPAGE="https://github.com/pyenchant/pyenchant
+	https://pypi.org/project/pyenchant/"
+SRC_URI="
+	https://github.com/pyenchant/pyenchant/archive/v${PV}.tar.gz
+		-> ${P}.gh.tar.gz"
 
 LICENSE="LGPL-2.1"
 SLOT="0"
-KEYWORDS="amd64 arm arm64 ~hppa ppc ppc64 sparc x86"
-IUSE="test"
-RESTRICT="!test? ( test )"
+KEYWORDS="~alpha amd64 arm arm64 ~hppa ~ia64 ppc ppc64 ~riscv sparc x86"
 
-RDEPEND="app-text/enchant:0"
-DEPEND="
-	dev-python/setuptools[${PYTHON_USEDEP}]
+RDEPEND="app-text/enchant:*"
+BDEPEND="
 	test? (
-		${RDEPEND}
 		app-dicts/myspell-en
 	)"
 
-python_prepare_all() {
-	# Avoid a test failure when there is no dictionary
-	# matching the available locales
-	# https://github.com/rfk/pyenchant/issues/134
-	sed -i 's/test_default_language/_&/' enchant/checker/tests.py || die
-	distutils-r1_python_prepare_all
-}
+distutils_enable_tests pytest
 
-python_test() {
-	esetup.py test
+src_prepare() {
+	rm tests/test_docstrings.py || die
+	distutils-r1_src_prepare
 }

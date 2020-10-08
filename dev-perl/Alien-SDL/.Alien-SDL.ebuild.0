@@ -1,10 +1,10 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=5
+EAPI=7
 
-MODULE_AUTHOR=FROGGS
-MODULE_VERSION=1.446
+DIST_AUTHOR=FROGGS
+DIST_VERSION=1.446
 inherit perl-module toolchain-funcs
 
 DESCRIPTION="building, finding and using SDL binaries"
@@ -29,13 +29,22 @@ RDEPEND="
 	virtual/perl-File-Spec
 	virtual/perl-File-Temp
 "
-DEPEND="${RDEPEND}"
+DEPEND="
+	dev-perl/Module-Build
+	media-libs/libsdl
+"
+BDEPEND="${RDEPEND}"
 
+PERL_RM_FILES=(
+	t/release-pod-{syntax,coverage}.t
+)
+PATCHES=(
+	"${FILESDIR}"/${PN}-1.444.0-fix-build-option.patch
+	"${FILESDIR}"/${PN}-1.444.0-no-sysclean.patch
+)
 src_prepare() {
 	tc-export CC
-	epatch "${FILESDIR}"/${PN}-1.444.0-fix-build-option.patch
 	perl-module_src_prepare
 }
 
-SRC_TEST=do
 myconf='--with-sdl-config'

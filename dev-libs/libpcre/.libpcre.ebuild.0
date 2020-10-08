@@ -1,7 +1,7 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 inherit multilib libtool flag-o-matic toolchain-funcs multilib-minimal preserve-libs usr-ldscript
 
@@ -29,8 +29,8 @@ RDEPEND="
 	libedit? ( dev-libs/libedit )
 	readline? ( sys-libs/readline:0= )
 "
-DEPEND="
-	${RDEPEND}
+DEPEND="${RDEPEND}"
+BDEPEND="
 	virtual/pkgconfig
 "
 
@@ -84,7 +84,7 @@ multilib_src_install() {
 }
 
 multilib_src_install_all() {
-	find "${ED}" -name "*.la" -delete || die
+	find "${ED}" -type f -name "*.la" -delete || die
 }
 
 pkg_preinst() {

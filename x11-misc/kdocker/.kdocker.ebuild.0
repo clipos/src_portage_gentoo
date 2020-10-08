@@ -29,10 +29,6 @@ RDEPEND="${DEPEND}"
 
 DOCS=( AUTHORS BUGS ChangeLog CREDITS README.md TODO )
 
-PATCHES=(
-	"${FILESDIR}"/qt-5.14.patch
-)
-
 S=${WORKDIR}/${MY_P}
 
 src_prepare() {
@@ -40,6 +36,8 @@ src_prepare() {
 
 	sed -i -e "/completion.path/s%/etc/bash_completion.d%$(get_bashcompdir)%" \
 		kdocker.pro || die "sed failed"
+	sed -i -e 's|/usr/share/appdata|/usr/share/metainfo|g' kdocker.pro \
+		|| die "sed failed"
 }
 
 src_configure() {

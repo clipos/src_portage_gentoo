@@ -24,7 +24,7 @@ DEPEND="
 	>=sci-geosciences/geocode-glib-3.10
 	>=dev-libs/glib-2.56:2
 	>=gnome-base/gnome-desktop-3.34.2:3=
-	>=gnome-base/gsettings-desktop-schemas-3.33.0
+	>=gnome-base/gsettings-desktop-schemas-3.35.91
 	>=x11-libs/gtk+-3.15.3:3[X,wayland?]
 	>=dev-libs/libgweather-3.9.5:2=
 	colord? (
@@ -80,11 +80,10 @@ BDEPEND="
 "
 
 PATCHES=(
-	# Translation update from gnome-3-34 branch
+	# Updates from master branch after 3.36.1 (gnome-3-36 wasn't branched yet)
 	# Allow disabling udev and networkmanager on Linux
 	# Make colord and wacom optional
 	"${WORKDIR}"/patches/
-	"${FILESDIR}"/3.32.1-fix-wacom-no-wayland.patch #677494, fixed in 3.36
 )
 
 python_check_deps() {

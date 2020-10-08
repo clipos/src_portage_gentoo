@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
-PYTHON_COMPAT=( python2_7 )
+PYTHON_COMPAT=( python3_{7,8,9} )
 
 inherit python-single-r1 toolchain-funcs
 
@@ -21,6 +21,12 @@ RDEPEND="${PYTHON_DEPS}"
 DEPEND="${RDEPEND}"
 
 S=${WORKDIR}/${PN^}
+
+DOCS=( 00readme )
+
+PATCHES=(
+	"${FILESDIR}/${P}-py3.patch"
+)
 
 src_prepare() {
 	default
@@ -47,5 +53,5 @@ src_install() {
 	dosym ../lib/apetag/rmid3tag.py /usr/bin/rmid3tag.py
 	dosym ../lib/apetag/tagdir.py /usr/bin/tagdir.py
 
-	newdoc 00readme README
+	einstalldocs
 }

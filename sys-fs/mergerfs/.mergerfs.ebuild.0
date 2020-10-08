@@ -3,6 +3,8 @@
 
 EAPI=7
 
+inherit toolchain-funcs
+
 DESCRIPTION="A featureful union filesystem"
 HOMEPAGE="https://github.com/trapexit/mergerfs"
 
@@ -22,11 +24,12 @@ RDEPEND="${DEPEND}"
 
 BDEPEND="sys-devel/gettext"
 
+PATCHES=(
+	"${FILESDIR}"/mergerfs-makefiles-fixes-ar-cflags-cxxflags-ldflags.patch
+)
+
 src_prepare() {
 	default
-
-	# drop -O2 from those handmade Makefiles.
-	sed -r '/^OPTS[ \t]*=/d' -i Makefile || die
 
 	# Hand made build system at it's finest.
 	echo -e "#!/bin/sh\ntrue" >tools/update-version || die
@@ -36,6 +39,13 @@ src_prepare() {
 	if ! use xattr; then
 		sed 's%USE_XATTR = 1%USE_XATTR = 0%g' -i Makefile || die
 	fi
+}
+
+src_compile() {
+	# https://bugs.gentoo.org/725978
+	tc-export AR
+
+	default
 }
 
 src_install() {

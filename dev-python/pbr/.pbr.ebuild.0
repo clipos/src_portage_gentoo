@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python2_7 python3_{6..9} pypy3 )
+PYTHON_COMPAT=( python3_{6..9} pypy3 )
 PYTHON_REQ_USE="threads(+)"
 
 inherit distutils-r1
@@ -25,19 +25,17 @@ RESTRICT="!test? ( test )"
 # stestr is run as external tool
 BDEPEND="
 	test? (
-		$(python_gen_cond_dep '
-			>=dev-python/wheel-0.32.0[${PYTHON_USEDEP}]
-			>=dev-python/fixtures-3.0.0[${PYTHON_USEDEP}]
-			>=dev-python/mock-2.0.0[${PYTHON_USEDEP}]
-			>=dev-python/six-1.10.0[${PYTHON_USEDEP}]
-			dev-python/sphinx[${PYTHON_USEDEP}]
-			>=dev-python/testresources-2.0.0[${PYTHON_USEDEP}]
-			>=dev-python/testscenarios-0.4[${PYTHON_USEDEP}]
-			>=dev-python/testtools-2.2.0[${PYTHON_USEDEP}]
-			<dev-python/virtualenv-20[${PYTHON_USEDEP}]
-			>=dev-python/stestr-2.1.0
-			dev-vcs/git
-		' -3)
+		>=dev-python/wheel-0.32.0[${PYTHON_USEDEP}]
+		>=dev-python/fixtures-3.0.0[${PYTHON_USEDEP}]
+		>=dev-python/mock-2.0.0[${PYTHON_USEDEP}]
+		>=dev-python/six-1.10.0[${PYTHON_USEDEP}]
+		dev-python/sphinx[${PYTHON_USEDEP}]
+		>=dev-python/testresources-2.0.0[${PYTHON_USEDEP}]
+		>=dev-python/testscenarios-0.4[${PYTHON_USEDEP}]
+		>=dev-python/testtools-2.2.0[${PYTHON_USEDEP}]
+		<dev-python/virtualenv-20[${PYTHON_USEDEP}]
+		>=dev-python/stestr-2.1.0
+		dev-vcs/git
 	)"
 PDEPEND=""
 
@@ -57,12 +55,6 @@ python_prepare_all() {
 }
 
 python_test() {
-	if ! python_is_python3; then
-		ewarn "Skipping tests on ${EPYTHON} to unblock circular deps."
-		ewarn "Please run tests manually."
-		return
-	fi
-
 	distutils_install_for_testing
 	local -x PATH=${TEST_DIR}/scripts:${PATH}
 

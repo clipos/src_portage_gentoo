@@ -1,0 +1,1 @@
+.ki18n.ebuild.0

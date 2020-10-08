@@ -1,1 +1,0 @@
-.openoffice-bin.ebuild.0

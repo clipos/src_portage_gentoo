@@ -1,8 +1,13 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # Unmask the flag which corresponds to ARCH.
 -arm64
+
+# Sam James <sam@gentoo.org> (2020-10-08)
+# PyPy3 works on arm64
+-python_targets_pypy3
+-python_single_target_pypy3
 
 # David Seifert <soap@gentoo.org (2020-05-17)
 # Mono is hopelessly broken on arm64
@@ -33,9 +38,6 @@ cpu_flags_arm_neon
 -cpu_flags_arm_vfpv4
 -cpu_flags_arm_vfp-d32
 
-# Unmask [old] arm specific USE flags
--armvfp
-
 # Mattéo Rossillol‑‑Laruelle <beatussum@protonmail.com> (2019‑08‑31)
 # Dependency not keyworded (dev-libs/libindicate).
 appindicator
@@ -53,10 +55,6 @@ opencl
 # Mart Raudsepp <leio@gentoo.org> (2018-02-13)
 # net-libs/libsmi not tested on arm64 yet
 smi
-
-# Michał Górny <mgorny@gentoo.org> (2018-01-23)
-# sci-geosciences/gpsd is not keyworded here.
-gps
 
 # Mart Raudsepp <leio@gentoo.org> (2017-02-01)
 # Unmask systemd since it is keyworded here.
@@ -80,7 +78,6 @@ cblas-external
 amr
 
 # No hardware to test by the team
-dvb
 ios
 ipod
 
@@ -89,10 +86,6 @@ ipod
 dmi
 
 # Stuff we don't want
-fuse
-R
-octave
-xindy
 mpi
 lasi
 hardened
@@ -101,14 +94,10 @@ prelude
 mssql
 
 # havent tested yet
-libproxy
 darcs
 afs
-lirc
-lm-sensors
 scanner
 zvbi
-fluidsynth
 sid
 mms
 ieee1394
@@ -116,22 +105,15 @@ pm-utils
 darcs
 bs2b
 ladspa
-ldns
 ggi
 nut
 dvd
 fits
-tokyocabinet
-rtmp
-vpx
 lpsol
 quvi
-libtar
 zvbi
-devil
 gts
 anthy
-sdl
 
 # Unmask ARM-only video-cards
 -video_cards_exynos
@@ -140,6 +122,7 @@ sdl
 -video_cards_nouveau
 -video_cards_panfrost
 -video_cards_tegra
+-video_cards_v3d
 -video_cards_vc4
 
 # James Le Cuirot <chewi@gentoo.org>

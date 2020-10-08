@@ -9,7 +9,7 @@ DISTUTILS_USE_SETUPTOOLS=rdepend
 # entry_points is added via **kwargs in a dict
 _DISTUTILS_SETUPTOOLS_WARNED=1
 
-inherit distutils-r1 eutils
+inherit distutils-r1 optfeature
 
 DESCRIPTION="Python code static checker"
 HOMEPAGE="https://www.logilab.org/project/pylint
@@ -35,12 +35,19 @@ BDEPEND="
 
 PATCHES=(
 	"${FILESDIR}/${PN}-2.4.4-sphinx-theme.patch"
-	"${FILESDIR}/${PN}-2.4.4-no-pytest-runner.patch"
-	"${FILESDIR}/${PN}-2.4.4-tests.patch"
+	"${FILESDIR}/${PN}-2.5.3-no-pytest-runner.patch"
+	"${FILESDIR}/${PN}-2.5.3-tests.patch"
 )
 
 distutils_enable_sphinx doc
 distutils_enable_tests pytest
+
+python_prepare_all() {
+	# we don't want to run the benchmarking tests
+	rm -f tests/benchmark/test_baseline_benchmarks.py || die
+
+	distutils-r1_python_prepare_all
+}
 
 python_install_all() {
 	doman man/{pylint,pyreverse}.1

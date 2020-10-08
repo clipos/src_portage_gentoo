@@ -1,17 +1,15 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI="6"
+EAPI="7"
 
 CMAKE_MAKEFILE_GENERATOR=emake
 
-# Keeping eutils in EAPI=6 for emktemp in pkg_config
-
-inherit cmake-utils eutils flag-o-matic linux-info \
-	prefix toolchain-funcs multilib-minimal
+inherit check-reqs cmake flag-o-matic linux-info \
+	multiprocessing prefix toolchain-funcs multilib-minimal
 
 # Patch version
-PATCH_SET="https://dev.gentoo.org/~whissi/dist/mysql/${PN}-5.7.30-patches-01.tar.xz"
+PATCH_SET="https://dev.gentoo.org/~whissi/dist/mysql/${PN}-5.7.31-patches-01.tar.xz"
 
 SRC_URI="https://cdn.mysql.com/Downloads/MySQL-5.7/${PN}-boost-${PV}.tar.gz
 	https://cdn.mysql.com/archives/mysql-5.7/mysql-boost-${PV}.tar.gz
@@ -21,7 +19,7 @@ SRC_URI="https://cdn.mysql.com/Downloads/MySQL-5.7/${PN}-boost-${PV}.tar.gz
 HOMEPAGE="https://www.mysql.com/"
 DESCRIPTION="A fast, multi-threaded, multi-user SQL database server"
 LICENSE="GPL-2"
-SLOT="0/18"
+SLOT="5.7/18"
 IUSE="cjk client-libs cracklib debug experimental jemalloc latin1 libressl numa +perl profiling
 	selinux +server static static-libs systemtap tcmalloc test"
 
@@ -39,19 +37,18 @@ S="${WORKDIR}/mysql"
 # Be warned, *DEPEND are version-dependant
 # These are used for both runtime and compiletime
 # MULTILIB_USEDEP only set for libraries used by the client library
-COMMON_DEPEND="net-misc/curl:=
-	>=sys-apps/sed-4
-	>=sys-apps/texinfo-4.7-r1
+COMMON_DEPEND="
 	sys-libs/ncurses:0=
-	client-libs? ( >=sys-libs/zlib-1.2.3:0=[${MULTILIB_USEDEP},static-libs?] )
+	client-libs? (
+		>=sys-libs/zlib-1.2.3:0=[${MULTILIB_USEDEP},static-libs?]
+		!libressl? ( >=dev-libs/openssl-1.0.0:0=[${MULTILIB_USEDEP},static-libs?] )
+		libressl? ( dev-libs/libressl:0=[${MULTILIB_USEDEP},static-libs?] )
+	)
 	!client-libs? (
 		dev-db/mysql-connector-c[${MULTILIB_USEDEP},static-libs?]
 		>=sys-libs/zlib-1.2.3:0=
-	)
-	jemalloc? ( dev-libs/jemalloc:0= )
-	kernel_linux? (
-		dev-libs/libaio:0=
-		sys-process/procps:0=
+		!libressl? ( >=dev-libs/openssl-1.0.0:0= )
+		libressl? ( dev-libs/libressl:0= )
 	)
 	server? (
 		>=app-arch/lz4-0_p131:=
@@ -61,18 +58,15 @@ COMMON_DEPEND="net-misc/curl:=
 			dev-libs/protobuf:=
 			net-libs/libtirpc:=
 		)
+		jemalloc? ( dev-libs/jemalloc:0= )
+		kernel_linux? (
+			dev-libs/libaio:0=
+			sys-process/procps:0=
+		)
 		numa? ( sys-process/numactl )
 	)
 	systemtap? ( >=dev-util/systemtap-1.3:0= )
 	tcmalloc? ( dev-util/google-perftools:0= )
-	client-libs? (
-		!libressl? ( >=dev-libs/openssl-1.0.0:0=[${MULTILIB_USEDEP},static-libs?] )
-		libressl? ( dev-libs/libressl:0=[${MULTILIB_USEDEP},static-libs?] )
-	)
-	!client-libs? (
-		!libressl? ( >=dev-libs/openssl-1.0.0:0= )
-		libressl? ( dev-libs/libressl:0= )
-	)
 "
 DEPEND="${COMMON_DEPEND}
 	|| ( >=sys-devel/gcc-3.4.6 >=sys-devel/gcc-apple-4.0 )
@@ -90,6 +84,8 @@ DEPEND="${COMMON_DEPEND}
 "
 RDEPEND="${COMMON_DEPEND}
 	!dev-db/mariadb !dev-db/mariadb-galera !dev-db/percona-server !dev-db/mysql-cluster
+	!dev-db/mysql:0
+	!dev-db/mysql:8.0
 	client-libs? ( !dev-db/mariadb-connector-c[mysqlcompat] !dev-db/mysql-connector-c dev-libs/protobuf:= )
 	selinux? ( sec-policy/selinux-mysql )
 	server? (
@@ -104,55 +100,11 @@ RDEPEND="${COMMON_DEPEND}
 PDEPEND="perl? ( >=dev-perl/DBD-mysql-2.9004 )"
 
 mysql_init_vars() {
-	MY_SHAREDSTATEDIR=${MY_SHAREDSTATEDIR="${EPREFIX}/usr/share/mysql"}
-	MY_SYSCONFDIR=${MY_SYSCONFDIR="${EPREFIX}/etc/mysql"}
-	MY_LOCALSTATEDIR=${MY_LOCALSTATEDIR="${EPREFIX}/var/lib/mysql"}
-	MY_LOGDIR=${MY_LOGDIR="${EPREFIX}/var/log/mysql"}
-
-	if [[ -z "${MY_DATADIR}" ]] ; then
-		MY_DATADIR=""
-		if [[ -f "${MY_SYSCONFDIR}/my.cnf" ]] ; then
-			MY_DATADIR=`"my_print_defaults" mysqld 2>/dev/null \
-				| sed -ne '/datadir/s|^--datadir=||p' \
-				| tail -n1`
-			if [[ -z "${MY_DATADIR}" ]] ; then
-				MY_DATADIR=`grep ^datadir "${MY_SYSCONFDIR}/my.cnf" \
-				| sed -e 's/.*=\s*//' \
-				| tail -n1`
-			fi
-		fi
-		if [[ -z "${MY_DATADIR}" ]] ; then
-			MY_DATADIR="${MY_LOCALSTATEDIR}"
-			einfo "Using default MY_DATADIR"
-		fi
-		elog "MySQL MY_DATADIR is ${MY_DATADIR}"
-
-		if [[ -z "${PREVIOUS_DATADIR}" ]] ; then
-			if [[ -e "${MY_DATADIR}" ]] ; then
-				# If you get this and you're wondering about it, see bug #207636
-				elog "MySQL datadir found in ${MY_DATADIR}"
-				elog "A new one will not be created."
-				PREVIOUS_DATADIR="yes"
-			else
-				PREVIOUS_DATADIR="no"
-			fi
-			export PREVIOUS_DATADIR
-		fi
-	else
-		if [[ ${EBUILD_PHASE} == "config" ]] ; then
-			local new_MY_DATADIR
-			new_MY_DATADIR=`"my_print_defaults" mysqld 2>/dev/null \
-				| sed -ne '/datadir/s|^--datadir=||p' \
-				| tail -n1`
-
-			if [[ ( -n "${new_MY_DATADIR}" ) && ( "${new_MY_DATADIR}" != "${MY_DATADIR}" ) ]] ; then
-				ewarn "MySQL MY_DATADIR has changed"
-				ewarn "from ${MY_DATADIR}"
-				ewarn "to ${new_MY_DATADIR}"
-				MY_DATADIR="${new_MY_DATADIR}"
-			fi
-		fi
-	fi
+	: ${MY_SHAREDSTATEDIR="${EPREFIX}/usr/share/mysql"}
+	: ${MY_SYSCONFDIR="${EPREFIX}/etc/mysql"}
+	: ${MY_LOCALSTATEDIR="${EPREFIX}/var/lib/mysql"}
+	: ${MY_LOGDIR="${EPREFIX}/var/log/mysql"}
+	MY_DATADIR="${MY_LOCALSTATEDIR}"
 
 	export MY_SHAREDSTATEDIR MY_SYSCONFDIR
 	export MY_LOCALSTATEDIR MY_LOGDIR
@@ -160,33 +112,58 @@ mysql_init_vars() {
 }
 
 pkg_pretend() {
-	if use numa ; then
-		local CONFIG_CHECK="~NUMA"
+	if [[ ${MERGE_TYPE} != binary ]] ; then
+		if use server ; then
+			CHECKREQS_DISK_BUILD="3G"
 
-		local WARNING_NUMA="This package expects NUMA support in kernel which this system does not have at the moment;"
-		WARNING_NUMA+=" Either expect runtime errors, enable NUMA support in kernel or rebuild the package without NUMA support"
+			if has test $FEATURES ; then
+				CHECKREQS_DISK_BUILD="9G"
+			fi
 
-		check_extra_config
+			check-reqs_pkg_pretend
+		fi
 	fi
 }
 
 pkg_setup() {
 	if [[ ${MERGE_TYPE} != binary ]] ; then
-		local GCC_MAJOR_SET=$(gcc-major-version)
-		local GCC_MINOR_SET=$(gcc-minor-version)
-		# Bug 565584: InnoDB now requires atomic functions introduced with gcc-4.7 on
-		# non x86{,_64} arches
-		if ! use amd64 && ! use x86 && [[ ${GCC_MAJOR_SET} -lt 4 || \
-			${GCC_MAJOR_SET} -eq 4 && ${GCC_MINOR_SET} -lt 7 ]] ; then
-			eerror "${PN} needs to be built with gcc-4.7 or later."
-			eerror "Please use gcc-config to switch to gcc-4.7 or later version."
-			die
-		fi
-	fi
+		CHECKREQS_DISK_BUILD="3G"
 
-	if has test ${FEATURES} && \
-		use server && ! has userpriv ${FEATURES} ; then
-			eerror "Testing with FEATURES=-userpriv is no longer supported by upstream. Tests MUST be run as non-root."
+		if has test ${FEATURES} ; then
+			CHECKREQS_DISK_BUILD="9G"
+
+			# Bug #213475 - MySQL _will_ object strenuously if your machine is named
+			# localhost. Also causes weird failures.
+			[[ "${HOSTNAME}" == "localhost" ]] && die "Your machine must NOT be named localhost"
+
+			if ! has userpriv ${FEATURES} ; then
+				die "Testing with FEATURES=-userpriv is no longer supported by upstream. Tests MUST be run as non-root."
+			fi
+
+			local aio_max_nr=$(sysctl -n fs.aio-max-nr 2>/dev/null)
+			[[ -z "${aio_max_nr}" || ${aio_max_nr} -lt 250000 ]] \
+				&& die "FEATURES=test will require fs.aio-max-nr=250000 at minimum!"
+
+			if use latin1 ; then
+				# Upstream only supports tests with default charset
+				die "Testing with USE=latin1 is not supported."
+			fi
+		fi
+
+		if use kernel_linux ; then
+			if use numa ; then
+				linux-info_get_any_version
+
+				local CONFIG_CHECK="~NUMA"
+
+				local WARNING_NUMA="This package expects NUMA support in kernel which this system does not have at the moment;"
+				WARNING_NUMA+=" Either expect runtime errors, enable NUMA support in kernel or rebuild the package without NUMA support"
+
+				check_extra_config
+			fi
+		fi
+
+		use server && check-reqs_pkg_setup
 	fi
 }
 
@@ -194,8 +171,8 @@ pkg_preinst() {
 	# Here we need to see if the implementation switched client libraries
 	# We check if this is a new instance of the package and a client library already exists
 	local SHOW_ABI_MESSAGE libpath
-	if use client-libs && [[ -z ${REPLACING_VERSIONS} && -e "${EROOT}usr/$(get_libdir)/libmysqlclient.so" ]] ; then
-		libpath=$(readlink "${EROOT}usr/$(get_libdir)/libmysqlclient.so")
+	if use client-libs && [[ -z ${REPLACING_VERSIONS} && -e "${EROOT}/usr/$(get_libdir)/libmysqlclient.so" ]] ; then
+		libpath=$(readlink "${EROOT}/usr/$(get_libdir)/libmysqlclient.so")
 		elog "Due to ABI changes when switching between different client libraries,"
 		elog "revdep-rebuild must find and rebuild all packages linking to libmysqlclient."
 		elog "Please run: revdep-rebuild --library ${libpath}"
@@ -248,8 +225,6 @@ src_unpack() {
 src_prepare() {
 	eapply "${WORKDIR}"/mysql-patches
 
-	cmake-utils_src_prepare
-
 	if use jemalloc ; then
 		echo "TARGET_LINK_LIBRARIES(mysqld jemalloc)" >> "${S}/sql/CMakeLists.txt" || die
 	fi
@@ -284,6 +259,8 @@ src_prepare() {
 	fi
 
 	sed -i 's~ADD_SUBDIRECTORY(storage/ndb)~~' CMakeLists.txt || die
+
+	cmake_src_prepare
 }
 
 src_configure() {
@@ -443,7 +420,7 @@ multilib_src_configure() {
 		)
 	fi
 
-	cmake-utils_src_configure
+	cmake_src_configure
 }
 
 src_compile() {
@@ -455,7 +432,7 @@ src_compile() {
 }
 
 multilib_src_compile() {
-	cmake-utils_src_compile
+	cmake_src_compile
 }
 
 # Official test instructions:
@@ -482,27 +459,33 @@ src_test() {
 		return 0
 	fi
 
-	# Bug #213475 - MySQL _will_ object strenously if your machine is named
-	# localhost. Also causes weird failures.
-	[[ "${HOSTNAME}" == "localhost" ]] && die "Your machine must NOT be named localhost"
-
-	if [[ $UID -eq 0 ]] ; then
-		die "Testing with FEATURES=-userpriv is no longer supported by upstream. Tests MUST be run as non-root."
-	fi
-	has usersandbox $FEATURES && ewarn "Some tests may fail with FEATURES=usersandbox"
-
 	einfo ">>> Test phase [test]: ${CATEGORY}/${PF}"
 
 	# Run CTest (test-units)
-	cmake-utils_src_test
+	cmake_src_test
 	retstatus_unit=$?
 
 	# Ensure that parallel runs don't die
 	export MTR_BUILD_THREAD="$((${RANDOM} % 100))"
-	# Enable parallel testing, auto will try to detect number of cores
-	# You may set this by hand.
-	# The default maximum is 8 unless MTR_MAX_PARALLEL is increased
-	export MTR_PARALLEL="${MTR_PARALLEL:-auto}"
+
+	if [[ -z "${MTR_PARALLEL}" ]] ; then
+		local -x MTR_PARALLEL=$(makeopts_jobs)
+
+		if [[ ${MTR_PARALLEL} -gt 4 ]] ; then
+			# Running multiple tests in parallel usually require higher ulimit
+			# and fs.aio-max-nr setting. In addition, tests like main.multi_update
+			# are known to hit timeout when system is busy.
+			# To avoid test failure we will limit MTR_PARALLEL to 4 instead of
+			# using "auto".
+			local info_msg="Parallel MySQL test suite jobs limited to 4 (MAKEOPTS=${MTR_PARALLEL})"
+			info_msg+=" to avoid test failures. Set MTR_PARALLEL if you know what you are doing!"
+			einfo "${info_msg}"
+			unset info_msg
+			MTR_PARALLEL=4
+		fi
+	else
+		einfo "MTR_PARALLEL is set to '${MTR_PARALLEL}'"
+	fi
 
 	# create directories because mysqladmin might run out of order
 	mkdir -p "${T}"/var-tests{,/log} || die
@@ -678,8 +661,7 @@ src_install() {
 
 # Intentionally override eclass function
 multilib_src_install() {
-
-	cmake-utils_src_install
+	cmake_src_install
 
 	# Kill old libmysqclient_r symlinks if they exist. Time to fix what depends on them.
 	find "${D}" -name 'libmysqlclient_r.*' -type l -delete || die
@@ -751,7 +733,7 @@ pkg_config() {
 		local flag="--${2}="
 		local extra_options="${3}"
 		local cmd=(
-			"${EROOT%/}/usr/bin/my_print_defaults"
+			"${my_print_defaults_binary}"
 			"${extra_options}"
 			"${section}"
 		)
@@ -762,48 +744,289 @@ pkg_config() {
 			echo "${results[-1]}"
 		fi
 	}
-	local old_MY_DATADIR="${MY_DATADIR}"
-	local old_HOME="${HOME}"
-	# my_print_defaults needs to read stuff in $HOME/.my.cnf
-	export HOME=${EPREFIX}/root
 
-	# Make sure the vars are correctly initialized
-	mysql_init_vars
+	_mktemp_dry() {
+		# emktemp has no --dry-run option
+		local template="${1}"
 
-	[[ -z "${MY_DATADIR}" ]] && die "Sorry, unable to find MY_DATADIR"
-	if [[ ! -x "${EROOT%/}/usr/sbin/mysqld" ]] ; then
-		die "Minimal builds do NOT include the MySQL server"
+		if [[ -z "${template}" ]] ; then
+			if [[ -z "${T}" ]] ; then
+				template="/tmp/XXXXXXX"
+			else
+				template="${T}/XXXXXXX"
+			fi
+		fi
+
+		local template_wo_X=${template//X/}
+		local n_X
+		let n_X=${#template}-${#template_wo_X}
+		if [[ ${n_X} -lt 3 ]] ; then
+			echo "${FUNCNAME[0]}: too few X's in template ‘${template}’" >&2
+			return
+		fi
+
+		local attempts=0
+		local character tmpfile
+		while [[ true ]] ; do
+			let attempts=attempts+1
+
+			new_file=
+			while read -n1 character ; do
+				if [[ "${character}" == "X" ]] ; then
+					tmpfile+="${RANDOM:0:1}"
+				else
+					tmpfile+="${character}"
+				fi
+			done < <(echo -n "${template}")
+
+			if [[ ! -f "${tmpfile}" ]]
+			then
+				echo "${tmpfile}"
+				return
+			fi
+
+			if [[ ${attempts} -ge 100 ]] ; then
+				echo "${FUNCNAME[0]}: Cannot create temporary file after 100 attempts." >&2
+				return
+			fi
+		done
+	}
+
+	local mysqld_binary="${EROOT}/usr/sbin/mysqld"
+	if [[ ! -x "${mysqld_binary}" ]] ; then
+		die "'${mysqld_binary}' not found! Please re-install ${CATEGORY}/${PN}!"
 	fi
 
-	if [[ ( -n "${MY_DATADIR}" ) && ( "${MY_DATADIR}" != "${old_MY_DATADIR}" ) ]] ; then
-		local MY_DATADIR_s="${ROOT%/}/${MY_DATADIR}"
-		MY_DATADIR_s="${MY_DATADIR_s%%/}"
-		local old_MY_DATADIR_s="${ROOT%/}/${old_MY_DATADIR}"
-		old_MY_DATADIR_s="${old_MY_DATADIR_s%%/}"
+	local mysql_binary="${EROOT}/usr/bin/mysql"
+	if [[ ! -x "${mysql_binary}" ]] ; then
+		die "'${mysql_binary}' not found! Please re-install ${CATEGORY}/${PN}!"
+	fi
 
-		if [[ ( -d "${old_MY_DATADIR_s}" ) && ( "${old_MY_DATADIR_s}" != / ) ]] ; then
-			if [[ -d "${MY_DATADIR_s}" ]] ; then
-				ewarn "Both ${old_MY_DATADIR_s} and ${MY_DATADIR_s} exist"
-				ewarn "Attempting to use ${MY_DATADIR_s} and preserving ${old_MY_DATADIR_s}"
-			else
-				elog "Moving MY_DATADIR from ${old_MY_DATADIR_s} to ${MY_DATADIR_s}"
-				mv --strip-trailing-slashes -T "${old_MY_DATADIR_s}" "${MY_DATADIR_s}" \
-				|| die "Moving MY_DATADIR failed"
-			fi
-		else
-			ewarn "Previous MY_DATADIR (${old_MY_DATADIR_s}) does not exist"
-			if [[ -d "${MY_DATADIR_s}" ]] ; then
-				ewarn "Attempting to use ${MY_DATADIR_s}"
-			else
-				eerror "New MY_DATADIR (${MY_DATADIR_s}) does not exist"
-				die "Configuration Failed! Please reinstall ${CATEGORY}/${PN}"
+	local my_print_defaults_binary="${EROOT}/usr/bin/my_print_defaults"
+	if [[ ! -x "${my_print_defaults_binary}" ]] ; then
+		die "'${my_print_defaults_binary}' not found! Please re-install dev-db/mysql-connector-c!"
+	fi
+
+	if [[ -z "${MYSQL_USER}" ]] ; then
+		MYSQL_USER=mysql
+		if use prefix ; then
+			MYSQL_USER=$(id -u -n 2>/dev/null)
+			if [[ -z "${MYSQL_USER}" ]] ; then
+				die "Failed to determine current username!"
 			fi
 		fi
 	fi
 
-	local pwd1="a"
-	local pwd2="b"
-	local maxtry=15
+	if [[ -z "${MYSQL_GROUP}" ]] ; then
+		MYSQL_GROUP=mysql
+		if use prefix ; then
+			MYSQL_GROUP=$(id -g -n 2>/dev/null)
+			if [[ -z "${MYSQL_GROUP}" ]] ; then
+				die "Failed to determine current user groupname!"
+			fi
+		fi
+	fi
+
+	# my_print_defaults needs to read stuff in $HOME/.my.cnf
+	local -x HOME="${EROOT}/root"
+
+	# Make sure the vars are correctly initialized
+	mysql_init_vars
+
+	# Read currently set data directory
+	MY_DATADIR="$(_getoptval mysqld datadir "--defaults-file='${MY_SYSCONFDIR}/my.cnf'")"
+
+	# Bug #213475 - MySQL _will_ object strenously if your machine is named
+	# localhost. Also causes weird failures.
+	[[ "${HOSTNAME}" == "localhost" ]] && die "Your machine must NOT be named localhost"
+
+	if [[ -z "${MY_DATADIR}" ]] ; then
+		die "Sorry, unable to find MY_DATADIR!"
+	elif [[ -d "${MY_DATADIR}/mysql" ]] ; then
+		ewarn "Looks like your data directory '${MY_DATADIR}' is already initialized!"
+		ewarn "Please rename or delete its content if you wish to initialize a new data directory."
+		die "${PN} data directory at '${MY_DATADIR}' looks already initialized!"
+	fi
+
+	MYSQL_TMPDIR="$(_getoptval mysqld tmpdir "--defaults-file='${MY_SYSCONFDIR}/my.cnf'")"
+	MYSQL_TMPDIR=${MYSQL_TMPDIR%/}
+	# These are dir+prefix
+	MYSQL_LOG_BIN="$(_getoptval mysqld log-bin "--defaults-file='${MY_SYSCONFDIR}/my.cnf'")"
+	MYSQL_LOG_BIN=${MYSQL_LOG_BIN%/*}
+	MYSQL_RELAY_LOG="$(_getoptval mysqld relay-log "--defaults-file='${MY_SYSCONFDIR}/my.cnf'")"
+	MYSQL_RELAY_LOG=${MYSQL_RELAY_LOG%/*}
+
+	# Create missing directories.
+	# Always check if mysql user can write to directory even if we just
+	# created directory because a parent directory might be not
+	# accessible for that user.
+	PID_DIR="${EROOT}/run/mysqld"
+	if [[ ! -d "${PID_DIR}" ]] ; then
+		einfo "Creating ${PN} PID directory '${PID_DIR}' ..."
+		install -d -m 755 -o ${MYSQL_USER} -g ${MYSQL_GROUP} "${PID_DIR}" \
+			|| die "Failed to create PID directory '${PID_DIR}'!"
+	fi
+
+	local _pid_dir_testfile="$(_mktemp_dry "${PID_DIR}/.pkg_config-access-test.XXXXXXXXX")"
+	[[ -z "${_pid_dir_testfile}" ]] \
+		&& die "_mktemp_dry() for '${PID_DIR}/.pkg_config-access-test.XXXXXXXXX' failed!"
+
+	if use prefix ; then
+		touch "${_pid_dir_testfile}" &>/dev/null
+	else
+		su -s /bin/sh -c "touch ${_pid_dir_testfile}" ${MYSQL_USER} &>/dev/null
+	fi
+
+	if [[ $? -ne 0 ]] ; then
+		die "${MYSQL_USER} user cannot write into PID dir '${PID_DIR}'!"
+	else
+		rm "${_pid_dir_testfile}" || die
+		unset _pid_dir_testfile
+	fi
+
+	if [[ ! -d "${MY_DATADIR}" ]] ; then
+		einfo "Creating ${PN} data directory '${MY_DATADIR}' ..."
+		install -d -m 770 -o ${MYSQL_USER} -g ${MYSQL_GROUP} "${MY_DATADIR}" \
+			|| die "Failed to create ${PN} data directory '${MY_DATADIR}'!"
+	fi
+
+	local _my_datadir_testfile="$(_mktemp_dry "${MY_DATADIR}/.pkg_config-access-test.XXXXXXXXX")"
+	[[ -z "${_my_datadir_testfile}" ]] \
+		&& die "_mktemp_dry() for '${MY_DATADIR}/.pkg_config-access-test.XXXXXXXXX' failed!"
+
+	if use prefix ; then
+		touch "${_my_datadir_testfile}" &>/dev/null
+	else
+		su -s /bin/sh -c "touch ${_my_datadir_testfile}" ${MYSQL_USER} &>/dev/null
+	fi
+
+	if [[ $? -ne 0 ]] ; then
+		die "${MYSQL_USER} user cannot write into data directory '${MY_DATADIR}'!"
+	else
+		rm "${_my_datadir_testfile}" || die
+		unset _my_datadir_testfile
+	fi
+
+	if [[ -n "${MYSQL_TMPDIR}" && ! -d "${MYSQL_TMPDIR}" ]] ; then
+		einfo "Creating ${PN} tmpdir '${MYSQL_TMPDIR}' ..."
+		install -d -m 770 -o ${MYSQL_USER} -g ${MYSQL_GROUP} "${MYSQL_TMPDIR}" \
+			|| die "Failed to create ${PN} tmpdir '${MYSQL_TMPDIR}'!"
+	fi
+
+	if [[ -z "${MYSQL_TMPDIR}" ]] ; then
+		MYSQL_TMPDIR="$(_mktemp_dry "${EROOT}/tmp/mysqld-tmp.XXXXXXXXX")"
+		[[ -z "${MYSQL_TMPDIR}" ]] \
+			&& die "_mktemp_dry() for '${MYSQL_TMPDIR}' failed!"
+
+		mkdir "${MYSQL_TMPDIR}" || die
+		chown ${MYSQL_USER} "${MYSQL_TMPDIR}" || die
+	fi
+
+	# Now we need to test MYSQL_TMPDIR...
+	local _my_tmpdir_testfile="$(_mktemp_dry "${MYSQL_TMPDIR}/.pkg_config-access-test.XXXXXXXXX")"
+	[[ -z "${_my_tmpdir_testfile}" ]] \
+		&& die "_mktemp_dry() for '${MYSQL_TMPDIR}/.pkg_config-access-test.XXXXXXXXX' failed!"
+
+	if use prefix ; then
+		touch "${_my_tmpdir_testfile}" &>/dev/null
+	else
+		su -s /bin/sh -c "touch ${_my_tmpdir_testfile}" ${MYSQL_USER} &>/dev/null
+	fi
+
+	if [[ $? -ne 0 ]] ; then
+		die "${MYSQL_USER} user cannot write into tmpdir '${MYSQL_TMPDIR}'!"
+	else
+		rm "${_my_tmpdir_testfile}" || die
+		unset _my_tmpdir_testfile
+	fi
+
+	if [[ -n "${MYSQL_LOG_BIN}" && ! -d "${MYSQL_LOG_BIN}" ]] ; then
+		einfo "Creating ${PN} log-bin directory '${MYSQL_LOG_BIN}' ..."
+		install -d -m 770 -o ${MYSQL_USER} -g ${MYSQL_GROUP} "${MYSQL_LOG_BIN}" \
+			|| die "Failed to create ${PN} log-bin directory '${MYSQL_LOG_BIN}'"
+	fi
+
+	if [[ -n "${MYSQL_LOG_BIN}" ]] ; then
+		local _my_logbin_testfile="$(_mktemp_dry "${MYSQL_LOG_BIN}/.pkg_config-access-test.XXXXXXXXX")"
+		[[ -z "${_my_logbin_testfile}" ]] \
+			&& die "_mktemp_dry() for '${MYSQL_LOG_BIN}/.pkg_config-access-test.XXXXXXXXX' failed!"
+
+		if use prefix ; then
+			touch "${_my_logbin_testfile}" &>/dev/null
+		else
+			su -s /bin/sh -c "touch ${_my_logbin_testfile}" ${MYSQL_USER} &>/dev/null
+		fi
+
+		if [[ $? -ne 0 ]] ; then
+			die "${MYSQL_USER} user cannot write into log-bin directory '${MYSQL_LOG_BIN}'!"
+		else
+			rm "${_my_logbin_testfile}" || die
+			unset _my_logbin_testfile
+		fi
+	fi
+
+	if [[ -n "${MYSQL_RELAY_LOG}" && ! -d "${MYSQL_RELAY_LOG}" ]] ; then
+		einfo "Creating ${PN} relay-log directory '${MYSQL_RELAY_LOG}' ..."
+		install -d -m 770 -o ${MYSQL_USER} -g ${MYSQL_GROUP} "${MYSQL_RELAY_LOG}" \
+			|| die "Failed to create ${PN} relay-log directory '${MYSQL_RELAY_LOG}'!"
+	fi
+
+	if [[ -n "${MYSQL_RELAY_LOG}" ]] ; then
+		local _my_relaylog_testfile="$(_mktemp_dry "${MYSQL_RELAY_LOG}/.pkg_config-access-test.XXXXXXXXX")"
+		[[ -z "${_my_relaylog_testfile}" ]] \
+			&& die "_mktemp_dry() for '${MYSQL_RELAY_LOG}/.pkg_config-access-test.XXXXXXXXX' failed!"
+
+		if use prefix ; then
+			touch "${_my_relaylog_testfile}" &>/dev/null
+		else
+			su -s /bin/sh -c "touch ${_my_relaylog_testfile}" ${MYSQL_USER} &>/dev/null
+		fi
+
+		if [[ $? -ne 0 ]] ; then
+			die "${MYSQL_USER} user cannot write into relay-log directory '${MYSQL_RELAY_LOG}'!"
+		else
+			rm "${_my_relaylog_testfile}" || die
+			unset _my_relaylog_testfile
+		fi
+	fi
+
+	local mysql_install_log="$(_mktemp_dry "${MYSQL_TMPDIR}/install_db.XXXXXXXXX.log")"
+	if [[ -z "${mysql_install_log}" ]] ; then
+		die "_mktemp_dry() for '${MYSQL_TMPDIR}/install_db.XXXXXXXXX.log' failed!"
+	else
+		# make sure file is writable for MYSQL_USER...
+		touch "${mysql_install_log}" || die
+		chown ${MYSQL_USER} "${mysql_install_log}" || die
+	fi
+
+	local mysqld_logfile="$(_mktemp_dry "${MYSQL_TMPDIR}/install_mysqld.XXXXXXXXX.log")"
+	if [[ -z "${mysqld_logfile}" ]] ; then
+		die "_mktemp_dry() for '${MYSQL_TMPDIR}/install_mysqld.XXXXXXXXX.log' failed!"
+	else
+		# make sure file is writable for MYSQL_USER...
+		touch "${mysqld_logfile}" || die
+		chown ${MYSQL_USER} "${mysqld_logfile}" || die
+	fi
+
+	echo ""
+	einfo "Detected settings:"
+	einfo "=================="
+	einfo "MySQL User:\t\t\t\t${MYSQL_USER}"
+	einfo "MySQL Group:\t\t\t\t${MYSQL_GROUP}"
+	einfo "MySQL DATA directory:\t\t${MY_DATADIR}"
+	einfo "MySQL TMP directory:\t\t\t${MYSQL_TMPDIR}"
+
+	if [[ -n "${MYSQL_LOG_BIN}" ]] ; then
+		einfo "MySQL Binary Log File location:\t${MYSQL_LOG_BIN}"
+	fi
+
+	if [[ -n "${MYSQL_RELAY_LOG}" ]] ; then
+		einfo "MySQL Relay Log File location:\t${MYSQL_RELAY_LOG}"
+	fi
+
+	einfo "PID DIR:\t\t\t\t${PID_DIR}"
+	einfo "Install db log:\t\t\t${mysql_install_log}"
+	einfo "Install server log:\t\t\t${mysqld_logfile}"
 
 	if [[ -z "${MYSQL_ROOT_PASSWORD}" ]] ; then
 		local tmp_mysqld_password_source=
@@ -830,154 +1053,183 @@ pkg_config() {
 
 		unset tmp_mysqld_password_source
 	fi
-	MYSQL_TMPDIR="$(_getoptval mysqld tmpdir)"
-	# These are dir+prefix
-	MYSQL_RELAY_LOG="$(_getoptval mysqld relay-log)"
-	MYSQL_RELAY_LOG=${MYSQL_RELAY_LOG%/*}
-	MYSQL_LOG_BIN="$(_getoptval mysqld log-bin)"
-	MYSQL_LOG_BIN=${MYSQL_LOG_BIN%/*}
-
-	if [[ ! -d "${EROOT%/}/$MYSQL_TMPDIR" ]] ; then
-		einfo "Creating MySQL tmpdir $MYSQL_TMPDIR"
-		install -d -m 770 -o mysql -g mysql "${EROOT%/}/$MYSQL_TMPDIR"
-	fi
-
-	if [[ ! -d "${EROOT%/}/$MYSQL_LOG_BIN" ]] ; then
-		einfo "Creating MySQL log-bin directory $MYSQL_LOG_BIN"
-		install -d -m 770 -o mysql -g mysql "${EROOT%/}/$MYSQL_LOG_BIN"
-	fi
-
-	if [[ ! -d "${EROOT%/}/$MYSQL_RELAY_LOG" ]] ; then
-		einfo "Creating MySQL relay-log directory $MYSQL_RELAY_LOG"
-		install -d -m 770 -o mysql -g mysql "${EROOT%/}/$MYSQL_RELAY_LOG"
-	fi
-
-	if [[ -d "${ROOT%/}/${MY_DATADIR}/mysql" ]] ; then
-		ewarn "You have already a MySQL database in place."
-		ewarn "(${ROOT%/}/${MY_DATADIR}/*)"
-		ewarn "Please rename or delete it if you wish to replace it."
-		die "MySQL database already exists!"
-	fi
-
-	# Bug #213475 - MySQL _will_ object strenously if your machine is named
-	# localhost. Also causes weird failures.
-	[[ "${HOSTNAME}" == "localhost" ]] && die "Your machine must NOT be named localhost"
 
 	if [[ -z "${MYSQL_ROOT_PASSWORD}" ]] ; then
+		local pwd1="a"
+		local pwd2="b"
 
-		einfo "Please provide a password for the mysql 'root' user now"
-		einfo "or through the ${HOME}/.my.cnf file."
-		ewarn "Avoid [\"'\\_%] characters in the password"
+		echo
+		einfo "No password for mysql 'root' user was specified via environment"
+		einfo "variable MYSQL_ROOT_PASSWORD and no password was found in config"
+		einfo "file like '${HOME}/.my.cnf'."
+		einfo "To continue please provide a password for the mysql 'root' user"
+		einfo "now on console:"
+		ewarn "NOTE: Please avoid [\"'\\_%] characters in the password!"
 		read -rsp "    >" pwd1 ; echo
 
 		einfo "Retype the password"
 		read -rsp "    >" pwd2 ; echo
 
 		if [[ "x$pwd1" != "x$pwd2" ]] ; then
-			die "Passwords are not the same"
+			die "Passwords are not the same!"
 		fi
+
 		MYSQL_ROOT_PASSWORD="${pwd1}"
 		unset pwd1 pwd2
+
+		echo
 	fi
 
-	local options
-	local sqltmp="$(emktemp "${EROOT%/}/tmp")"
+	local -a mysqld_options
 
 	# Fix bug 446200. Don't reference host my.cnf, needs to come first,
 	# see http://bugs.mysql.com/bug.php?id=31312
-	use prefix && options="${options} '--defaults-file=${MY_SYSCONFDIR}/my.cnf'"
+	use prefix && mysqld_options+=( "--defaults-file='${MY_SYSCONFDIR}/my.cnf'" )
 
 	# Figure out which options we need to disable to do the setup
-	local helpfile="${TMPDIR%/}/mysqld-help"
-	"${EROOT%/}/usr/sbin/mysqld" --verbose --help >"${helpfile}" 2>/dev/null
+	local helpfile="${TMPDIR}/mysqld-help"
+	"${EROOT}/usr/sbin/mysqld" --verbose --help >"${helpfile}" 2>/dev/null
+
+	local opt optexp optfull
 	for opt in host-cache name-resolve networking slave-start \
 		federated ssl log-bin relay-log slow-query-log external-locking \
 		log-slave-updates \
-		; do
+	; do
 		optexp="--(skip-)?${opt}" optfull="--loose-skip-${opt}"
-		egrep -sq -- "${optexp}" "${helpfile}" && options="${options} ${optfull}"
+		egrep -sq -- "${optexp}" "${helpfile}" && mysqld_options+=( "${optfull}" )
 	done
 
-	einfo "Creating the mysql database and setting proper permissions on it ..."
+	# Prepare timezones, see
+	# https://dev.mysql.com/doc/mysql/en/time-zone-support.html
+	local tz_sql="$(_mktemp_dry "${MYSQL_TMPDIR}/tz.XXXXXXXXX.sql")"
+	[[ -z "${tz_sql}" ]] \
+		&& die "_mktemp_dry() for '${MYSQL_TMPDIR}/tz.XXXXXXXXX.sql' failed!"
 
-	# Now that /var/run is a tmpfs mount point, we need to ensure it exists before using it
-	PID_DIR="${EROOT%/}/var/run/mysqld"
-	if [[ ! -d "${PID_DIR}" ]] ; then
-		install -d -m 755 -o mysql -g mysql "${PID_DIR}" || die "Could not create pid directory"
+	echo "USE mysql;" >"${tz_sql}"
+	"${EROOT}/usr/bin/mysql_tzinfo_to_sql" "${EROOT}/usr/share/zoneinfo" >> "${tz_sql}" 2>/dev/null
+	if [[ $? -ne 0 ]] ; then
+		die "mysql_tzinfo_to_sql failed!"
 	fi
-
-	if [[ ! -d "${MY_DATADIR}" ]] ; then
-		install -d -m 750 -o mysql -g mysql "${MY_DATADIR}" || die "Could not create data directory"
-	fi
-
-	pushd "${TMPDIR}" &>/dev/null || die
-
-	# Filling timezones, see
-	# http://dev.mysql.com/doc/mysql/en/time-zone-support.html
-	echo "USE mysql;" >"${sqltmp}"
-	"${EROOT%/}/usr/bin/mysql_tzinfo_to_sql" "${EROOT%/}/usr/share/zoneinfo" >> "${sqltmp}" 2>/dev/null
-	chown mysql "${sqltmp}" || die
 
 	# --initialize-insecure will not set root password
 	# --initialize would set a random one in the log which we don't need as we set it ourselves
-	local cmd=( "${EROOT%/}/usr/sbin/mysqld" "--initialize-insecure" "--init-file='${sqltmp}'" )
-	cmd+=( "--basedir=${EPREFIX}/usr" ${options} "--datadir=${ROOT%/}${MY_DATADIR}" "--tmpdir=${ROOT%/}${MYSQL_TMPDIR}" )
-	einfo "Command: ${cmd[*]}"
-	su -s /bin/sh -c "${cmd[*]}" mysql \
-		>"${TMPDIR%/}"/mysql_install_db.log 2>&1
+	local cmd=(
+		"${mysqld_binary}"
+		"${mysqld_options[@]}"
+		"--initialize-insecure"
+		"--init-file='${tz_sql}'"
+		"--basedir='${EROOT}/usr'"
+		"--datadir='${MY_DATADIR}'"
+		"--tmpdir='${MYSQL_TMPDIR}'"
+		"--log-error='${mysql_install_log}'"
+		"--user=${MYSQL_USER}"
+	)
+
+	einfo "Initializing ${PN} data directory: ${cmd[@]}"
+	eval "${cmd[@]}" >>"${mysql_install_log}" 2>&1
+
 	if [[ $? -ne 0 ]] ; then
-		grep -B5 -A999 -i "ERROR" "${TMPDIR%/}"/mysql_install_db.log 1>&2
-		die "Failed to initialize mysqld. Please review ${EPREFIX}/var/log/mysql/mysqld.err AND ${TMPDIR%/}/mysql_install_db.log"
+		grep -B5 -A999 -iE "(Aborting|ERROR|errno)" "${mysql_install_log}" 1>&2
+		die "Failed to initialize ${PN} data directory. Please review '${mysql_install_log}'!"
 	fi
-	popd &>/dev/null || die
-	[[ -f "${ROOT%/}/${MY_DATADIR}/mysql/user.frm" ]] \
-	|| die "MySQL databases not installed"
 
-	use prefix || options="${options} --user=mysql"
+	rm "${tz_sql}" || die
 
-	local socket="${EROOT%/}/var/run/mysqld/mysqld${RANDOM}.sock"
-	local pidfile="${EROOT%/}/var/run/mysqld/mysqld${RANDOM}.pid"
-	local mysqld="${EROOT%/}/usr/sbin/mysqld \
-		${options} \
-		$(use prefix || echo --user=mysql) \
-		--log-warnings=0 \
-		--basedir=${EROOT%/}/usr \
-		--datadir=${ROOT%/}/${MY_DATADIR} \
-		--max_allowed_packet=8M \
-		--net_buffer_length=16K \
-		--socket=${socket} \
-		--pid-file=${pidfile} \
-		--tmpdir=${ROOT}/${MYSQL_TMPDIR}"
-	#einfo "About to start mysqld: ${mysqld}"
-	ebegin "Starting mysqld"
-	einfo "Command ${mysqld}"
-	${mysqld} &
-	rc=$?
-	while ! [[ -S "${socket}" || "${maxtry}" -lt 1 ]] ; do
+	local x=${RANDOM}
+	local socket="${EROOT}${PID_DIR}/mysqld${x}.sock"
+	local pidfile="${EROOT}${PID_DIR}/mysqld${x}.pid"
+	unset x
+
+	cmd=(
+		"${mysqld_binary}"
+		"${mysqld_options[@]}"
+		"--basedir='${EROOT}/usr'"
+		"--datadir='${MY_DATADIR}'"
+		"--tmpdir='${MYSQL_TMPDIR}'"
+		--max_allowed_packet=8M
+		--net_buffer_length=16K
+		"--socket='${socket}'"
+		"--pid-file='${pidfile}'"
+		"--log-error='${mysqld_logfile}'"
+		"--user=${MYSQL_USER}"
+	)
+
+	einfo "Starting mysqld to finalize initialization: ${cmd[@]}"
+	eval "${cmd[@]}" >>"${mysqld_logfile}" 2>&1 &
+
+	echo -n "Waiting for mysqld to accept connections "
+	local maxtry=15
+	while [[ ! -S "${socket}" && "${maxtry}" -gt 1 ]] ; do
 		maxtry=$((${maxtry}-1))
 		echo -n "."
 		sleep 1
 	done
-	eend $rc
 
-	if ! [[ -S "${socket}" ]] ; then
-		die "Completely failed to start up mysqld with: ${mysqld}"
+	if [[ -S "${socket}" ]] ; then
+		# Even with a socket we don't know if mysqld will abort
+		# start due to an error so just wait a little bit more...
+		maxtry=5
+		while [[ -S "${socket}" && "${maxtry}" -gt 1 ]] ; do
+			maxtry=$((${maxtry}-1))
+			echo -n "."
+			sleep 1
+		done
 	fi
+
+	echo
+
+	if [[ ! -S "${socket}" ]] ; then
+		grep -B5 -A999 -iE "(Aborting|ERROR|errno)" "${mysqld_logfile}" 1>&2
+		die "mysqld was unable to start from initialized data directory. Please review '${mysqld_logfile}'!"
+	fi
+
+	local mysql_logfile="${TMPDIR}/set_root_pw.log"
+	touch "${mysql_logfile}" || die
 
 	ebegin "Setting root password"
 	# Do this from memory, as we don't want clear text passwords in temp files
-	local sql="ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${MYSQL_ROOT_PASSWORD}'"
-	"${EROOT%/}/usr/bin/mysql" \
-		--no-defaults \
-		"--socket=${socket}" \
-		-hlocalhost \
-		-e "${sql}"
-	eend $?
+	local sql="ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}'"
+	cmd=(
+		"${mysql_binary}"
+		--no-defaults
+		"--socket='${socket}'"
+		-hlocalhost
+		"-e \"${sql}\""
+	)
+	eval "${cmd[@]}" >"${mysql_logfile}" 2>&1
+	local rc=$?
+	eend ${rc}
 
-	# Stop the server and cleanup
-	einfo "Stopping the server ..."
-	kill $(< "${pidfile}" )
-	rm -f "${sqltmp}"
-	wait %1
-	einfo "Done"
+	if [[ ${rc} -ne 0 ]] ; then
+		# Poor man's solution which tries to avoid having password
+		# in log.  NOTE: sed can fail if user didn't follow advice
+		# and included character which will require escaping...
+		sed -i -e "s/${MYSQL_ROOT_PASSWORD}/*****/" "${mysql_logfile}" 2>/dev/null
+
+		grep -B5 -A999 -iE "(Aborting|ERROR|errno)" "${mysql_logfile}"
+		die "Failed to set ${PN} root password. Please review '${mysql_logfile}'!"
+	fi
+
+	# Stop the server
+	if [[ -f "${pidfile}" ]] && pgrep -F "${pidfile}" &>/dev/null ; then
+		echo -n "Stopping the server "
+		pkill -F "${pidfile}" &>/dev/null
+
+		maxtry=10
+		while [[ -f "${pidfile}" ]] && pgrep -F "${pidfile}" &>/dev/null ; do
+			maxtry=$((${maxtry}-1))
+			echo -n "."
+			sleep 1
+		done
+
+		echo
+
+		if [[ -f "${pidfile}" ]] && pgrep -F "${pidfile}" &>/dev/null ; then
+			# We somehow failed to stop server.
+			# However, not a fatal error. Just warn the user.
+			ewarn "WARNING: mysqld[$(cat "${pidfile}")] is still running!"
+		fi
+	fi
+
+	einfo "${PN} data directory at '${MY_DATADIR}' successfully initialized!"
 }

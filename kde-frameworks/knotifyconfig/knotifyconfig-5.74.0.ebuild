@@ -1,0 +1,1 @@
+.knotifyconfig.ebuild.0

@@ -3,7 +3,7 @@
 
 EAPI="5"
 
-inherit eutils gnome2-utils fdo-mime ltprune
+inherit eutils gnome2-utils ltprune xdg-utils
 
 DESCRIPTION="French conjugation system"
 HOMEPAGE="http://sarrazip.com/dev/verbiste.html"
@@ -53,16 +53,14 @@ pkg_preinst() {
 
 pkg_postinst() {
 	if use gtk; then
-		fdo-mime_desktop_database_update
-		fdo-mime_mime_database_update
+		xdg_desktop_database_update
 		gnome2_icon_cache_update
 	fi
 }
 
 pkg_postrm() {
 	if use gtk; then
-		fdo-mime_desktop_database_update
-		fdo-mime_mime_database_update
+		xdg_desktop_database_update
 		gnome2_icon_cache_update
 	fi
 }

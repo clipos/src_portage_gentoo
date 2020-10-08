@@ -1,0 +1,1 @@
+.kdeclarative.ebuild.0

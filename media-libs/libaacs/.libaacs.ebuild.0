@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=5
+EAPI=7
 
-inherit autotools-multilib
+inherit multilib-minimal
 
 DESCRIPTION="Open implementation of the Advanced Access Content System (AACS) specification"
 HOMEPAGE="https://www.videolan.org/developers/libaacs.html"
@@ -16,17 +16,29 @@ IUSE="static-libs"
 
 RDEPEND=">=dev-libs/libgcrypt-1.5.3:0=[${MULTILIB_USEDEP}]
 	>=dev-libs/libgpg-error-1.12[${MULTILIB_USEDEP}]"
-DEPEND="${RDEPEND}
+DEPEND="${RDEPEND}"
+BDEPEND="
 	sys-devel/flex
-	virtual/yacc"
+	virtual/yacc
+"
 
-DOCS=( ChangeLog KEYDB.cfg README.txt )
+DOCS=( ChangeLog KEYDB.cfg README.md )
 
-AUTOTOOLS_IN_SOURCE_BUILD=1
+src_prepare() {
+	default
+	multilib_copy_sources
+}
 
-src_configure() {
+multilib_src_configure() {
 	local myeconfargs=(
 		--disable-optimizations
+		--enable-shared
+		$(use_enable static-libs static)
 	)
-	autotools-multilib_src_configure
+	econf "${myeconfargs[@]}"
+}
+
+multilib_src_install_all() {
+	einstalldocs
+	find "${ED}" -type f -name "*.la" -delete || die
 }

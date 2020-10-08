@@ -1,1 +1,1 @@
-.kglobalaccel.ebuild.0
+.kglobalaccel.ebuild.1

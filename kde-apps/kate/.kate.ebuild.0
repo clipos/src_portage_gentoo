@@ -5,8 +5,8 @@ EAPI=7
 
 ECM_HANDBOOK="optional"
 ECM_TEST="true"
-KFMIN=5.63.0
-QTMIN=5.12.3
+KFMIN=5.70.0
+QTMIN=5.14.2
 VIRTUALX_REQUIRED="test"
 inherit ecm kde.org
 
@@ -17,9 +17,14 @@ https://kde.org/applications/utilities/org.kde.kate"
 LICENSE="GPL-2" # TODO: CHECK
 SLOT="5"
 KEYWORDS="amd64 arm64 ~ppc64 x86"
-IUSE="activities +filebrowser lspclient +projects plasma +snippets sql"
+IUSE="activities +filebrowser lspclient +projects plasma +snippets sql telemetry"
 
+# only addons/externaltools depends on kiconthemes, too small for USE
 DEPEND="
+	>=dev-qt/qtdbus-${QTMIN}:5
+	>=dev-qt/qtgui-${QTMIN}:5
+	>=dev-qt/qtwidgets-${QTMIN}:5
+	>=dev-qt/qtxml-${QTMIN}:5
 	>=kde-frameworks/kcodecs-${KFMIN}:5
 	>=kde-frameworks/kcompletion-${KFMIN}:5
 	>=kde-frameworks/kconfig-${KFMIN}:5
@@ -40,10 +45,6 @@ DEPEND="
 	>=kde-frameworks/kwidgetsaddons-${KFMIN}:5
 	>=kde-frameworks/kwindowsystem-${KFMIN}:5
 	>=kde-frameworks/kxmlgui-${KFMIN}:5
-	>=dev-qt/qtdbus-${QTMIN}:5
-	>=dev-qt/qtgui-${QTMIN}:5
-	>=dev-qt/qtwidgets-${QTMIN}:5
-	>=dev-qt/qtxml-${QTMIN}:5
 	activities? ( >=kde-frameworks/kactivities-${KFMIN}:5 )
 	filebrowser? ( >=kde-frameworks/kbookmarks-${KFMIN}:5 )
 	lspclient? ( >=kde-frameworks/kitemmodels-${KFMIN}:5 )
@@ -54,13 +55,12 @@ DEPEND="
 	)
 	snippets? ( >=kde-frameworks/knewstuff-${KFMIN}:5 )
 	sql? (
-		>=kde-frameworks/kwallet-${KFMIN}:5
 		>=dev-qt/qtsql-${QTMIN}:5
+		>=kde-frameworks/kwallet-${KFMIN}:5
 	)
+	telemetry? ( dev-libs/kuserfeedback:5 )
 "
-RDEPEND="${DEPEND}
-	!kde-misc/ktexteditorpreviewplugin
-"
+RDEPEND="${DEPEND}"
 
 src_prepare() {
 	ecm_src_prepare
@@ -82,6 +82,7 @@ src_configure() {
 		-DBUILD_snippets=$(usex snippets)
 		-DBUILD_katesql=$(usex sql)
 		-DBUILD_kwrite=FALSE
+		$(cmake_use_find_package telemetry KUserFeedback)
 	)
 
 	ecm_src_configure

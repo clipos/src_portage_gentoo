@@ -1,1 +1,1 @@
-.knotifyconfig.ebuild.0
+.knotifyconfig.ebuild.1

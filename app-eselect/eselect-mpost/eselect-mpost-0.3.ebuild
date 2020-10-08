@@ -1,1 +1,0 @@
-.eselect-mpost.ebuild.0

@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -15,9 +15,9 @@ fi
 LICENSE="metapackage"
 SLOT="0"
 
-IUSE="+about admin +filemanager lightdm lximage minimal nls
-	+policykit powermanagement processviewer screenshot sddm
-	ssh-askpass sudo terminal +trash"
+IUSE="+about admin archiver +display-manager +filemanager lximage
+minimal nls +policykit powermanagement processviewer screenshot +sddm
+ssh-askpass sudo terminal +trash"
 
 REQUIRED_USE="trash? ( filemanager )"
 
@@ -37,8 +37,12 @@ RDEPEND="
 	=x11-themes/lxqt-themes-${MY_PV}
 	about? ( =lxqt-base/lxqt-about-${MY_PV} )
 	admin? ( =lxqt-base/lxqt-admin-${MY_PV} )
+	archiver? ( app-arch/lxqt-archiver )
+	display-manager? (
+		sddm? ( >=x11-misc/sddm-0.11.0 )
+		!sddm? ( x11-misc/lightdm )
+	)
 	filemanager? ( =x11-misc/pcmanfm-qt-${MY_PV} )
-	lightdm? ( x11-misc/lightdm )
 	lximage? ( media-gfx/lximage-qt )
 	!minimal? (
 		x11-wm/openbox

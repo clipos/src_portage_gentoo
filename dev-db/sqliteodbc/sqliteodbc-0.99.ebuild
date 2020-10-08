@@ -1,1 +1,0 @@
-.sqliteodbc.ebuild.0

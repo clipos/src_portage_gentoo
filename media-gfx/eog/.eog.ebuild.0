@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -31,7 +31,7 @@ RDEPEND="
 	xmp? ( media-libs/exempi:2 )
 	jpeg? ( virtual/jpeg:0 )
 	introspection? ( >=dev-libs/gobject-introspection-1.54:= )
-	svg? ( >=gnome-base/librsvg-2.36.2:2 )
+	svg? ( >=gnome-base/librsvg-2.44.0:2 )
 
 	x11-libs/libX11
 "

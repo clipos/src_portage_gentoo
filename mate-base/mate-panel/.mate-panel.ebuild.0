@@ -19,7 +19,7 @@ IUSE="X +introspection wayland"
 
 REQUIRED_USE="|| ( X wayland )"
 
-RDEPEND="
+COMMON_DEPEND="
 	dev-libs/atk
 	>=dev-libs/dbus-glib-0.80:0
 	>=dev-libs/glib-2.50:2
@@ -37,16 +37,19 @@ RDEPEND="
 	x11-libs/libSM
 	>=x11-libs/libwnck-3.4.6:3[introspection?]
 	>=x11-libs/pango-1.15.4:0[introspection?]
-	virtual/libintl
 	X? (
 		x11-libs/libX11
 		x11-libs/libXau
 		>=x11-libs/libXrandr-1.3
 	)
 	introspection? ( >=dev-libs/gobject-introspection-0.6.7:= )
-	wayland? ( dev-libs/wayland )"
+	wayland? ( gui-libs/gtk-layer-shell )"
 
-DEPEND="${RDEPEND}
+RDEPEND="${COMMON_DEPEND}
+	virtual/libintl
+"
+
+DEPEND="${COMMON_DEPEND}
 	app-text/docbook-xml-dtd:4.1.2
 	app-text/yelp-tools
 	>=dev-lang/perl-5:=
@@ -54,12 +57,12 @@ DEPEND="${RDEPEND}
 	dev-util/gdbus-codegen
 	dev-util/gtk-doc
 	dev-util/gtk-doc-am
-	>=dev-util/intltool-0.50.1
-	sys-devel/gettext
+	>=sys-devel/gettext-0.19.8:*
 	virtual/pkgconfig"
 
 src_configure() {
 	mate_src_configure \
+		--disable-static \
 		--libexecdir=/usr/libexec/mate-applets \
 		--disable-deprecation-flags \
 		$(use_enable X x11) \

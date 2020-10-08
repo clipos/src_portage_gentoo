@@ -1,1 +1,0 @@
-.pyid3lib.ebuild.0

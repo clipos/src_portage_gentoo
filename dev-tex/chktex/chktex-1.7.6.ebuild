@@ -1,1 +1,0 @@
-.chktex.ebuild.0

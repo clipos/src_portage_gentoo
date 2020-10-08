@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{6,7} )
+PYTHON_COMPAT=( python3_{6..9} )
 
 inherit python-r1
 
@@ -13,21 +13,18 @@ SRC_URI="https://github.com/dagwieers/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~alpha amd64 ~arm64 hppa ~ia64 ~mips ppc ppc64 sparc x86 ~amd64-linux ~x86-linux"
-IUSE="doc examples wifi"
+KEYWORDS="~alpha amd64 ~arm64 hppa ~ia64 ~mips ppc ppc64 sparc x86 ~x86-linux"
+IUSE="doc examples"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
-RDEPEND="
-	${PYTHON_DEPS}
-	dev-python/six[${PYTHON_USEDEP}]
-	wifi? (
-		net-wireless/python-wifi
-	)"
+RDEPEND="${PYTHON_DEPS}
+	dev-python/six[${PYTHON_USEDEP}]"
 DEPEND="${RDEPEND}"
 
-PATCHES=( \
-	"${FILESDIR}/dstat-${PV}-skip-non-sandbox-tests.patch" \
-	"${FILESDIR}/fix-collections-deprecation-warning.patch" \
+PATCHES=(
+	"${FILESDIR}/dstat-${PV}-skip-non-sandbox-tests.patch"
+	"${FILESDIR}/fix-collections-deprecation-warning.patch"
+	"${FILESDIR}/dstat-0.7.4-fix-csv-output.patch"
 )
 
 src_prepare() {
@@ -56,4 +53,8 @@ src_install() {
 	if use doc; then
 		dodoc docs/*.html
 	fi
+}
+
+src_test() {
+	python_foreach_impl emake test
 }

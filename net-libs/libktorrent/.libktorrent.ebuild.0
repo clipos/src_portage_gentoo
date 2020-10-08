@@ -1,9 +1,10 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
 ECM_TEST="forceoptional"
+KDE_ORG_CATEGORY="network"
 KFMIN=5.60.0
 QTMIN=5.12.3
 VIRTUALX_REQUIRED="test"
@@ -12,7 +13,7 @@ inherit ecm kde.org
 DESCRIPTION="BitTorrent library based on KDE Frameworks"
 HOMEPAGE="https://kde.org/applications/internet/org.kde.ktorrent
 https://userbase.kde.org/KTorrent"
-SRC_URI="mirror://kde/stable/ktorrent/5.1.2/${P}.tar.xz"
+SRC_URI="mirror://kde/stable/ktorrent/5.2.0/${P}.tar.xz"
 
 LICENSE="GPL-2+"
 SLOT="5"
@@ -29,6 +30,7 @@ COMMON_DEPEND="
 	>=kde-frameworks/karchive-${KFMIN}:5
 	>=kde-frameworks/kconfig-${KFMIN}:5
 	>=kde-frameworks/kcoreaddons-${KFMIN}:5
+	>=kde-frameworks/kcrash-${KFMIN}:5
 	>=kde-frameworks/ki18n-${KFMIN}:5
 	>=kde-frameworks/kio-${KFMIN}:5
 	>=kde-frameworks/solid-${KFMIN}:5
@@ -40,10 +42,7 @@ RDEPEND="${COMMON_DEPEND}
 	!dev-libs/botan[gmp(-)]
 "
 
-PATCHES=(
-	"${FILESDIR}/${P}-fileops.patch" # bug 700090
-	"${FILESDIR}/${PN}-2.1-unused-link.patch" # git master
-)
+PATCHES=( "${FILESDIR}/${P}-fix-MultiFileCache.patch" ) # 2.2 branch
 
 src_prepare() {
 	ecm_src_prepare

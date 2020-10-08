@@ -1,0 +1,1 @@
+.kdesignerplugin.ebuild.0

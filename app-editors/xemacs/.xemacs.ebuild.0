@@ -4,10 +4,10 @@
 # Note: xemacs currently does not work with position independent code
 # so the build forces the use of the -no-pie option
 
-EAPI="5"
+EAPI=7
 
 WANT_AUTOCONF="2.1"
-inherit autotools eutils flag-o-matic toolchain-funcs xdg-utils
+inherit autotools eutils flag-o-matic toolchain-funcs xdg-utils desktop
 
 DESCRIPTION="highly customizable open source text editor and application development system"
 HOMEPAGE="http://www.xemacs.org/"
@@ -16,7 +16,7 @@ SRC_URI="http://ftp.xemacs.org/xemacs-21.4/${P}.tar.gz
 
 LICENSE="GPL-2+"
 SLOT="0"
-KEYWORDS="~alpha amd64 arm64 ~hppa ppc ppc64 sparc ~x86"
+KEYWORDS="~alpha amd64 arm64 ~hppa ppc ppc64 sparc x86"
 IUSE="eolconv gif gpm pop postgres ldap xface nas dnd X jpeg tiff png mule motif freewnn canna xim athena neXt Xaw3d gdbm berkdb"
 
 X_DEPEND="x11-libs/libXt x11-libs/libXmu x11-libs/libXext x11-misc/xbitmaps"
@@ -59,12 +59,21 @@ src_unpack() {
 
 src_prepare() {
 	# see bug 58350, 102540 and 143580
-	epatch "${FILESDIR}"/xemacs-21.4.19-db.patch
+	eapply "${FILESDIR}"/xemacs-21.4.19-db.patch
 	# see bug 576512
-	epatch "${FILESDIR}"/xemacs-21.4.24-gcc5.patch
-	epatch "${FILESDIR}"/xemacs-21.4.24-glibc-macro.patch
+	eapply "${FILESDIR}"/xemacs-21.4.24-gcc5.patch
+	eapply "${FILESDIR}"/xemacs-21.4.24-glibc-macro.patch
 	# see bug 615544
-	epatch "${FILESDIR}"/xemacs-21.4.24-ncurses-tinfo.patch
+	eapply "${FILESDIR}"/xemacs-21.4.24-ncurses-tinfo.patch
+	eapply "${FILESDIR}"/xemacs-21.4.24-strsignal.patch
+
+	# Convert to utf-8
+	iconv -f iso-8859-1 -t utf-8 -o man/xemacs-faq.texi.tmp man/xemacs-faq.texi \
+	      && mv -f man/xemacs-faq.texi.tmp man/xemacs-faq.texi || die
+	iconv -f iso-8859-1 -t utf-8 -o man/lispref/ldap.texi.tmp man/lispref/ldap.texi \
+	      && mv -f man/lispref/ldap.texi.tmp man/lispref/ldap.texi || die
+
+	eapply_user
 
 	# Some binaries and man pages are installed under suffixed names
 	# to avoid collions with their GNU Emacs counterparts (see below).

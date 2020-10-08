@@ -1,0 +1,1 @@
+.text-unidecode.ebuild.0

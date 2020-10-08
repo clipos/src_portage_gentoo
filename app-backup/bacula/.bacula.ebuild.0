@@ -1,7 +1,7 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 inherit desktop libtool qmake-utils systemd
 
@@ -38,7 +38,7 @@ DEPEND="
 		dev-libs/lzo[static-libs]
 		sys-libs/ncurses:=[static-libs]
 		sys-libs/zlib[static-libs]
-		acl? ( virtual/acl[static-libs] )
+		acl? ( virtual/acl[static-libs(+)] )
 		ssl? (
 			!libressl? ( dev-libs/openssl:0=[static-libs] )
 			libressl? ( dev-libs/libressl:0=[static-libs] )
@@ -122,7 +122,7 @@ src_prepare() {
 	# bug #328701
 	eapply -p0 "${FILESDIR}"/5.2.3/${PN}-5.2.3-openssl-1.patch
 
-	eapply -p0 "${FILESDIR}"/9.0.8/${PN}-9.0.8-fix-static.patch
+	eapply -p0 "${FILESDIR}"/9.6.3/${PN}-9.6.3-fix-static.patch
 
 	# fix soname in libbaccat.so bug #602952
 	eapply -p0 "${FILESDIR}/bacula-fix-sonames.patch"
@@ -166,8 +166,10 @@ src_prepare() {
 	fi
 
 	# Don't let program install man pages directly
-	rm "${S}"/manpages/Makefile.in || die "Unable to remove man pages Makefile.in"
-	eapply -p1 "${FILESDIR}/bacula-fix-manpages.patch"
+	sed -i -e 's/ manpages//' Makefile.in || die
+
+	# correct installation for plugins to mode 0755 (bug #725946)
+	sed -i -e "s/(INSTALL_PROGRAM) /(INSTALL_LIB) /" src/plugins/fd/Makefile.in ||die
 
 	# fix bundled libtool (bug 466696)
 	# But first move directory with M4 macros out of the way.
@@ -292,7 +294,7 @@ src_install() {
 	fi
 
 	# Install all man pages
-	doman "${S}"/manpages/*
+	doman "${S}"/manpages/*.[18]
 
 	if ! use qt5; then
 		rm -vf "${D}"/usr/share/man/man1/bat.1*

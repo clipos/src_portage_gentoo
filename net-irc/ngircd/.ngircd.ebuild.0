@@ -45,11 +45,6 @@ DEPEND="
 	)
 "
 
-PATCHES=(
-	"${FILESDIR}/${PN}-25-fix-gcc-10.patch"
-	"${FILESDIR}/${PN}-25-make-env.patch"
-)
-
 # Flaky test needs investigation (bug 719256)
 RESTRICT="test"
 
@@ -105,7 +100,7 @@ src_install() {
 
 pkg_postinst() {
 	if [[ -z ${REPLACING_VERSIONS} ]] && use pam; then
-		elog "ngircd will use PAMOnly by default, please change this option."
+		elog "ngircd will use PAMIsOptionalPAM by default, please change this option."
 		elog "You may not be able to login until you change this."
 	fi
 }

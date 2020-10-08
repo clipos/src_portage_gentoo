@@ -1,1 +1,0 @@
-.obexftp.ebuild.0

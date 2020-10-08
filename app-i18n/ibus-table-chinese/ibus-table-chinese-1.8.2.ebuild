@@ -1,0 +1,1 @@
+.ibus-table-chinese.ebuild.0

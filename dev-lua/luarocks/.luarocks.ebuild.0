@@ -1,9 +1,7 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=4
-
-inherit eutils multilib
+EAPI=7
 
 DESCRIPTION="A deployment and management system for Lua modules"
 HOMEPAGE="http://www.luarocks.org"
@@ -11,42 +9,28 @@ SRC_URI="http://luarocks.org/releases/${P}.tar.gz"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="amd64 ~ppc x86"
-IUSE="curl openssl"
+KEYWORDS="amd64 ~ppc ~ppc64 x86"
+IUSE="libressl"
 
-DEPEND="dev-lang/lua
-		curl? ( net-misc/curl )
-		openssl? ( dev-libs/openssl )"
+DEPEND="dev-lang/lua:="
 RDEPEND="${DEPEND}
-		app-arch/unzip"
+	net-misc/curl
+	!libressl? ( dev-libs/openssl:0 )
+	libressl? ( dev-libs/libressl:0 )
+"
+BDEPEND="virtual/pkgconfig"
 
 src_configure() {
-	USE_MD5="md5sum"
-	USE_FETCH="wget"
-	use openssl && USE_MD5="openssl"
-	use curl && USE_FETCH="curl"
-
 	# econf doesn't work b/c it passes variables the custom configure can't
 	# handle
 	./configure \
-			--prefix=/usr \
-			--with-lua-lib=/usr/$(get_libdir) \
-			--rocks-tree=/usr/$(get_libdir)/lua/luarocks \
-			--with-downloader=$USE_FETCH \
-			--with-md5-checker=$USE_MD5 \
+			--prefix="${EPRIFIX}/usr" \
+			--with-lua-lib="${EPRIFIX}/usr/$(get_libdir)" \
+			--rocks-tree="${EPRIFIX}/usr/$(get_libdir)/lua/luarocks" \
 			|| die "configure failed"
 }
 
-src_compile() {
-	# -j1 b/c make tries to delete files it has yet to create (bug #402005)
-	emake DESTDIR="${D}" -j1
-}
-
 src_install() {
-	# -j1 b/c otherwise it fails to find src/bin/luarocks
-	emake DESTDIR="${D}" -j1 install
-}
-
-pkg_preinst() {
-	find "${D}" -type f | xargs sed -i -e "s:${D}::g" || die "sed failed"
+	default
+	{ find "${D}" -type f -exec sed -i -e "s:${D}::g" {} \;; } || die "sed failed"
 }

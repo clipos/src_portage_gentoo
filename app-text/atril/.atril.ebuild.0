@@ -19,10 +19,10 @@ IUSE="caja dbus debug djvu dvi epub +introspection gnome-keyring +postscript t1l
 
 REQUIRED_USE="t1lib? ( dvi )"
 
-RDEPEND="
+COMMON_DEPEND="
 	>=app-text/poppler-0.22[cairo]
 	dev-libs/atk
-	>=dev-libs/glib-2.50:2
+	>=dev-libs/glib-2.62:2
 	>=dev-libs/libxml2-2.5:2
 	sys-libs/zlib
 	x11-libs/gdk-pixbuf:2
@@ -30,8 +30,9 @@ RDEPEND="
 	x11-libs/libICE
 	>=x11-libs/libSM-1:0
 	x11-libs/libX11
-	>=x11-libs/cairo-1.9.10
+	>=x11-libs/cairo-1.14
 	x11-libs/pango
+	virtual/tex-base
 	caja? ( >=mate-base/caja-1.17.1[introspection?] )
 	djvu? ( >=app-text/djvu-3.5.17:0 )
 	dvi? (
@@ -40,16 +41,21 @@ RDEPEND="
 	)
 	epub? (
 		dev-libs/mathjax
-		>=net-libs/webkit-gtk-2.4.3:4
+		>=net-libs/webkit-gtk-2.6.0:4
 	)
 	gnome-keyring? ( >=app-crypt/libsecret-0.5 )
 	introspection? ( >=dev-libs/gobject-introspection-0.6:= )
 	postscript? ( >=app-text/libspectre-0.2 )
 	tiff? ( >=media-libs/tiff-3.6:0 )
 	xps? ( >=app-text/libgxps-0.2.1 )
-	!!app-text/mate-document-viewer"
+"
 
-DEPEND="${RDEPEND}
+RDEPEND="${COMMON_DEPEND}
+	virtual/libintl
+	!!app-text/mate-document-viewer
+"
+
+DEPEND="${COMMON_DEPEND}
 	app-text/docbook-xml-dtd:4.1.2
 	app-text/rarian
 	app-text/yelp-tools
@@ -58,9 +64,9 @@ DEPEND="${RDEPEND}
 	dev-util/glib-utils
 	dev-util/gtk-doc
 	dev-util/gtk-doc-am
-	>=dev-util/intltool-0.50.1
-	sys-devel/gettext
-	virtual/pkgconfig"
+	>=sys-devel/gettext-0.19.8:*
+	virtual/pkgconfig
+"
 
 # Tests use dogtail which is not available on Gentoo.
 RESTRICT="test"
@@ -69,6 +75,7 @@ src_configure() {
 	# Passing --disable-help would drop offline help, that would be inconsistent
 	# with helps of the most of GNOME apps that doesn't require network for that.
 	mate_src_configure \
+		--disable-static \
 		--disable-tests \
 		--enable-comics \
 		--enable-pdf \

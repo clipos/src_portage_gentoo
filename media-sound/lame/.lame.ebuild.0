@@ -10,7 +10,7 @@ SRC_URI="mirror://sourceforge/${PN}/${P}.tar.gz"
 
 LICENSE="LGPL-2.1"
 SLOT="0"
-KEYWORDS="~alpha amd64 arm arm64 hppa ~ia64 ~mips ppc ppc64 sparc x86 ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~x64-solaris ~x86-solaris"
+KEYWORDS="~alpha amd64 arm arm64 hppa ~ia64 ~mips ppc ppc64 sparc x86 ~amd64-linux ~x86-linux ~ppc-macos ~x86-macos ~sparc-solaris ~x64-solaris ~x86-solaris"
 IUSE="debug cpu_flags_x86_mmx +frontend mp3rtp sndfile static-libs"
 
 # These deps are without MULTILIB_USEDEP and are correct since we only build
@@ -34,6 +34,7 @@ PATCHES=(
 	"${FILESDIR}"/${PN}-3.99.5-tinfo.patch
 	"${FILESDIR}"/${PN}-3.99.5-msse.patch
 	"${FILESDIR}"/${PN}-3.100-symbols.patch #662752
+	"${FILESDIR}"/${PN}-3.100-pkgconfig.patch #735168
 )
 
 src_prepare() {
@@ -77,5 +78,5 @@ multilib_src_install_all() {
 	docinto html
 	dodoc misc/lameGUI.html Dll/LameDLLInterface.htm
 
-	find "${D}" -name '*.la' -type f -delete || die
+	find "${ED}" -name '*.la' -type f -delete || die
 }

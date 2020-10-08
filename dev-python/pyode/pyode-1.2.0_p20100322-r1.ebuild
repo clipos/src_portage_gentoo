@@ -1,1 +1,0 @@
-.pyode.ebuild.0

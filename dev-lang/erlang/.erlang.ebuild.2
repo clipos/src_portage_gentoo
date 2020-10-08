@@ -1,10 +1,10 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 WX_GTK_VER="3.0"
 
-inherit autotools eapi7-ver elisp-common java-pkg-opt-2 systemd wxwidgets
+inherit elisp-common java-pkg-opt-2 systemd wxwidgets
 
 # NOTE: If you need symlinks for binaries please tell maintainers or
 # open up a bug to let it be created.
@@ -23,9 +23,11 @@ LICENSE="Apache-2.0"
 # http://erlang.org/doc/system_principles/misc.html for more information.
 SLOT="0/${PV}"
 KEYWORDS="amd64 ~arm ~arm64 ~hppa ~ia64 ppc ppc64 sparc x86 ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~x64-solaris"
-IUSE="doc emacs +hipe java +kpoll libressl odbc pgo sctp ssl systemd tk wxwidgets"
+IUSE="doc emacs +hipe java +kpoll libressl odbc sctp ssl systemd tk wxwidgets"
 
 RDEPEND="
+	acct-group/epmd
+	acct-user/epmd
 	sys-libs/ncurses:0
 	sys-libs/zlib
 	emacs? ( >=app-editors/emacs-23.1:* )
@@ -47,9 +49,7 @@ S="${WORKDIR}/otp-OTP-${PV}"
 
 PATCHES=(
 	"${FILESDIR}/18.2.1-wx3.0.patch"
-	"${FILESDIR}/${PN}-20.3.2-dont-ignore-LDFLAGS.patch"
-	"${FILESDIR}/${PN}-add-epmd-pid-file-creation-for-openrc.patch"
-	"${FILESDIR}/${PN}-custom-autoconf.patch"
+	"${FILESDIR}/${PN}-22.0-dont-ignore-LDFLAGS.patch"
 )
 
 SITEFILE=50"${PN}"-gentoo.el
@@ -57,9 +57,7 @@ SITEFILE=50"${PN}"-gentoo.el
 src_prepare() {
 	default
 
-	./otp_build autoconf
-	find -name configure.in -execdir mv '{}' configure.ac \; || die "find failed"
-	eautoreconf
+	./otp_build autoconf || die
 }
 
 src_configure() {
@@ -70,25 +68,16 @@ src_configure() {
 		$(use_enable hipe)
 		$(use_enable kpoll kernel-poll)
 		$(use_with java javac)
-		$(use_with odbc)
 		$(use_enable sctp)
 		$(use_with ssl ssl "${EPREFIX}"/usr)
 		$(use_enable ssl dynamic-ssl-lib)
 		$(use_enable systemd)
-		$(use_enable pgo)
 		$(usex wxwidgets "--with-wx-config=${WX_CONFIG}" "--with-wxdir=/dev/null")
-		--enable-threads
 	)
 	econf "${myconf[@]}"
 }
 
 src_compile() {
-	if use pgo; then
-		# disable distcc and ccache
-		export DISTCC_HOSTS=""
-		export CCACHE_DISABLE=1
-	fi
-
 	emake
 
 	if use emacs ; then
@@ -117,7 +106,13 @@ src_install() {
 	emake INSTALL_PREFIX="${D}" install
 
 	if use doc ; then
-		local DOCS=( "AUTHORS" "HOWTO"/* "README.md" "CONTRIBUTING.md" "${WORKDIR}"/doc/. "${WORKDIR}"/lib/. "${WORKDIR}"/erts-* )
+		# Note: we explicitly install docs into:
+		#     /usr/share/doc/${PF}/{doc,lib,erts-*}
+		# To maintain that layout we gather everything in 'html-docs'.
+		# See bug #684376.
+		mkdir html-docs || die
+		mv "${WORKDIR}"/doc "${WORKDIR}"/lib "${WORKDIR}"/erts-* html-docs/ || die
+		local DOCS=( "AUTHORS" "HOWTO"/* "README.md" "CONTRIBUTING.md" html-docs/. )
 		docompress -x /usr/share/doc/${PF}
 	else
 		local DOCS=("README.md")
@@ -149,8 +144,9 @@ src_install() {
 		elisp-site-file-install "${T}/${SITEFILE}"
 	fi
 
-	newinitd "${FILESDIR}"/epmd.init epmd
-	use systemd && systemd_dounit "${FILESDIR}"/epmd.service
+	newinitd "${FILESDIR}"/epmd.init-r2 epmd
+	newconfd "${FILESDIR}"/epmd.confd-r2 epmd
+	use systemd && systemd_newunit "${FILESDIR}"/epmd.service-r1 epmd.service
 }
 
 pkg_postinst() {

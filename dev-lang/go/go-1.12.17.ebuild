@@ -1,1 +1,0 @@
-.go.ebuild.2

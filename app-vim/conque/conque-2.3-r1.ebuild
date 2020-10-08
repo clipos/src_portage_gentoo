@@ -1,1 +1,0 @@
-.conque.ebuild.0

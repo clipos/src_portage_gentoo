@@ -1,1 +1,0 @@
-.cvs2svn.ebuild.0

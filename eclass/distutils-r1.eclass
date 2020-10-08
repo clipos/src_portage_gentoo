@@ -455,47 +455,6 @@ distutils_enable_tests() {
 	return 0
 }
 
-# @FUNCTION: _distutils-r1_verify_use_setuptools
-# @INTERNAL
-# @DESCRIPTION:
-# Check setup.py for signs that DISTUTILS_USE_SETUPTOOLS have been set
-# incorrectly.
-_distutils_verify_use_setuptools() {
-	[[ ${DISTUTILS_OPTIONAL} ]] && return
-	[[ ${DISTUTILS_USE_SETUPTOOLS} == manual ]] && return
-	[[ ${DISTUTILS_USE_SETUPTOOLS} == pyproject.toml ]] && return
-
-	# ok, those are cheap greps.  we can try toimprove them if we hit
-	# false positives.
-	local expected=no
-	if [[ ${CATEGORY}/${PN} == dev-python/setuptools ]]; then
-		# as a special case, setuptools provides itself ;-)
-		:
-	elif grep -E -q -s '(from|import)\s+setuptools' setup.py; then
-		if grep -E -q -s 'entry_points\s*=' setup.py; then
-			expected=rdepend
-		elif grep -F -q -s '[options.entry_points]' setup.cfg; then
-			expected=rdepend
-		elif grep -F -q -s '[entry_points]' setup.cfg; then  # pbr
-			expected=rdepend
-		else
-			expected=bdepend
-		fi
-	fi
-
-	if [[ ${DISTUTILS_USE_SETUPTOOLS} != ${expected} ]]; then
-		if [[ ! ${_DISTUTILS_SETUPTOOLS_WARNED} ]]; then
-			_DISTUTILS_SETUPTOOLS_WARNED=1
-			local def=
-			[[ ${DISTUTILS_USE_SETUPTOOLS} == bdepend ]] && def=' (default?)'
-
-			eqawarn "DISTUTILS_USE_SETUPTOOLS value is probably incorrect"
-			eqawarn "  value:    DISTUTILS_USE_SETUPTOOLS=${DISTUTILS_USE_SETUPTOOLS}${def}"
-			eqawarn "  expected: DISTUTILS_USE_SETUPTOOLS=${expected}"
-		fi
-	fi
-}
-
 # @FUNCTION: esetup.py
 # @USAGE: [<args>...]
 # @DESCRIPTION:
@@ -518,7 +477,6 @@ esetup.py() {
 	[[ ${EAPI} != [45] ]] && die_args+=( -n )
 
 	[[ ${BUILD_DIR} ]] && _distutils-r1_create_setup_cfg
-	_distutils_verify_use_setuptools
 
 	set -- "${EPYTHON:-python}" setup.py "${mydistutilsargs[@]}" "${@}"
 
@@ -561,6 +519,7 @@ distutils_install_for_testing() {
 	TEST_DIR=${BUILD_DIR}/test
 	local bindir=${TEST_DIR}/scripts
 	local libdir=${TEST_DIR}/lib
+	PATH=${bindir}:${PATH}
 	PYTHONPATH=${libdir}:${PYTHONPATH}
 
 	local add_args=(
@@ -950,6 +909,11 @@ distutils-r1_run_phase() {
 		local BUILD_DIR=${BUILD_DIR}/build
 	fi
 	local -x PYTHONPATH="${BUILD_DIR}/lib:${PYTHONPATH}"
+
+	# make PATH local for distutils_install_for_testing calls
+	# it makes little sense to let user modify PATH in per-impl phases
+	# and _all() already localizes it
+	local -x PATH=${PATH}
 
 	# Bug 559644
 	# using PYTHONPATH when the ${BUILD_DIR}/lib is not created yet might lead to

@@ -1,1 +1,0 @@
-.sphinxtogithub.ebuild.0

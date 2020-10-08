@@ -1,1 +1,0 @@
-.spark.ebuild.0

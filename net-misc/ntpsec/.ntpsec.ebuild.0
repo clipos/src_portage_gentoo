@@ -11,11 +11,9 @@ inherit flag-o-matic python-r1 waf-utils systemd
 if [[ ${PV} == *9999* ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://gitlab.com/NTPsec/ntpsec.git"
-	BDEPEND=""
 else
 	SRC_URI="ftp://ftp.ntpsec.org/pub/releases/${PN}-${PV}.tar.gz"
 	RESTRICT="mirror"
-	BDEPEND=""
 	KEYWORDS="amd64 arm arm64 ~x86"
 fi
 
@@ -36,7 +34,6 @@ REQUIRED_USE="${PYTHON_REQUIRED_USE} nist? ( rclock_local )"
 
 # net-misc/pps-tools oncore,pps
 CDEPEND="${PYTHON_DEPS}
-	${BDEPEND}
 	sys-libs/libcap
 	dev-python/psutil[${PYTHON_USEDEP}]
 	libbsd? ( dev-libs/libbsd:0= )
@@ -51,7 +48,7 @@ RDEPEND="${CDEPEND}
 	acct-user/ntp
 "
 DEPEND="${CDEPEND}
-	app-text/asciidoc
+	>=app-text/asciidoc-8.6.8
 	dev-libs/libxslt
 	app-text/docbook-xsl-stylesheets
 	sys-devel/bison
@@ -59,11 +56,12 @@ DEPEND="${CDEPEND}
 	rclock_pps? ( net-misc/pps-tools )
 "
 
-WAF_BINARY="${S}/waf"
+PATCHES=(
+	"${FILESDIR}/${PN}-1.1.8-fix-missing-scmp_sys-on-aarch64.patch"
+	"${FILESDIR}/${P}-remove-asciidoctor-from-config.patch"
+)
 
-PATCHES=( "${FILESDIR}/${P}-externalize-sys_maxclock-fix-for-bug-708522.patch"
-	"${FILESDIR}/${P}-fix-missing-scmp_sys-on-aarch64.patch"
-	"${FILESDIR}/${P}-fix-asciidoc-version-detect.patch")
+WAF_BINARY="${S}/waf"
 
 src_prepare() {
 	default
@@ -94,7 +92,7 @@ src_configure() {
 		--nopyo
 		--refclock="${CLOCKSTRING}"
 		--build-epoch="$(date +%s)"
-		$(use doc	&& echo "--enable-doc")
+		$(use doc	|| echo "--disable-doc")
 		$(use early	&& echo "--enable-early-droproot")
 		$(use gdb	&& echo "--enable-debug-gdb")
 		$(use samba	&& echo "--enable-mssntp")
@@ -150,12 +148,7 @@ src_install() {
 	cp -Rv "${S}"/etc/ntp.d/ "${ED}"/etc/
 
 	# move doc files to /usr/share/doc/"${P}"
-	if use doc; then
-		mv -v "${ED}"/usr/share/doc/"${PN}" \
-			"${ED}"/usr/share/doc/"${PF}"/html
-	else
-		rm -rf "${ED}"/usr/share/doc/"${PN}"
-	fi
+	use doc && mv -v "${ED}"/usr/share/doc/"${PN}" "${ED}"/usr/share/doc/"${P}"/html
 }
 
 pkg_postinst() {

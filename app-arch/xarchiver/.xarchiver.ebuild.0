@@ -1,9 +1,9 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
-inherit autotools gnome2-utils xdg-utils
+inherit autotools xdg-utils
 
 DESCRIPTION="A GTK+ archive manager that can be used with Thunar"
 HOMEPAGE="https://github.com/ib/xarchiver"
@@ -33,6 +33,7 @@ DEPEND="${RDEPEND}
 src_prepare() {
 	sed -e '/COPYING/d' -e '/NEWS/d' -i doc/Makefile.am || die
 	default
+	mkdir m4 || die
 	eautoreconf
 }
 
@@ -45,11 +46,11 @@ src_configure() {
 
 pkg_postinst() {
 	xdg_desktop_database_update
-	gnome2_icon_cache_update
+	xdg_icon_cache_update
 
 	elog "You need external programs for some formats, including:"
 	elog "7zip - app-arch/p7zip"
-	elog "arj - app-arch/unarj app-arch/arj"
+	elog "arj - app-arch/arj"
 	elog "lha - app-arch/lha"
 	elog "lzop - app-arch/lzop"
 	elog "rar - app-arch/unrar app-arch/rar"
@@ -58,5 +59,5 @@ pkg_postinst() {
 
 pkg_postrm() {
 	xdg_desktop_database_update
-	gnome2_icon_cache_update
+	xdg_icon_cache_update
 }

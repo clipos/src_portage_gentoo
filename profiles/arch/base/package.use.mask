@@ -1,6 +1,28 @@
 # Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
+# Sam James <sam@gentoo.org> (2020-10-05)
+# Guile only supports JIT on some arches
+# (See 9.3.8 in the Guile manual)
+dev-scheme/guile jit
+
+# Sam James <sam@gentoo.org> (2020-09-20)
+# (for Mikle Kolyada <zlogene@gentoo.org>)
+# libgcrypt et al no longer support static-libs
+# Need to determine whether crypt is possible dynamically?
+sys-power/suspend crypt
+
+# Sam James <sam@gentoo.org> (2020-09-20)
+# (for Mikle Kolyada <zlogene@gentoo.org>)
+# libgcrypt et al no longer support static-libs
+# Need to determine whether dar's static use
+# is worthwhile without it.
+app-backup/dar static static-libs
+
+# Thomas Deutschmann <whissi@gentoo.org> (2020-09-07)
+# dev-util/nvidia-cuda-toolkit is only available on amd64
+app-metrics/collectd collectd_plugins_gpu_nvidia
+
 # Sam James <sam@gentoo.org> (2020-07-03)
 # Rust is only available on some arches
 # Bug #728558
@@ -16,6 +38,10 @@ sys-block/fio io-uring zbc
 #  - internal is presently only supported on amd64/x86 and mipsel,
 #  - the others only work on x86 due to lack of PCI-port I/O support.
 sys-apps/flashrom atahpt atapromise internal nic3com nicnatsemi nicrealtek rayer-spi satamv tools
+
+# Mikle Kolyada <zlogene@gentoo.org> (2020-06-08)
+# requires clisp whichis keyworded on fewer arches
+app-text/texlive-core xindy
 
 # Thomas Deutschmann <whissi@gentoo.org> (2020-04-30)
 # Dependency is only keyworded on amd64 and x86
@@ -37,6 +63,7 @@ dev-libs/gjs sysprof
 dev-qt/qtdeclarative vulkan
 dev-qt/qtgui vulkan
 dev-qt/qtwayland vulkan
+media-video/pipewire vulkan
 
 # dev-python/pandas is only keyworded for amd64 & x86
 sys-block/fio python gnuplot
@@ -57,9 +84,7 @@ sys-firmware/seabios debug
 
 # Georgy Yakovlev <gyakovlev@gentoo.org> (2019-08-28)
 # upstream tarballs for tier-2 arches do not ship docs
-# and starting with 1.37 no longer ship extra tools
 dev-lang/rust-bin doc
->=dev-lang/rust-bin-1.37 clippy rustfmt
 
 # Craig Andrews <candrews@gentoo.org> (2019-07-03)
 # Raspberry Pi support is only available on arm.
@@ -82,10 +107,11 @@ media-video/vlc libplacebo
 # Overlay can only be built on amd64 and x86
 x11-apps/igt-gpu-tools overlay
 
-# Thomas Deutschmann <whissi@gentoo.org> (2018-11-15)
+# Thomas Deutschmann <whissi@gentoo.org> (2020-10-06)
+# - aesni plugin is only supported on amd64 and x86
 # - rdrand plugin is only supported on amd64 and x86
 # - padlock plugin is only supported on amd64 and x86
-net-vpn/strongswan strongswan_plugins_rdrand strongswan_plugins_padlock
+net-vpn/strongswan strongswan_plugins_aesni strongswan_plugins_rdrand strongswan_plugins_padlock
 
 # James Le Cuirot <chewi@gentoo.org> (2018-11-02)
 # Vulkan is only available on amd64 at present.
@@ -135,10 +161,6 @@ app-admin/rsyslog mdblookup
 # spacetime is only supported on amd64 at the moment.
 # https://caml.inria.fr/pub/docs/manual-ocaml/spacetime.html
 dev-lang/ocaml spacetime
-
-# Alexis Ballier <aballier@gentoo.org> (2017-01-31)
-# nvenc requires nvidia drivers, apply same mask logic
-media-video/ffmpeg nvenc
 
 # Thomas Deutschmann <whissi@gentoo.org> (2017-01-30)
 # media-libs/raspberrypi-userland not keyworded
@@ -196,18 +218,9 @@ media-video/ffmpeg mmal
 # sys-boot/gnu-efi is not supported on all archs.
 sys-apps/systemd gnuefi
 
-# James Le Cuirot <chewi@gentoo.org> (2015-07-29)
-# JavaFX and the browser plugin are not included on some platforms.
-dev-java/oracle-jdk-bin javafx nsplugin
-dev-java/oracle-jre-bin javafx nsplugin
-
 # Ben de Groot <yngwin@gentoo.org> (2015-03-15)
 # Mask bdplus support and unmask on arches where libbdplus is keyworded.
 media-libs/libbluray bdplus
-
-# Michał Górny <mgorny@gentoo.org> (2015-03-01)
-# pidgin-opensteamworks is only available for amd64, ppc32 and x86
-net-im/telepathy-connection-managers steam
 
 # Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org> (2014-04-24)
 # It's only supported on amd64

@@ -1,1 +1,0 @@
-.aastex.ebuild.0

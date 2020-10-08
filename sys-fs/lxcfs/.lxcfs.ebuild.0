@@ -13,9 +13,6 @@ LICENSE="Apache-2.0"
 SLOT="0"
 KEYWORDS="amd64"
 
-# Omit all dbus.  Upstream appears to require it because systemd, but
-# lxcfs makes no direct use of dbus.
-# acct-group/lxd needed for the fowners below.
 RDEPEND="dev-libs/glib:2
 	sys-fs/fuse:0"
 DEPEND="${RDEPEND}"
@@ -37,18 +34,18 @@ src_configure() {
 }
 
 src_test() {
+	cd tests/ || die
 	emake tests
-	tests/main.sh || die "Tests failed"
+	./main.sh || die "Tests failed"
 }
 
 src_install() {
 	default
 
-	# Getting weird file collisions, 
-	# keepdir /var/lib/lxcfs
-	# fowners -R root:lxd /var/lib/lxcfs
-
 	newconfd "${FILESDIR}"/lxcfs-4.0.0.confd lxcfs
 	newinitd "${FILESDIR}"/lxcfs-4.0.0.initd lxcfs
-	systemd_dounit config/init/systemd/lxcfs.service
+
+	# Provide our own service file (copy of upstream) due to paths being different from upstream,
+	# 728470
+	systemd_newunit "${FILESDIR}"/lxcfs-4.0.0.service lxcfs.service
 }

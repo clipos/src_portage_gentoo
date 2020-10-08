@@ -1,1 +1,0 @@
-.bugzilla.ebuild.1

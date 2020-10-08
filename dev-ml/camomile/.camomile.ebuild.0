@@ -1,7 +1,7 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=5
+EAPI=7
 
 inherit findlib eutils
 
@@ -14,6 +14,8 @@ SLOT="0/${PV}"
 KEYWORDS="amd64 ppc x86"
 IUSE="debug +ocamlopt"
 
+PATCHES=( "${FILESDIR}"/ocaml-unsafe-string.patch )
+
 RDEPEND="
 	>=dev-lang/ocaml-3.10.2:=[ocamlopt?]
 	dev-ml/camlp4:=
@@ -21,7 +23,11 @@ RDEPEND="
 DEPEND="${RDEPEND}"
 
 src_prepare() {
-	has_version '>=dev-lang/ocaml-4.05_beta' && epatch "${FILESDIR}/ocaml405.patch"
+	default
+
+	if has_version '>=dev-lang/ocaml-4.05_beta'; then
+		eapply "${FILESDIR}/ocaml405.patch"
+	fi
 }
 
 src_configure() {

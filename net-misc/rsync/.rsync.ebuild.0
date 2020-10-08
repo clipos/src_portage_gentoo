@@ -3,13 +3,13 @@
 
 EAPI=7
 
-inherit autotools flag-o-matic prefix systemd
+inherit flag-o-matic prefix systemd
 
 DESCRIPTION="File transfer program to keep remote files into sync"
 HOMEPAGE="https://rsync.samba.org/"
 if [[ "${PV}" == *9999 ]] ; then
 	PYTHON_COMPAT=( python3_{6,7,8} )
-	inherit git-r3 python-any-r1
+	inherit autotools git-r3 python-any-r1
 	EGIT_REPO_URI="https://github.com/WayneD/rsync.git"
 else
 	if [[ "${PV}" == *_pre* ]] ; then
@@ -37,7 +37,7 @@ LIB_DEPEND="acl? ( virtual/acl[static-libs(+)] )
 	system-zlib? ( sys-libs/zlib[static-libs(+)] )
 	xattr? ( kernel_linux? ( sys-apps/attr[static-libs(+)] ) )
 	xxhash? ( dev-libs/xxhash[static-libs(+)] )
-	zstd? ( app-arch/zstd[static-libs(+)] )
+	zstd? ( >=app-arch/zstd-1.4[static-libs(+)] )
 	>=dev-libs/popt-1.5[static-libs(+)]"
 RDEPEND="!static? ( ${LIB_DEPEND//\[static-libs(+)]} )
 	iconv? ( virtual/libiconv )"
@@ -56,17 +56,13 @@ python_check_deps() {
 	has_version "dev-python/commonmark[${PYTHON_USEDEP}]"
 }
 
-PATCHES=(
-	"${FILESDIR}/${P}-simd_check.patch"
-	"${FILESDIR}/${P}-noexecstack.patch" #728882
-)
-
 src_prepare() {
 	default
-
-	eaclocal -I m4
-	eautoconf -o configure.sh
-	eautoheader && touch config.h.in
+	if [[ "${PV}" == *9999 ]] ; then
+		eaclocal -I m4
+		eautoconf -o configure.sh
+		eautoheader && touch config.h.in
+	fi
 }
 
 src_configure() {
@@ -85,8 +81,9 @@ src_configure() {
 		$(use_enable zstd)
 	)
 
-	if [[ "${ARCH}" == "amd64" ]] ; then
-		# SIMD is only available for x86_64 right now (#728868)
+	if use elibc_glibc && [[ "${ARCH}" == "amd64" ]] ; then
+		# SIMD is only available for x86_64 right now
+		# and only on glibc (#728868)
 		myeconfargs+=( $(use_enable cpu_flags_x86_sse2 simd) )
 	else
 		myeconfargs+=( --disable-simd )
@@ -102,7 +99,7 @@ src_install() {
 	newconfd "${FILESDIR}"/rsyncd.conf.d rsyncd
 	newinitd "${FILESDIR}"/rsyncd.init.d-r1 rsyncd
 
-	dodoc NEWS.md OLDNEWS.md README.md TODO tech_report.tex
+	dodoc NEWS.md README.md TODO tech_report.tex
 
 	insinto /etc
 	newins "${FILESDIR}"/rsyncd.conf-3.0.9-r1 rsyncd.conf

@@ -5,8 +5,8 @@ EAPI=7
 
 ECM_HANDBOOK="forceoptional"
 ECM_TEST="forceoptional"
-KFMIN=5.63.0
-QTMIN=5.12.3
+KFMIN=5.70.0
+QTMIN=5.14.2
 VIRTUALX_REQUIRED="test"
 inherit ecm kde.org
 
@@ -16,12 +16,12 @@ HOMEPAGE="https://kde.org/applications/system/org.kde.ksystemlog"
 LICENSE="GPL-2" # TODO: CHECK
 SLOT="5"
 KEYWORDS="amd64 arm64 ~ppc64 x86"
-IUSE="systemd"
-
-# bug 378101
-RESTRICT+=" test"
+IUSE="kdesu systemd"
 
 DEPEND="
+	>=dev-qt/qtgui-${QTMIN}:5
+	>=dev-qt/qtprintsupport-${QTMIN}:5
+	>=dev-qt/qtwidgets-${QTMIN}:5
 	>=kde-frameworks/karchive-${KFMIN}:5
 	>=kde-frameworks/kcompletion-${KFMIN}:5
 	>=kde-frameworks/kconfig-${KFMIN}:5
@@ -35,26 +35,18 @@ DEPEND="
 	>=kde-frameworks/ktextwidgets-${KFMIN}:5
 	>=kde-frameworks/kwidgetsaddons-${KFMIN}:5
 	>=kde-frameworks/kxmlgui-${KFMIN}:5
-	>=dev-qt/qtgui-${QTMIN}:5
-	>=dev-qt/qtprintsupport-${QTMIN}:5
-	>=dev-qt/qtwidgets-${QTMIN}:5
 	systemd? ( sys-apps/systemd )
 "
-RDEPEND="${DEPEND}"
+RDEPEND="${DEPEND}
+	kdesu? ( kde-plasma/kde-cli-tools[kdesu] )
+"
 
 src_prepare() {
 	ecm_src_prepare
 
-	if use test; then
-		# beat this stupid test into shape: the test files contain no year, so
-		# comparison succeeds only in 2007 !!!
-		local theyear=$(date +%Y)
-		einfo Setting the current year as ${theyear} in the test files
-		sed -e "s:2007:${theyear}:g" -i tests/systemAnalyzerTest.cpp || die
-
-		# one test consistently fails, so comment it out for the moment
-		sed -e "s:systemAnalyzerTest:# dont run systemAnalyzerTest:g" \
-			-i ksystemlog/tests/CMakeLists.txt || die
+	if ! use kdesu; then
+		sed -e "/^X-KDE-SubstituteUID/s:true:false:" \
+			-i src/org.kde.ksystemlog.desktop || die
 	fi
 }
 
@@ -63,4 +55,10 @@ src_configure() {
 		$(cmake_use_find_package systemd Journald)
 	)
 	ecm_src_configure
+}
+
+pkg_postinst() {
+	ecm_pkg_postinst
+	use kdesu || elog "Will show only user readable logs without USE=kdesu (only in X)."
+	use kdesu && elog "Cannot be launched from application menu in Wayland with USE=kdesu."
 }

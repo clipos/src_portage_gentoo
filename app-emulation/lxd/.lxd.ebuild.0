@@ -3,20 +3,20 @@
 
 EAPI=7
 
-inherit autotools bash-completion-r1 eutils linux-info systemd
+inherit autotools bash-completion-r1 linux-info optfeature systemd
 
 DESCRIPTION="Fast, dense and secure container management"
 HOMEPAGE="https://linuxcontainers.org/lxd/introduction/ https://github.com/lxc/lxd"
 SRC_URI="https://linuxcontainers.org/downloads/${PN}/${P}.tar.gz"
 
-# Needs to include licenses for all bundled programs.
+# Needs to include licenses for all bundled programs and libraries.
 LICENSE="Apache-2.0 BSD BSD-2 LGPL-3 MIT MPL-2.0"
 SLOT="0"
 KEYWORDS="amd64"
-IUSE="+ipv6 nls"
+IUSE="apparmor +ipv6 nls"
 
 DEPEND="app-arch/xz-utils
-	>=app-emulation/lxc-3.0.0[seccomp]
+	>=app-emulation/lxc-3.0.0[apparmor?,seccomp]
 	dev-lang/tcl
 	dev-libs/libuv
 	dev-libs/lzo
@@ -30,7 +30,7 @@ RDEPEND="${DEPEND}
 	sys-fs/lxcfs
 	sys-fs/squashfs-tools
 	virtual/acl"
-BDEPEND="dev-lang/go
+BDEPEND=">=dev-lang/go-1.13
 	nls? ( sys-devel/gettext )"
 
 CONFIG_CHECK="
@@ -46,12 +46,12 @@ CONFIG_CHECK="
 	~NET_IPGRE
 	~NET_IPGRE_DEMUX
 	~NET_IPIP
-	~NF_NAT_MASQUERADE_IPV4
-	~NF_NAT_MASQUERADE_IPV6
+	~NF_NAT_MASQUERADE
+	~VSOCKETS
 	~VXLAN
 "
 
-# To no one's surprise uses internet connection.
+# 4.0.3: Network fetching fixed, but tests don't work when ran inside container.
 RESTRICT="test"
 
 # Go magic.
@@ -66,8 +66,6 @@ QA_PREBUILT="/usr/lib/lxd/libdqlite.so.0.0.1
 
 EGO_PN="github.com/lxc/lxd"
 GOPATH="${S}/_dist" # this seems to reset every now and then, though
-
-PATCHES=( "${FILESDIR}"/lxd-4.0.1-clang.patch )
 
 common_op() {
 	local i
@@ -128,6 +126,7 @@ src_compile() {
 	done
 
 	ln -s libco.so.0.1.0 libco.so || die
+	ln -s libco.so.0.1.0 libco.so.0 || die
 
 	cd "${GOPATH}/deps/dqlite" || die
 	emake CFLAGS="-I${GOPATH}/deps/sqlite -I${GOPATH}/deps/raft/include" LDFLAGS="-L${GOPATH}/deps/sqlite -L${GOPATH}/deps/raft"
@@ -146,14 +145,10 @@ src_compile() {
 src_test() {
 	export GOPATH="${S}/_dist"
 
-	# This is mostly a copy/paste from the Makefile's "check" rule, but
-	# patching the Makefile to work in a non "fully-qualified" go namespace
-	# was more complicated than this modest copy/paste.
-	# Also: sorry, for now a network connection is needed to run tests.
-	# Will properly bundle test dependencies later.
-	go get -v -x github.com/rogpeppe/godeps || die
-	go get -v -x github.com/remyoudompheng/go-misc/deadcode || die
-	go get -v -x github.com/golang/lint/golint || die
+	export CGO_CFLAGS="${CGO_CFLAGS} -I${GOPATH}/deps/sqlite/ -I${GOPATH}/deps/dqlite/include/ -I${GOPATH}/deps/raft/include/ -I${GOPATH}/deps/libco/"
+	export CGO_LDFLAGS="${CGO_LDFLAGS} -L${GOPATH}/deps/sqlite/.libs/ -L${GOPATH}/deps/dqlite/.libs/ -L${GOPATH}/deps/raft/.libs -L${GOPATH}/deps/libco/ -Wl,-rpath,${EPREFIX}/usr/lib/lxd"
+	export LD_LIBRARY_PATH="${GOPATH}/deps/sqlite/.libs/:${GOPATH}/deps/dqlite/.libs/:${GOPATH}/deps/raft/.libs:${GOPATH}/deps/libco/:${LD_LIBRARY_PATH}"
+
 	go test -v ${EGO_PN}/lxd || die
 }
 
@@ -174,7 +169,8 @@ src_install() {
 
 	cd "${S}" || die
 
-	# We only need libraries, and we don't want anything to link against these.
+	# We only need bundled libs during src_compile, and we don't want anything
+	# to link against these.
 	rm "${ED}"/usr/bin/sqlite3 || die
 	rm -r "${ED}"/usr/include || die
 	rm -r "${ED}"/usr/lib/lxd/*.a || die
@@ -182,10 +178,17 @@ src_install() {
 
 	newbashcomp scripts/bash/lxd-client lxc
 
-	newconfd "${FILESDIR}"/${PN}-4.0.0.confd lxd
-	newinitd "${FILESDIR}"/${PN}-4.0.0.initd lxd
+	newconfd "${FILESDIR}"/lxd-4.0.0.confd lxd
+	newinitd "${FILESDIR}"/lxd-4.0.0.initd lxd
 
-	systemd_newunit "${FILESDIR}"/${PN}.service ${PN}.service
+	if use apparmor; then
+		systemd_newunit "${FILESDIR}"/lxd-4.0.0_apparmor.service lxd.service
+	else
+		systemd_newunit "${FILESDIR}"/lxd-4.0.0.service lxd.service
+	fi
+
+	systemd_newunit "${FILESDIR}"/lxd-containers-4.0.0.service lxd-containers.service
+	systemd_newunit "${FILESDIR}"/lxd-4.0.0.socket lxd.socket
 
 	dodoc AUTHORS doc/*
 	use nls && domo po/*.mo
@@ -197,7 +200,6 @@ pkg_postinst() {
 	elog "including a Quick Start."
 	elog
 	elog "Optional features:"
-	optfeature "apparmor support" app-emulation/lxc[apparmor]
 	optfeature "btrfs storage backend" sys-fs/btrfs-progs
 	optfeature "lvm2 storage backend" sys-fs/lvm2
 	optfeature "zfs storage backend" sys-fs/zfs

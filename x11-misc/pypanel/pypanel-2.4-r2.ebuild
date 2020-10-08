@@ -1,1 +1,0 @@
-.pypanel.ebuild.0

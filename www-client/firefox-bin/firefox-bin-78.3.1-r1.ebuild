@@ -1,0 +1,1 @@
+.firefox-bin.ebuild.1

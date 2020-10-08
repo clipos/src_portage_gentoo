@@ -1,21 +1,21 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 DESCRIPTION="A live audio streamer"
 HOMEPAGE="http://www.darkice.org/"
-SRC_URI="mirror://sourceforge/${PN}/${P}.tar.gz"
+SRC_URI="https://github.com/rafael2k/${PN}/releases/download/v${PV}/${P}.tar.gz"
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="amd64 ~hppa ppc ~sparc ~x86"
+KEYWORDS="amd64 ~hppa ppc sparc x86"
 IUSE="aac aacplus alsa debug jack libsamplerate mp3 opus pulseaudio twolame vorbis"
 
 RDEPEND="aac? ( media-libs/faac )
-	aacplus? ( >=media-libs/libaacplus-2.0.0 )
+	aacplus? ( media-libs/libaacplus )
 	alsa? ( media-libs/alsa-lib )
-	jack? ( media-sound/jack-audio-connection-kit )
+	jack? ( virtual/jack )
 	libsamplerate? ( media-libs/libsamplerate )
 	mp3? ( media-sound/lame )
 	opus? ( media-libs/opus )
@@ -26,6 +26,12 @@ DEPEND="${RDEPEND}"
 
 REQUIRED_USE="|| ( aac aacplus mp3 opus twolame vorbis )
 		|| ( alsa jack pulseaudio )"
+
+DOCS=( AUTHORS ChangeLog FAQ NEWS README TODO )
+
+PATCHES=(
+	"${FILESDIR}/${PN}-1.3-include.patch"
+)
 
 src_configure() {
 	local myeconfargs=(
@@ -46,5 +52,6 @@ src_configure() {
 
 src_install() {
 	default
-	dodoc AUTHORS ChangeLog FAQ NEWS README TODO
+
+	einstalldocs
 }

@@ -6,9 +6,13 @@ EAPI=7
 inherit cmake desktop flag-o-matic xdg virtualx
 
 DESCRIPTION="3D photo-realistic skies in real time"
-HOMEPAGE="https://www.stellarium.org/"
+HOMEPAGE="https://stellarium.org/"
+MY_DSO_VERSION="3.10"
 SRC_URI="
 	https://github.com/Stellarium/stellarium/releases/download/v${PV}/${P}.tar.gz
+	deep-sky? (
+		https://github.com/Stellarium/stellarium-data/releases/download/dso-${MY_DSO_VERSION}/catalog.dat -> ${PN}-dso-catalog-${MY_DSO_VERSION}.dat
+	)
 	stars? (
 		https://github.com/Stellarium/stellarium-data/releases/download/stars-2.0/stars_4_1v0_2.cat
 		https://github.com/Stellarium/stellarium-data/releases/download/stars-2.0/stars_5_2v0_1.cat
@@ -19,8 +23,8 @@ SRC_URI="
 
 LICENSE="GPL-2+"
 SLOT="0"
-KEYWORDS="amd64 ppc ppc64 ~x86 ~amd64-linux ~x86-linux"
-IUSE="debug gps media nls stars test"
+KEYWORDS="amd64 ppc ppc64 x86 ~amd64-linux ~x86-linux"
+IUSE="debug deep-sky gps media nls stars test"
 
 BDEPEND="
 	nls? ( dev-qt/linguist-tools:5 )
@@ -50,6 +54,11 @@ RESTRICT="!test? ( test )"
 src_prepare() {
 	cmake_src_prepare
 	use debug || append-cppflags -DQT_NO_DEBUG #415769
+
+	if use x86; then
+		# https://github.com/Stellarium/stellarium/issues/1153
+		eapply "${FILESDIR}/stellarium-0.20.2-disable-x86-test.patch"
+	fi
 }
 
 src_configure() {
@@ -78,6 +87,10 @@ src_install() {
 		insinto /usr/share/${PN}/stars/default
 		doins "${DISTDIR}"/stars_4_1v0_2.cat
 		doins "${DISTDIR}"/stars_{5,6,7,8}_2v0_1.cat
+	fi
+	if use deep-sky ; then
+		insinto /usr/share/${PN}/nebulae/default
+		newins "${DISTDIR}/${PN}-dso-catalog-${MY_DSO_VERSION}.dat" catalog.dat
 	fi
 	newicon doc/images/stellarium-logo.png ${PN}.png
 }

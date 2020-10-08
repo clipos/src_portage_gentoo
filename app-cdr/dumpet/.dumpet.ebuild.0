@@ -24,11 +24,14 @@ DEPEND="${RDEPEND}
 	virtual/pkgconfig
 	test? ( dev-util/valgrind )"
 
+PATCHES=( "${FILESDIR}"/musl-byteswap-fix.patch )
+
 src_prepare() {
 	sed -i Makefile \
 		-e "s/^install : all$/install :/" \
 		-e "s/^CFLAGS:=/CFLAGS?=/" \
 		-e "s/^CC:=/CC?=/" \
+		-e '/^LFLAGS/ s/$/$(LDFLAGS)/' \
 		|| die
 	default
 }

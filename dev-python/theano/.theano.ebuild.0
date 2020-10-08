@@ -3,46 +3,40 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{6,7} )
+PYTHON_COMPAT=( python3_{6..9} )
+DISTUTILS_USE_SETUPTOOLS=rdepend
 
-inherit distutils-r1 eutils
+inherit distutils-r1 optfeature
+
+MY_P=${P^}
 
 DESCRIPTION="Define and optimize multi-dimensional arrays mathematical expressions"
 HOMEPAGE="https://github.com/Theano/Theano"
-SRC_URI="mirror://pypi/T/${PN^}/${PN^}-${PV}.tar.gz"
+SRC_URI="mirror://pypi/${MY_P::1}/${MY_P%-*}/${MY_P}.tar.gz"
+S="${WORKDIR}/${MY_P}"
 
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS="amd64 x86 ~amd64-linux ~x86-linux"
-IUSE="test"
-RESTRICT="!test? ( test )"
 
+BDEPEND="test? ( dev-python/parameterized[${PYTHON_USEDEP}] )"
 RDEPEND="
 	dev-python/numpy[${PYTHON_USEDEP}]
 	dev-python/six[${PYTHON_USEDEP}]
-	sci-libs/scipy[${PYTHON_USEDEP}]
+	dev-python/scipy[${PYTHON_USEDEP}]
 "
-DEPEND="${RDEPEND}
-	dev-python/setuptools[${PYTHON_USEDEP}]
-	test? (
-		dev-python/flake8[${PYTHON_USEDEP}]
-		dev-python/nose[${PYTHON_USEDEP}]
-		dev-python/parameterized[${PYTHON_USEDEP}]
-		dev-python/pyflakes[${PYTHON_USEDEP}]
-	)"
 
-S="${WORKDIR}/${PN^}-${PV}"
+distutils_enable_tests nose
 
-python_prepare_all() {
-	# remove bundled six
-	find -type f -name "*.py" -exec \
-		sed -e 's:theano.compat.six:six:g' -i '{}' + || die
-	distutils-r1_python_prepare_all
+src_prepare() {
+	sed -i -e "s/, 'flake8'//" setup.py || die
+
+	distutils-r1_src_prepare
 }
 
 python_test() {
 	distutils_install_for_testing
-	nosetests --verbosity=3 || die
+	nosetests --verbosity=3 -e test_format_flake8 || die
 }
 
 pkg_postinst() {
